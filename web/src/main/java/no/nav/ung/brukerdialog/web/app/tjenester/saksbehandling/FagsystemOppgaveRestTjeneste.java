@@ -7,7 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -19,12 +18,10 @@ import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.ung.brukerdialog.kontrakt.AktørIdDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.EndreFristDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.EndreOppgaveStatusDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveRequest;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OpprettOppgaveDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveForSaksbehandlingTjeneste;
-import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
-
-import java.util.UUID;
 
 @Path(FagsystemOppgaveRestTjeneste.BASE_PATH)
 @ApplicationScoped
@@ -61,37 +58,33 @@ public class FagsystemOppgaveRestTjeneste {
     }
 
     @POST
-    @Path("/sett-avbrutt/{eksternRef}")
+    @Path("/sett-avbrutt")
     @Operation(summary = "Avbryter en oppgave basert på ekstern referanse", tags = "saksbehandling-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response avbrytOppgave(
         @Valid
         @NotNull
-        @PathParam("eksternRef")
-        @Parameter(description = "Ekstern referanse til oppgaven")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
-        UUID eksternRef) {
-        oppgaveForSaksbehandlingTjeneste.avbrytOppgave(eksternRef);
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("/sett-utlopt/{eksternRef}")
-    @Operation(summary = "Markerer en oppgave som utløpt", tags = "saksbehandling-oppgave")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
-    public Response oppgaveUtløpt(
-        @Valid
-        @NotNull
-        @PathParam("eksternRef")
-        @Parameter(description = "Ekstern referanse til oppgaven")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
-        UUID eksternRef) {
-        oppgaveForSaksbehandlingTjeneste.oppgaveUtløpt(eksternRef);
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
+        OppgaveRequest oppgaveRequest) {
+        oppgaveForSaksbehandlingTjeneste.avbrytOppgave(oppgaveRequest.oppgaveReferanse());
         return Response.ok().build();
     }
 
     @POST
     @Path("/sett-utlopt")
+    @Operation(summary = "Markerer en oppgave som utløpt", tags = "saksbehandling-oppgave")
+    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
+    public Response oppgaveUtløpt(
+        @Valid
+        @NotNull
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
+        OppgaveRequest oppgaveRequest) {
+        oppgaveForSaksbehandlingTjeneste.oppgaveUtløpt(oppgaveRequest.oppgaveReferanse());
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/sett-utlopt-for-type-og-periode")
     @Operation(summary = "Setter oppgaver av en gitt type og periode til utløpt", tags = "saksbehandling-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response settOppgaveTilUtløpt(
@@ -104,7 +97,7 @@ public class FagsystemOppgaveRestTjeneste {
     }
 
     @POST
-    @Path("/sett-avbrutt")
+    @Path("/sett-avbrutt-for-type-og-periode")
     @Operation(summary = "Setter oppgaver av en gitt type og periode til avbrutt", tags = "saksbehandling-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response settOppgaveTilAvbrutt(
@@ -121,8 +114,8 @@ public class FagsystemOppgaveRestTjeneste {
     @Operation(summary = "Løser en søk-ytelse-oppgave for en deltaker", tags = "saksbehandling-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response løsSøkYtelseOppgave(
-        @NotEmpty
         @Valid
+        @NotNull
         @Parameter(description = "AktørId for deltakeren")
         @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
         AktørIdDto aktørId) {

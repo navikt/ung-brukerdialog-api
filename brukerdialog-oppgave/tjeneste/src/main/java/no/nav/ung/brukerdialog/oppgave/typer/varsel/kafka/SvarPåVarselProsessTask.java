@@ -56,13 +56,13 @@ public class SvarPåVarselProsessTask implements ProsessTaskHandler {
         var oppgavereferanse = UUID.fromString(svar.oppgaveBekreftelse().getSøknadId().getId());
         var bekreftelse = svar.oppgaveBekreftelse().getBekreftelse();
 
-        log.info("Behandler svar på varsel for journalpostId='{}', oppgavereferanse='{}'",
+        log.info("Behandler svar på varsel for journalpostId='{}', oppgaveReferanse='{}'",
             journalpostId, oppgavereferanse);
 
-        // Finn oppgaven basert på oppgavereferanse
+        // Finn oppgaven basert på oppgaveReferanse
         var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)
             .orElseThrow(() -> new IllegalStateException(
-                "Fant ingen oppgave for oppgavereferanse=" + oppgavereferanse));
+                "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
 
         // Oppdater oppgaven med bekreftelse
         oppgave.setBekreftelse(new SvarPåVarselDTO(bekreftelse.harUttalelse(), bekreftelse.getUttalelseFraBruker()));

@@ -57,14 +57,14 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
     @Override
     public void avbrytOppgave(UUID eksternRef) {
         var oppgave = repository.hentOppgaveForOppgavereferanse(eksternRef)
-            .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgavereferanse: " + eksternRef));
+            .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgaveReferanse: " + eksternRef));
         oppgaveLivssyklusTjeneste.avbrytOppgave(oppgave);
     }
 
     @Override
     public void oppgaveUtløpt(UUID eksternRef) {
         var oppgave = repository.hentOppgaveForOppgavereferanse(eksternRef)
-            .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgavereferanse: " + eksternRef));
+            .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgaveReferanse: " + eksternRef));
         oppgaveLivssyklusTjeneste.utløpOppgave(oppgave);
     }
 

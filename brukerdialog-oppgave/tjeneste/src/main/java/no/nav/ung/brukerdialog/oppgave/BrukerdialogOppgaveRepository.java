@@ -68,7 +68,7 @@ public class BrukerdialogOppgaveRepository {
 
     public BrukerdialogOppgaveEntitet endreFrist(UUID oppgaveReferanse, AktørId aktørId, LocalDateTime nyFrist) {
         var brukerdialogOppgaveEntitet = hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).orElseThrow(() ->
-            new IllegalArgumentException("Fant ingen oppgave for oppgavereferanse " + oppgaveReferanse)
+            new IllegalArgumentException("Fant ingen oppgave for oppgaveReferanse " + oppgaveReferanse)
         );
         brukerdialogOppgaveEntitet.setFristTid(nyFrist);
         return oppdater(brukerdialogOppgaveEntitet);
