@@ -54,7 +54,7 @@ public interface OppgaveForSaksbehandlingTjeneste {
      * Endrer frist for en oppgave.
      *
      * @param aktørId          aktørId for den oppgaven gjelder
-     * @param eksternReferanse oppgavereferanse
+     * @param eksternReferanse oppgaveReferanse
      * @param frist            ny frist for oppgaven
      */
     void endreFrist(AktørId aktørId, UUID eksternReferanse, LocalDateTime frist);

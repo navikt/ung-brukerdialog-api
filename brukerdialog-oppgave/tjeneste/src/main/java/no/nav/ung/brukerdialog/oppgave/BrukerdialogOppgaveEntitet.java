@@ -24,7 +24,7 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", nullable = false, updatable = false)))
     private AktørId aktørId;
 
-    @Column(name = "oppgavereferanse", nullable = false, updatable = false, unique = true)
+    @Column(name = "oppgaveReferanse", nullable = false, updatable = false, unique = true)
     private UUID oppgavereferanse;
 
     @Column(name = "status", nullable = false)

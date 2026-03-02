@@ -60,7 +60,7 @@ public class BrukerdialogOppgaveRestTjeneste {
 
     @GET
     @Path("/{oppgavereferanse}")
-    @Operation(summary = "Henter en spesifikk oppgave basert på oppgavereferanse", tags = "brukerdialog-oppgave")
+    @Operation(summary = "Henter en spesifikk oppgave basert på oppgaveReferanse", tags = "brukerdialog-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.READ, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE)
     public BrukerdialogOppgaveDto hentOppgave(
         @Valid

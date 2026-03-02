@@ -21,7 +21,7 @@ public interface BrukerdialogOppgaveTjeneste {
     List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId);
 
     /**
-     * Henter en spesifikk oppgave basert på oppgavereferanse og aktørId.
+     * Henter en spesifikk oppgave basert på oppgaveReferanse og aktørId.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
@@ -31,7 +31,7 @@ public interface BrukerdialogOppgaveTjeneste {
     BrukerdialogOppgaveDto hentOppgaveForOppgavereferanse(UUID oppgavereferanse, AktørId aktørId);
 
     /**
-     * Lukker en oppgave basert på oppgavereferanse.
+     * Lukker en oppgave basert på oppgaveReferanse.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
@@ -41,7 +41,7 @@ public interface BrukerdialogOppgaveTjeneste {
     BrukerdialogOppgaveDto lukkOppgave(UUID oppgavereferanse, AktørId aktørId);
 
     /**
-     * Åpner en oppgave basert på oppgavereferanse.
+     * Åpner en oppgave basert på oppgaveReferanse.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
@@ -51,7 +51,7 @@ public interface BrukerdialogOppgaveTjeneste {
     BrukerdialogOppgaveDto åpneOppgave(UUID oppgavereferanse, AktørId aktørId);
 
     /**
-     * Løser en oppgave basert på oppgavereferanse.
+     * Løser en oppgave basert på oppgaveReferanse.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
