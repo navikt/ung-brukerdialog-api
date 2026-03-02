@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.DeaktiverMinSideVarselTask;
@@ -18,6 +19,7 @@ public class OppgaveLivssyklusTjeneste {
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
     private Instance<OppgavelInnholdUtleder> varselInnholdUtledere;
     private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper;
+    private boolean skalPublisereVarsel;
 
     public OppgaveLivssyklusTjeneste() {
     }
@@ -26,11 +28,13 @@ public class OppgaveLivssyklusTjeneste {
     public OppgaveLivssyklusTjeneste(ProsessTaskTjeneste prosessTaskTjeneste,
                                      BrukerdialogOppgaveRepository brukerdialogOppgaveRepository,
                                      @Any Instance<OppgavelInnholdUtleder> varselInnholdUtledere,
-                                     @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
+                                     @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper,
+                                     @KonfigVerdi(value = "SKAL_PUBLISERE_VARSEL", defaultVerdi = "false") boolean skalPublisereVarsel) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.brukerdialogOppgaveRepository = brukerdialogOppgaveRepository;
         this.varselInnholdUtledere = varselInnholdUtledere;
         this.oppgaveDataMapper = oppgaveDataMapper;
+        this.skalPublisereVarsel = skalPublisereVarsel;
     }
 
     /**
@@ -77,7 +81,7 @@ public class OppgaveLivssyklusTjeneste {
     /**
      * Persisterer oppgave og publiserer varsel til Min Side.
      *
-     * @param oppgaveEntitet     Oppgave som skal opprettes og publiseres.
+     * @param oppgaveEntitet  Oppgave som skal opprettes og publiseres.
      * @param oppgavetypeData
      */
     public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData) {
@@ -88,7 +92,9 @@ public class OppgaveLivssyklusTjeneste {
         var oppgaveData = OppgaveDataMapperFraDtoTilEntitet.finnTjeneste(oppgaveDataMapper, oppgaveEntitet.getOppgaveType()).map(oppgavetypeData);
         oppgaveEntitet.setOppgaveData(oppgaveData);
         brukerdialogOppgaveRepository.lagre(oppgaveEntitet);
-        opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
+        if (skalPublisereVarsel) {
+            opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
+        }
     }
 
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
