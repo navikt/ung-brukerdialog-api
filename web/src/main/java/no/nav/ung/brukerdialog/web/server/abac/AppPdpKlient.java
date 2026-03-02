@@ -8,6 +8,8 @@ import no.nav.k9.felles.sikkerhet.abac.*;
 import no.nav.sif.abac.kontrakt.abac.dto.PersonerOperasjonDto;
 import no.nav.sif.abac.kontrakt.abac.dto.SaksinformasjonOgPersonerTilgangskontrollInputDto;
 
+import java.util.Collections;
+
 @Dependent
 @Alternative
 @Priority(1)
@@ -27,7 +29,9 @@ public class AppPdpKlient implements PdpKlient {
         return new Tilgangsbeslutning(
             resultat.harTilgang(),
             pdpRequest,
-            TilgangType.INTERNBRUKER // TODO: Bruker riktig tilgangstype?
+            pdpRequest.getResourceType().equals(BeskyttetRessursResourceType.TOKENX_RESOURCE) ?
+                TilgangType.EKSTERNBRUKER : TilgangType.INTERNBRUKER,
+            new BerørtePersonerForAuditlogg(pdpRequest.getFødselsnumre(), pdpRequest.getAktørIder())
         );
     }
 }
