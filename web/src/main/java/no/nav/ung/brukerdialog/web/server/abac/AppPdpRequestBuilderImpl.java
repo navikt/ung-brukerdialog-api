@@ -5,16 +5,14 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Alternative;
 import no.nav.k9.felles.konfigurasjon.env.Cluster;
 import no.nav.k9.felles.konfigurasjon.env.Environment;
-import no.nav.k9.felles.sikkerhet.abac.AbacAttributtSamling;
-import no.nav.k9.felles.sikkerhet.abac.PdpRequest;
-import no.nav.k9.felles.sikkerhet.abac.PdpRequestBuilder;
-import no.nav.k9.felles.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.k9.felles.sikkerhet.abac.*;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Dependent
 @Alternative
@@ -35,7 +33,7 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        PdpRequest pdpRequest = new PdpRequest();
+        PdpRequestMedBerørtePersonerForAuditlogg pdpRequest = new PdpRequestMedBerørtePersonerForAuditlogg();
 
         pdpRequest.setActionType(attributter.getActionType());
         pdpRequest.setResourceType(attributter.getResourceType());
@@ -45,6 +43,9 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         Set<String> fødselsnumre = attributter.getVerdier(StandardAbacAttributtType.FNR);
         pdpRequest.setAktørIderStr(aktørIder);
         pdpRequest.setFødselsnumreStr(fødselsnumre);
+        pdpRequest.setBerørtePersonerForAuditlogg(new BerørtePersonerForAuditlogg(
+            fødselsnumre.stream().map(Fnr::new).collect(Collectors.toSet()),
+            aktørIder.stream().map(AktørId::new).collect(Collectors.toSet())));
         return pdpRequest;
     }
 
