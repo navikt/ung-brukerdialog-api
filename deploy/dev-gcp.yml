@@ -135,10 +135,13 @@ spec:
       value: api://dev-gcp.k9saksbehandling.sif-abac-pdp/.default
     - name: SIF_ABAC_PDP_URL
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/ung
+    - name: UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL
+      value: https://ungdomsytelse-deltaker.intern.dev.nav.no/ungdomsprogrammet/ytelsen
+
+
+     # Sikkerhet:
     - name: NAV_ANSATT_URL
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/ung/nav-ansatt
-
-    # Sikkerhet:
     - name: CLIENT_SCOPE
       value: "api://dev-gcp.k9saksbehandling.ung-brukerdialog/.default"
     - name: ABAC_ATTRIBUTT_DRIFT
