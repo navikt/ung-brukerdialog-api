@@ -7,7 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -121,8 +120,8 @@ public class FagsystemOppgaveRestTjeneste {
     @Operation(summary = "Løser en søk-ytelse-oppgave for en deltaker", tags = "saksbehandling-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response løsSøkYtelseOppgave(
-        @NotEmpty
         @Valid
+        @NotNull
         @Parameter(description = "AktørId for deltakeren")
         @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
         AktørIdDto aktørId) {
