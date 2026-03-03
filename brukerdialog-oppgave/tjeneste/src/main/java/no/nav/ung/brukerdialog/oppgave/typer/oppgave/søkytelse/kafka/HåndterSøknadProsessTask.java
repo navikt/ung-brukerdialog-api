@@ -25,7 +25,7 @@ public class HåndterSøknadProsessTask implements ProsessTaskHandler {
 
     private static final Logger log = LoggerFactory.getLogger(HåndterSøknadProsessTask.class);
     private static final ObjectMapper MAPPER = JsonObjectMapper.getMapper();
-    public static final String TASK_NAVN = "handle.rapportert.inntekt";
+    public static final String TASK_NAVN = "handle.ung.soknad";
 
     private BrukerdialogOppgaveRepository oppgaveRepository;
     private OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste;
