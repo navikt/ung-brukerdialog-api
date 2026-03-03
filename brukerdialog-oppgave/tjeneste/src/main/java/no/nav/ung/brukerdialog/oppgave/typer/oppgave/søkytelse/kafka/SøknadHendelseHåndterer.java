@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka;
+package no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
@@ -8,27 +8,23 @@ import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.oppgave.kafka.KafkaMessageHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @ApplicationScoped
 @ActivateRequestContext
 @Transactional
-public class SvarPåVarselHendelseHåndterer implements KafkaMessageHandler.KafkaStringMessageHandler {
+public class SøknadHendelseHåndterer implements KafkaMessageHandler.KafkaStringMessageHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(SvarPåVarselHendelseHåndterer.class);
-
-    private static final String GROUP_ID = "ung-varsel-bekreftelse"; // Hold konstant pga offset commit
+    private static final String GROUP_ID = "ung-inntekt-rapportering"; // Hold konstant pga offset commit
     private String topicName;
     private ProsessTaskTjeneste taskTjeneste;
 
-    SvarPåVarselHendelseHåndterer() {
+    SøknadHendelseHåndterer() {
     }
 
     @Inject
-    public SvarPåVarselHendelseHåndterer(
-        @KonfigVerdi(value = "KAFKA_OPPGAVEBEKREFTELSE_TOPIC", defaultVerdi = "dusseldorf.ungdomsytelse-oppgavebekreftelse-mottatt") String topicName,
+    public SøknadHendelseHåndterer(
+        @KonfigVerdi(value = "KAFKA_UNG_SOKNAD_TOPIC", defaultVerdi = "dusseldorf.ungdomsytelse-soknad-mottatt") String topicName,
         ProsessTaskTjeneste taskTjeneste) {
         this.topicName = topicName;
         this.taskTjeneste = taskTjeneste;
@@ -39,12 +35,12 @@ public class SvarPåVarselHendelseHåndterer implements KafkaMessageHandler.Kafk
     public void handleRecord(String key, String value) {
         try {
             // Opprett prosesstask for å håndtere svaret
-            var prosessTaskData = ProsessTaskData.forProsessTask(SvarPåVarselProsessTask.class);
+            var prosessTaskData = ProsessTaskData.forProsessTask(HåndterSøknadProsessTask.class);
             prosessTaskData.setPayload(value);
             prosessTaskData.setCallIdFraEksisterende();
             taskTjeneste.lagre(prosessTaskData);
         } catch (Exception e) {
-            throw new IllegalStateException("Feil ved håndtering av svar på varsel", e);
+            throw new IllegalStateException("Feil ved håndtering av rapportert inntekt", e);
         }
     }
 
