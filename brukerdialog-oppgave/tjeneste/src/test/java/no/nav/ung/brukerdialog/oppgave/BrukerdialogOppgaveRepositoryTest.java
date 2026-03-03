@@ -230,7 +230,7 @@ class BrukerdialogOppgaveRepositoryTest {
         assertThat(hentetData.getTotalInntektYtelse()).isZero();
         assertThat(hentetData.getTotalInntekt()).isEqualTo(30000);
         assertThat(hentetData.getArbeidOgFrilansInntekter()).hasSize(1);
-        assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getArbeidsgiver()).isEqualTo("123456789");
+        assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getArbeidsgiverIdentifikator()).isEqualTo("123456789");
         assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getInntekt()).isEqualTo(30000);
         assertThat(hentetData.getYtelseInntekter()).hasSize(1);
         assertThat(hentetData.getYtelseInntekter().get(0).getYtelsetype()).isEqualTo(YtelseType.DAGPENGER);
