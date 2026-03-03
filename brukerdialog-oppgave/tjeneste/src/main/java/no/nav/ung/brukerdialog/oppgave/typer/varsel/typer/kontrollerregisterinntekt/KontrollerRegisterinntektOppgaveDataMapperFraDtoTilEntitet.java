@@ -28,10 +28,14 @@ public class KontrollerRegisterinntektOppgaveDataMapperFraDtoTilEntitet implemen
             registerinntekt.totalInntektYtelse(),
             registerinntekt.totalInntekt()
         );
-        registerinntekt.arbeidOgFrilansInntekter()
-            .forEach(i -> entitet.leggTilArbeidOgFrilansInntekt(i.arbeidsgiverIdentifikator(), i.arbeidsgiverNavn(), i.inntekt()));
-        registerinntekt.ytelseInntekter()
-            .forEach(i -> entitet.leggTilYtelseInntekt(i.ytelsetype(), i.inntekt()));
+        if (registerinntekt.arbeidOgFrilansInntekter() != null) {
+            registerinntekt.arbeidOgFrilansInntekter()
+                .forEach(i -> entitet.leggTilArbeidOgFrilansInntekt(i.arbeidsgiverIdentifikator(), i.arbeidsgiverNavn(), i.inntekt()));
+        }
+        if (registerinntekt.ytelseInntekter() != null) {
+            registerinntekt.ytelseInntekter()
+                .forEach(i -> entitet.leggTilYtelseInntekt(i.ytelsetype(), i.inntekt()));
+        }
         return entitet;
     }
 }
