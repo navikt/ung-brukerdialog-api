@@ -61,7 +61,7 @@ spec:
     application:
       enabled: true
       replyURLs:
-        - "https://ung-brukerdialog.intern.nav.no/ung/brukerdialog/cb"
+        - "https://ung.intern.nav.no/ung/brukerdialog/cb"
       claims:
         groups:
           # 0000-CA-ung-saksbehandler
@@ -126,7 +126,7 @@ spec:
 
     # Loadbalancerconfig
     - name: LOADBALANCER_URL
-      value: https://ung-brukerdialog.intern.nav.no
+      value: https://ung.intern.nav.no
 
     # PDL
     - name: PDL_TEMA
