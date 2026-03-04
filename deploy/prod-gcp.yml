@@ -81,6 +81,7 @@ spec:
       rules:
         - application: ung-deltakelse-opplyser
         - application: ung-sak
+        - application: ung-brukerdialog
   gcp:
     sqlInstances:
       - type: POSTGRES_16

@@ -87,6 +87,7 @@ spec:
     inbound:
       rules:
         - application: ung-sak
+        - application: ung-brukerdialog
         - application: ung-deltakelse-opplyser
   gcp:
     sqlInstances:
