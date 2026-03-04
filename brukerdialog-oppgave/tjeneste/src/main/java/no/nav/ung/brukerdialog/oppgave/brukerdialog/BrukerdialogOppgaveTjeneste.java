@@ -31,26 +31,6 @@ public interface BrukerdialogOppgaveTjeneste {
     BrukerdialogOppgaveDto hentOppgaveForOppgavereferanse(UUID oppgavereferanse, AktørId aktørId);
 
     /**
-     * Lukker en oppgave basert på oppgaveReferanse.
-     *
-     * @param oppgavereferanse unik referanse til oppgaven
-     * @param aktørId aktørId for bruker
-     * @return den lukkede oppgaven som DTO
-     * @throws IllegalArgumentException hvis oppgaven ikke finnes
-     */
-    BrukerdialogOppgaveDto lukkOppgave(UUID oppgavereferanse, AktørId aktørId);
-
-    /**
-     * Åpner en oppgave basert på oppgaveReferanse.
-     *
-     * @param oppgavereferanse unik referanse til oppgaven
-     * @param aktørId aktørId for bruker
-     * @return den åpnede oppgaven som DTO
-     * @throws IllegalArgumentException hvis oppgaven ikke finnes
-     */
-    BrukerdialogOppgaveDto åpneOppgave(UUID oppgavereferanse, AktørId aktørId);
-
-    /**
      * Løser en oppgave basert på oppgaveReferanse.
      *
      * @param oppgavereferanse unik referanse til oppgaven

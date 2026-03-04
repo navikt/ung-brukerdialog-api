@@ -74,18 +74,6 @@ public class BrukerdialogOppgaveRepository {
         return oppdater(brukerdialogOppgaveEntitet);
     }
 
-    public BrukerdialogOppgaveEntitet lukkOppgave(BrukerdialogOppgaveEntitet oppgave) {
-        oppgave.setStatus(OppgaveStatus.LUKKET);
-        oppgave.setLukketDato(LocalDateTime.now());
-        return oppdater(oppgave);
-    }
-
-    public BrukerdialogOppgaveEntitet åpneOppgave(BrukerdialogOppgaveEntitet oppgave) {
-        oppgave.setÅpnetDato(LocalDateTime.now());
-        return oppdater(oppgave);
-    }
-
-
     public void lagre(BrukerdialogOppgaveEntitet oppgave) {
         entityManager.persist(oppgave);
         entityManager.persist(oppgave.getOppgaveData());

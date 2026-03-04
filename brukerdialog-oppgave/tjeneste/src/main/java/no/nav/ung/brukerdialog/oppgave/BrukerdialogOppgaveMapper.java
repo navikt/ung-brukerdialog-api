@@ -36,8 +36,6 @@ public class BrukerdialogOppgaveMapper {
             oppgave.getStatus(),
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
-            toZonedDateTime(oppgave.getÅpnetDato()),
-            toZonedDateTime(oppgave.getLukketDato()),
             toZonedDateTime(oppgave.getFristTid())
         );
     }

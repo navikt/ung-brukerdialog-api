@@ -43,14 +43,6 @@ public record BrukerdialogOppgaveDto(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime løstDato,
 
-    @JsonProperty(value = "åpnetDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime åpnetDato,
-
-    @JsonProperty(value = "lukketDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime lukketDato,
-
     @JsonProperty(value = "frist")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime frist

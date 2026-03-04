@@ -97,14 +97,6 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     ? oppgaveDto.løstDato().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
                     : null;
 
-                LocalDateTime åpnetDato = oppgaveDto.åpnetDato() != null
-                    ? oppgaveDto.åpnetDato().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
-                    : null;
-
-                LocalDateTime lukketDato = oppgaveDto.lukketDato() != null
-                    ? oppgaveDto.lukketDato().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
-                    : null;
-
                 var nyOppgave = new BrukerdialogOppgaveEntitet(
                     oppgaveDto.oppgaveReferanse(),
                     oppgaveDto.oppgavetype(),
@@ -112,9 +104,7 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.bekreftelse(),
                     oppgaveDto.status(),
                     frist,
-                    løstDato,
-                    åpnetDato,
-                    lukketDato
+                    løstDato
                 );
                 oppgaveLivssyklusTjeneste.opprettOppgave(nyOppgave, oppgaveDto.oppgavetypeData());
                 antallOpprettet++;

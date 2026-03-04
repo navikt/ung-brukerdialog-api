@@ -94,49 +94,6 @@ class BrukerdialogOppgaveRepositoryTest {
     }
 
     @Test
-    void skal_oppdatere_oppgave_til_lukket() {
-        // Arrange
-        BrukerdialogOppgaveEntitet oppgave = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
-        UUID oppgaveReferanse = oppgave.getOppgavereferanse();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Act
-        BrukerdialogOppgaveEntitet hentetOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        repository.lukkOppgave(hentetOppgave);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Assert
-        BrukerdialogOppgaveEntitet verifisertOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        assertThat(verifisertOppgave.getStatus()).isEqualTo(OppgaveStatus.LUKKET);
-        assertThat(verifisertOppgave.getLukketDato()).isNotNull();
-    }
-
-    @Test
-    void skal_oppdatere_oppgave_til_åpnet() {
-        // Arrange
-        BrukerdialogOppgaveEntitet oppgave = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
-        UUID oppgaveReferanse = oppgave.getOppgavereferanse();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Act
-        BrukerdialogOppgaveEntitet hentetOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        repository.åpneOppgave(hentetOppgave);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Assert
-        BrukerdialogOppgaveEntitet verifisertOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        assertThat(verifisertOppgave.getÅpnetDato()).isNotNull();
-    }
-
-    @Test
     void skal_hente_oppgaver_basert_på_type_og_status() {
         // Arrange
         BrukerdialogOppgaveEntitet oppgave1 = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
@@ -144,7 +101,8 @@ class BrukerdialogOppgaveRepositoryTest {
         BrukerdialogOppgaveEntitet oppgave3 = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
 
         // Løs én av SØK_YTELSE oppgavene
-        repository.lukkOppgave(oppgave3);
+        oppgave3.setStatus(OppgaveStatus.LØST);
+        repository.oppdater(oppgave3);
 
         entityManager.flush();
         entityManager.clear();

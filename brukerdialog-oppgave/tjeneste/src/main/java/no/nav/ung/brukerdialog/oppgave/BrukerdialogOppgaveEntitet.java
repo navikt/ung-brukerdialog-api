@@ -41,12 +41,6 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @Column(name = "løst_dato")
     private LocalDateTime løstDato; // NOSONAR
 
-    @Column(name = "åpnet_dato")
-    private LocalDateTime åpnetDato; // NOSONAR
-
-    @Column(name = "lukket_dato")
-    private LocalDateTime lukketDato; // NOSONAR
-
     @Convert(converter = OppgaveBekreftelseConverter.class)
     @ColumnTransformer(write = "?::jsonb")
     @Column(name = "bekreftelse", columnDefinition = "jsonb")
@@ -79,9 +73,7 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
                                       BekreftelseDTO bekreftelse,
                                       OppgaveStatus status,
                                       LocalDateTime fristTid,
-                                      LocalDateTime løstDato,
-                                      LocalDateTime åpnetDato,
-                                      LocalDateTime lukketDato) {
+                                      LocalDateTime løstDato) {
         this.oppgavereferanse = oppgavereferanse;
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
@@ -89,8 +81,6 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.status = status;
         this.fristTid = fristTid;
         this.løstDato = løstDato;
-        this.åpnetDato = åpnetDato;
-        this.lukketDato = lukketDato;
     }
 
     public AktørId getAktørId() {
@@ -128,22 +118,6 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
 
     public LocalDateTime getLøstDato() {
         return løstDato;
-    }
-
-    public void setÅpnetDato(LocalDateTime åpnetDato) {
-        this.åpnetDato = åpnetDato;
-    }
-
-    public LocalDateTime getÅpnetDato() {
-        return åpnetDato;
-    }
-
-    public void setLukketDato(LocalDateTime lukketDato) {
-        this.lukketDato = lukketDato;
-    }
-
-    public LocalDateTime getLukketDato() {
-        return lukketDato;
     }
 
     public BekreftelseDTO getBekreftelse() {

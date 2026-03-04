@@ -73,36 +73,6 @@ public class BrukerdialogOppgaveRestTjeneste {
     }
 
     @GET
-    @Path("/{oppgavereferanse}/lukk")
-    @Operation(summary = "Lukker en oppgave", tags = "brukerdialog-oppgave")
-    @Deprecated(forRemoval = true)
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE, auditlogg = false)
-    public BrukerdialogOppgaveDto lukkOppgave(
-        @Valid
-        @NotNull
-        @PathParam("oppgavereferanse")
-        @Parameter(description = "Unik referanse til oppgaven")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
-        UUID oppgavereferanse) {
-        return oppgaveTjeneste.lukkOppgave(oppgavereferanse,finnAktørId());
-    }
-
-    @GET
-    @Path("/{oppgavereferanse}/apnet")
-    @Operation(summary = "Åpner en oppgave", tags = "brukerdialog-oppgave")
-    @Deprecated(forRemoval = true)
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE, auditlogg = false)
-    public BrukerdialogOppgaveDto åpneOppgave(
-        @Valid
-        @NotNull
-        @PathParam("oppgavereferanse")
-        @Parameter(description = "Unik referanse til oppgaven")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
-        UUID oppgavereferanse) {
-        return oppgaveTjeneste.åpneOppgave(oppgavereferanse, finnAktørId());
-    }
-
-    @GET
     @Path("/{oppgavereferanse}/løst")
     @Operation(summary = "Markerer en oppgave som løst", tags = "brukerdialog-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE, auditlogg = false)
