@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka.model;
 
 public record SvarPåVarselTopicEntry(
     MetaInfo metadata,
-    JournalførtSvarPåVarsel data
+    SvarPåVarsel data
 ) {
 }
 

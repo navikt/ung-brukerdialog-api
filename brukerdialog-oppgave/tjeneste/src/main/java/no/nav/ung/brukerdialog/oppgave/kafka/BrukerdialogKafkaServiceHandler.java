@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import no.nav.k9.felles.apptjeneste.AppServiceHandler;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.kafka.RapportertInntektHendelseHåndterer;
+import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka.SøknadHendelseHåndterer;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka.SvarPåVarselHendelseHåndterer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,13 @@ public class BrukerdialogKafkaServiceHandler implements AppServiceHandler {
     public BrukerdialogKafkaServiceHandler(
         @KonfigVerdi(value = "OPPGAVER_I_UNGBRUKERDIALOG_ENABLED", defaultVerdi = "true") boolean oppgaverIUngsakEnabled,
         SvarPåVarselHendelseHåndterer svarPåVarselHendelseHåndterer,
-        RapportertInntektHendelseHåndterer rapportertInntektHendelseHåndterer) {
+        RapportertInntektHendelseHåndterer rapportertInntektHendelseHåndterer,
+        SøknadHendelseHåndterer søknadHendelseHåndterer) {
         this.kcm = oppgaverIUngsakEnabled ?
-            new KafkaConsumerManager<>(List.of(svarPåVarselHendelseHåndterer, rapportertInntektHendelseHåndterer)) :
+            new KafkaConsumerManager<>(List.of(
+                svarPåVarselHendelseHåndterer,
+                rapportertInntektHendelseHåndterer,
+                søknadHendelseHåndterer)) :
             new KafkaConsumerManager<>(List.of());
     }
 

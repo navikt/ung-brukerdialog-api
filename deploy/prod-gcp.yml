@@ -117,9 +117,12 @@ spec:
     - name: KAFKA_MINSIDE_VARSEL_TOPIC
       value: min-side.aapen-brukervarsel-v1
     - name: KAFKA_OPPGAVEBEKREFTELSE_TOPIC
-      value: dusseldorf.ungdomsytelse-oppgavebekreftelse-cleanup
+      value: dusseldorf.ungdomsytelse-oppgavebekreftelse-mottatt
     - name: KAFKA_RAPPORTERT_INNTEKT_TOPIC
-      value: dusseldorf.ungdomsytelse-inntektsrapportering-preprosessering
+      value: dusseldorf.ungdomsytelse-inntektsrapportering-mottatt
+    - name: KAFKA_UNG_SOKNAD_TOPIC
+      value: dusseldorf.ungdomsytelse-soknad-mottatt
+
 
     # Loadbalancerconfig
     - name: LOADBALANCER_URL

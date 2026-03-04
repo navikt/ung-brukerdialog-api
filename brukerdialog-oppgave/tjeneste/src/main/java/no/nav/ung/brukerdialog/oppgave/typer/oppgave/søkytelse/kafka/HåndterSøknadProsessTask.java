@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka;
+package no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,10 +8,9 @@ import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.SvarPåVarselDTO;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka.model.SvarPåVarselTopicEntry;
+import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka.model.SøknadTopicEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,22 +20,22 @@ import java.util.UUID;
  * ProsessTask for å håndtere oppgavebekreftelse mottatt fra Kafka.
  */
 @ApplicationScoped
-@ProsessTask(value = SvarPåVarselProsessTask.TASK_NAVN)
-public class SvarPåVarselProsessTask implements ProsessTaskHandler {
+@ProsessTask(value = HåndterSøknadProsessTask.TASK_NAVN)
+public class HåndterSøknadProsessTask implements ProsessTaskHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(SvarPåVarselProsessTask.class);
+    private static final Logger log = LoggerFactory.getLogger(HåndterSøknadProsessTask.class);
     private static final ObjectMapper MAPPER = JsonObjectMapper.getMapper();
-    public static final String TASK_NAVN = "handle.varsel.uttalelse";
+    public static final String TASK_NAVN = "handle.ung.soknad";
 
     private BrukerdialogOppgaveRepository oppgaveRepository;
     private OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste;
 
-    SvarPåVarselProsessTask() {
+    HåndterSøknadProsessTask() {
         // CDI
     }
 
     @Inject
-    public SvarPåVarselProsessTask(BrukerdialogOppgaveRepository oppgaveRepository, OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste) {
+    public HåndterSøknadProsessTask(BrukerdialogOppgaveRepository oppgaveRepository, OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste) {
         this.oppgaveRepository = oppgaveRepository;
         this.oppgaveLivssyklusTjeneste = oppgaveLivssyklusTjeneste;
     }
@@ -45,27 +44,24 @@ public class SvarPåVarselProsessTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         var payload = prosessTaskData.getPayloadAsString();
 
-        SvarPåVarselTopicEntry topicEntry = null;
+        SøknadTopicEntry topicEntry = null;
         try {
-            topicEntry = MAPPER.readValue(payload, SvarPåVarselTopicEntry.class);
+            topicEntry = MAPPER.readValue(payload, SøknadTopicEntry.class);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Ugyldig payload", e);
         }
-        var svar = topicEntry.data().oppgave();
-        var oppgavereferanse = UUID.fromString(svar.oppgaveReferanse());
+        var oppgavereferanse = topicEntry.data().oppgaveReferanse();
 
-        log.info("Behandler svar på varsel for oppgaveReferanse='{}'", oppgavereferanse);
+        log.info("Behandler søknad for oppgaveReferanse='{}'", oppgavereferanse);
 
         // Finn oppgaven basert på oppgaveReferanse
-        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)
+        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(UUID.fromString(oppgavereferanse))
             .orElseThrow(() -> new IllegalStateException(
                 "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
 
-        // Oppdater oppgaven med bekreftelse
-        oppgave.setBekreftelse(new SvarPåVarselDTO(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker()));
         oppgaveLivssyklusTjeneste.løsOppgave(oppgave);
 
-        log.info("Svar på varsel behandlet for oppgave med referanse='{}'",
+        log.info("Mottatt søknad behandlet for oppgave med referanse='{}'",
             oppgave.getOppgavereferanse());
 
     }

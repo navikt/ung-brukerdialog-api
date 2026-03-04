@@ -26,7 +26,7 @@ public class RapportertInntektHendelseHåndterer implements KafkaMessageHandler.
 
     @Inject
     public RapportertInntektHendelseHåndterer(
-        @KonfigVerdi(value = "KAFKA_RAPPORTERT_INNTEKT_TOPIC", defaultVerdi = "dusseldorf.ungdomsytelse-inntektsrapportering-preprosessering") String topicName,
+        @KonfigVerdi(value = "KAFKA_RAPPORTERT_INNTEKT_TOPIC", defaultVerdi = "dusseldorf.ungdomsytelse-inntektsrapportering-mottatt") String topicName,
         ProsessTaskTjeneste taskTjeneste) {
         this.topicName = topicName;
         this.taskTjeneste = taskTjeneste;
