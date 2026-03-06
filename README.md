@@ -5,7 +5,7 @@ Tilbyr funksjonalitet for innsyn og brukervarsling for ungdomsprogramytelsen og 
 # Utvikling
 
 ## Enhetstester
-Start postgres først for å kjøre alle enhetstester. Bruker schema ung_brukerdialog_unit i
+Start postgres først for å kjøre alle enhetstester. Bruker schema ung_brukerdialog_api_unit i
 [Verdikjede](https://github.com/navikt/k9-verdikjede/tree/master/saksbehandling)
 `git clone git@github.com:navikt/k9-verdikjede.git; cd k9-verdikjede/saksbehandling; ./update-versions.sh; docker-compose up postgres`
 
