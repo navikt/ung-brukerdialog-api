@@ -151,6 +151,8 @@ spec:
       value: "api://dev-gcp.k9saksbehandling.ung-brukerdialog/.default"
     - name: ABAC_ATTRIBUTT_DRIFT
       value: "no.nav.abac.attributter.k9.drift"
+    - name: AZURE_LOGIN_URL
+      value: "https://login.microsoftonline.com/navnoq.onmicrosoft.com/oauth2/v2.0"
 
 
     # Feature-flag

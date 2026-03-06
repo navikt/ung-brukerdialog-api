@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.web.app.tjenester.brukerdialog;
+package no.nav.ung.brukerdialog.web.app.tjenester.bruker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -7,7 +7,10 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import no.nav.k9.felles.integrasjon.pdl.Pdl;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
@@ -16,36 +19,30 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.k9.sikkerhet.context.SubjectHandler;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OpprettOppgaveDto;
 import no.nav.ung.brukerdialog.oppgave.brukerdialog.BrukerdialogOppgaveTjeneste;
-import no.nav.ung.brukerdialog.oppgave.veileder.VeilederOppgaveTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
-import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 
 import java.util.List;
 import java.util.UUID;
 
-@Path(BrukerdialogOppgaveRestTjeneste.BASE_PATH)
+@Path(BrukerOppgaveRestTjeneste.BASE_PATH)
 @ApplicationScoped
 @Transactional
 @Produces(MediaType.APPLICATION_JSON)
-public class BrukerdialogOppgaveRestTjeneste {
+public class BrukerOppgaveRestTjeneste {
     static final String BASE_PATH = "/oppgave";
 
     private BrukerdialogOppgaveTjeneste oppgaveTjeneste;
-    private VeilederOppgaveTjeneste veilederOppgaveTjeneste;
     private Pdl pdl;
 
-    public BrukerdialogOppgaveRestTjeneste() {
+    public BrukerOppgaveRestTjeneste() {
         // CDI proxy
     }
 
     @Inject
-    public BrukerdialogOppgaveRestTjeneste(BrukerdialogOppgaveTjeneste oppgaveTjeneste,
-                                           VeilederOppgaveTjeneste veilederOppgaveTjeneste, Pdl pdl) {
+    public BrukerOppgaveRestTjeneste(BrukerdialogOppgaveTjeneste oppgaveTjeneste, Pdl pdl) {
         this.oppgaveTjeneste = oppgaveTjeneste;
-        this.veilederOppgaveTjeneste = veilederOppgaveTjeneste;
         this.pdl = pdl;
     }
 
@@ -72,36 +69,9 @@ public class BrukerdialogOppgaveRestTjeneste {
         return oppgaveTjeneste.hentOppgaveForOppgavereferanse(oppgavereferanse, finnAktørId());
     }
 
-    @GET
-    @Path("/{oppgavereferanse}/løst")
-    @Operation(summary = "Markerer en oppgave som løst", tags = "brukerdialog-oppgave")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE, auditlogg = false)
-    public BrukerdialogOppgaveDto løsOppgave(
-        @Valid
-        @NotNull
-        @PathParam("oppgavereferanse")
-        @Parameter(description = "Unik referanse til oppgaven")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
-        UUID oppgavereferanse) {
-        return oppgaveTjeneste.løsOppgave(oppgavereferanse, finnAktørId());
-    }
-
-
-    @POST
-    @Path("/opprett/sok-ytelse")
-    @Operation(summary = "Oppretter oppgave for å søke ytelse", tags = "brukerdialog-oppgave")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.CREATE, resource = BeskyttetRessursResourceType.UNGDOMSPROGRAM, auditlogg = false)
-    public BrukerdialogOppgaveDto opprettSøkYtelseOppgave(
-        @Valid
-        @NotNull
-        @Parameter(description = "Data om hvem og hva det søkes om")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
-        OpprettOppgaveDto opprettSøkYtelseOppgaveDto) {
-        return veilederOppgaveTjeneste.opprettSøkYtelseOppgave(opprettSøkYtelseOppgaveDto);
-    }
-
-
-    /** Veksler fra personIdent i token til aktørId ved hjelp av PDL.
+    /**
+     * Veksler fra personIdent i token til aktørId ved hjelp av PDL.
+     *
      * @return AktørId til innlogget bruker
      */
     private AktørId finnAktørId() {

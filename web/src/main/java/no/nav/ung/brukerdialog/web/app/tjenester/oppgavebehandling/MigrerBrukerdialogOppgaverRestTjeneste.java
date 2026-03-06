@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.web.app.tjenester.brukerdialog;
+package no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

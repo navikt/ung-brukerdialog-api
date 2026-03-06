@@ -122,6 +122,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
     }
 
 
+    // Vurder om denne logikken skal ligge i denne tjenesten eller håndteres av konsument
     private boolean gjelderSammePeriodeForInntektsrapportering(BrukerdialogOppgaveEntitet oppgave,
                                                                EndreOppgaveStatusDto dto) {
         if (oppgave.getOppgaveData() instanceof InntektsrapporteringOppgaveDataEntitet data) {
