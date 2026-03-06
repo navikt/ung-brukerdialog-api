@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 @ApplicationPath(InternApiConfig.API_URI)
 public class InternApiConfig extends ResourceConfig {
 
-    public static final String API_URI = "intern/api";
+    public static final String API_URI = "/intern/api";
     private static final String SECURITY_SCHEME_NAME = "azure-ad";
     private static final Environment ENV = Environment.current();
 
