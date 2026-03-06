@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.nav.ung.brukerdialog</groupId>
-    <artifactId>ung-brukerdialog</artifactId>
+    <artifactId>ung-brukerdialog-api</artifactId>
     <packaging>pom</packaging>
-    <name>ung-brukerdialog :: Root</name>
+    <name>ung-brukerdialog-api :: Root</name>
     <version>${revision}${sha1}${changelist}</version>
 
     <modules>
@@ -803,7 +803,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/navikt/ung-brukerdialog/</url>
+            <url>https://maven.pkg.github.com/navikt/ung-brukerdialog-api/</url>
         </repository>
         <repository>
             <id>central</id>
@@ -826,16 +826,16 @@
     </repositories>
 
     <scm>
-        <connection>scm:git:https://github.com/navikt/ung-brukerdialog.git</connection>
-        <developerConnection>scm:git:https://github.com/navikt/ung-brukerdialog.git</developerConnection>
-        <url>https://github.com/navikt/ung-brukerdialog</url>
+        <connection>scm:git:https://github.com/navikt/ung-brukerdialog-api.git</connection>
+        <developerConnection>scm:git:https://github.com/navikt/ung-brukerdialog-api.git</developerConnection>
+        <url>https://github.com/navikt/ung-brukerdialog-api</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>Github navikt Maven Packages</name>
-            <url>https://maven.pkg.github.com/navikt/ung-brukerdialog</url>
+            <url>https://maven.pkg.github.com/navikt/ung-brukerdialog-api</url>
         </repository>
     </distributionManagement>
 </project>

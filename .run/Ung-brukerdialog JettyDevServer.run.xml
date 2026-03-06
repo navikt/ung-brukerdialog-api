@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Ung-brukerdialog JettyDevServer" type="Application" factoryName="Application">
+  <configuration default="false" name="ung-brukerdialog-api JettyDevServer" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-25" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="no.nav.ung.brukerdialog.web.server.jetty.JettyDevServer" />

@@ -1,4 +1,4 @@
-# ung-brukerdialog
+# ung-brukerdialog-api
 Tilbyr funksjonalitet for innsyn og brukervarsling for ungdomsprogramytelsen og aktivitetspenger
 
 
@@ -25,7 +25,7 @@ Swagger: http://localhost:8902/ung/brukerdialog/swagger
 For å koble til databasen i dev-gcp kan man kjøre denne hjelpe-scriptet:
 
 ```shell script
-./scripts/nais-postgres.sh --context dev-gcp --namespace k9saksbehandling --app ung-brukerdialog
+./scripts/nais-postgres.sh --context dev-gcp --namespace k9saksbehandling --app ung-brukerdialog-api
 ```
 
 ## Kode generert av GitHub Copilot

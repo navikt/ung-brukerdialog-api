@@ -6,14 +6,14 @@
 
     <parent>
         <groupId>no.nav.ung.brukerdialog</groupId>
-        <artifactId>ung-brukerdialog</artifactId>
+        <artifactId>ung-brukerdialog-api</artifactId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
 
     <artifactId>kontrakt</artifactId>
     <packaging>jar</packaging>
-    <name>ung-brukerdialog :: Kontrakter</name>
-    <description>Kontrakter for tjenester eksponert / topics publisert av ung-brukerdialog</description>
+    <name>ung-brukerdialog-api :: Kontrakter</name>
+    <description>Kontrakter for tjenester eksponert / topics publisert av ung-brukerdialog-api</description>
 
     <properties>
         <maven.deploy.skip>false</maven.deploy.skip>

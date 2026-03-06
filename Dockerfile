@@ -9,7 +9,7 @@ RUN ["java", "scripts/RyddBiblioteker", "DUPLIKAT", "/app/lib", "/build/lib"]
 
 
 FROM ghcr.io/navikt/k9-felles/felles-java-25:10.1.3
-LABEL org.opencontainers.image.source=https://github.com/navikt/ung-brukerdialog
+LABEL org.opencontainers.image.source=https://github.com/navikt/ung-brukerdialog-api
 
 ENV JAVA_OPTS="-Djdk.virtualThreadScheduler.parallelism=8 "
 

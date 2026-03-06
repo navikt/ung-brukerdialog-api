@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: ung-brukerdialog
+  name: ung-brukerdialog-api
   namespace: k9saksbehandling
   labels:
     team: k9saksbehandling
@@ -50,7 +50,7 @@ spec:
       cpu: "500m"
       memory: "4096Mi"
   ingresses:
-    - "https://ung-brukerdialog.intern.nav.no"
+    - "https://ung-brukerdialog-api.intern.nav.no"
   kafka:
     pool: "nav-prod"
   vault:
@@ -61,7 +61,7 @@ spec:
     application:
       enabled: true
       replyURLs:
-        - "https://ung-brukerdialog.intern.nav.no/ung/brukerdialog/cb"
+        - "https://ung-brukerdialog-api.intern.nav.no/ung/brukerdialog/cb"
       claims:
         groups:
           # 0000-CA-ung-saksbehandler
@@ -81,7 +81,7 @@ spec:
       rules:
         - application: ung-deltakelse-opplyser
         - application: ung-sak
-        - application: ung-brukerdialog
+        - application: ung-brukerdialog-api
   gcp:
     sqlInstances:
       - type: POSTGRES_16
@@ -103,16 +103,16 @@ spec:
         pointInTimeRecovery: true
         retainedBackups : 30
   envFrom:
-    - secret: ung-brukerdialog-secrets
+    - secret: ung-brukerdialog-api-secrets
   env:
     - name: TZ
       value: "Europe/Oslo"
     - name: APP_NAME
-      value: "ung-brukerdialog"
+      value: "ung-brukerdialog-api"
 
     # open telemetry
     - name: OTEL_RESOURCE_ATTRIBUTES
-      value: "service.name=ung-brukerdialog,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
+      value: "service.name=ung-brukerdialog-api,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
 
     # Integrasjoner (Kafka)
     - name: KAFKA_MINSIDE_VARSEL_TOPIC
@@ -128,7 +128,7 @@ spec:
 
     # Loadbalancerconfig
     - name: LOADBALANCER_URL
-      value: https://ung-brukerdialog.intern.nav.no
+      value: https://ung-brukerdialog-api.intern.nav.no
 
     # PDL
     - name: PDL_TEMA
@@ -150,7 +150,7 @@ spec:
 
     # Sikkerhet:
     - name: CLIENT_SCOPE
-      value: "api://prod-gcp.k9saksbehandling.ung-brukerdialog/.default"
+      value: "api://prod-gcp.k9saksbehandling.ung-brukerdialog-api/.default"
     - name: ABAC_ATTRIBUTT_DRIFT
       value: "no.nav.abac.attributter.k9.drift"
 
@@ -168,4 +168,4 @@ spec:
     - name: AUDITLOGGER_VENDOR
       value: "ung"
     - name: AUDITLOGGER_PRODUCT
-      value: "ung-brukerdialog"
+      value: "ung-brukerdialog-api"

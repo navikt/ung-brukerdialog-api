@@ -5,13 +5,13 @@
 
     <parent>
         <groupId>no.nav.ung.brukerdialog</groupId>
-        <artifactId>ung-brukerdialog</artifactId>
+        <artifactId>ung-brukerdialog-api</artifactId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
 
     <artifactId>web-webapp</artifactId>
     <packaging>jar</packaging>
-    <name>ung-brukerdialog :: Webapp</name>
+    <name>ung-brukerdialog-api :: Webapp</name>
 
     <properties>
         <swagger-ui.version>5.31.0</swagger-ui.version>
@@ -355,7 +355,7 @@
 
                 The compile phase must have run before this so that the classes that defines the api has been built.
 
-                By default the plugin writes the result to the file target/ung-brukerdialog.openapi.json. One can override this
+                By default the plugin writes the result to the file target/ung-brukerdialog-api.openapi.json. One can override this
                 with an argument override from the command line.
 
                 Example of invocation from root project dir:
@@ -369,7 +369,7 @@
                     <mainClass>no.nav.ung.brukerdialog.web.app.util.OpenapiGenerate</mainClass>
                     <classpathScope>compile</classpathScope>
                     <arguments>
-                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/ung-brukerdialog.openapi.json</argument>
+                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/ung-brukerdialog-api.openapi.json</argument>
                     </arguments>
                 </configuration>
             </plugin>
