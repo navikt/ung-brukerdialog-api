@@ -139,21 +139,5 @@ public class OppgavebehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-
-    @POST
-    @Path("/opprett/sok-ytelse")
-    @Operation(summary = "Oppretter oppgave for å søke ytelse", tags = "brukerdialog-oppgave")
-    @Deprecated
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.CREATE, resource = BeskyttetRessursResourceType.OPPGAVE, auditlogg = false)
-    public BrukerdialogOppgaveDto opprettSøkYtelseOppgave(
-        @Valid
-        @NotNull
-        @Parameter(description = "Data om hvem og hva det søkes om")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
-        OpprettOppgaveDto opprettSøkYtelseOppgaveDto) {
-        return veilederOppgaveTjeneste.opprettSøkYtelseOppgave(opprettSøkYtelseOppgaveDto);
-    }
-
-
 }
 
