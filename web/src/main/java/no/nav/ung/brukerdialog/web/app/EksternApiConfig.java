@@ -45,7 +45,11 @@ public class EksternApiConfig extends ResourceConfig {
         new BrukerRestClasses().getRestClasses()
             .forEach(c -> openapiSetupHelper.addResourceClass(c.getName()));
         openapiSetupHelper.registerSubTypes(ObjectMapperFactory.allJsonTypeNameClasses(new BrukerRestClasses()));
-        openapiSetupHelper.setTypeNameResolver(new no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver("no.nav."));
+        openapiSetupHelper.setTypeNameResolver(new no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver(
+            "no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.",
+            "no.nav.ung.brukerdialog.kontrakt.oppgaver.",
+            "no.nav."
+        ));
         try {
             OpenAPI openAPI = openapiSetupHelper.resolveOpenAPI();
             openAPI.schemaRequirement(SECURITY_SCHEME_NAME, tokenXScheme);
