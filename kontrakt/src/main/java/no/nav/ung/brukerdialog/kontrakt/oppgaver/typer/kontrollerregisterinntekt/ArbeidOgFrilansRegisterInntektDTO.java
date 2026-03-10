@@ -13,10 +13,6 @@ public record ArbeidOgFrilansRegisterInntektDTO(
     @NotNull
     Integer inntekt,
 
-    @JsonProperty(value = "arbeidsgiver")
-    @Deprecated
-    String arbeidsgiver,
-
     @JsonProperty(value = "arbeidsgiverIdentifikator", required = true)
     @NotNull
     String arbeidsgiverIdentifikator,

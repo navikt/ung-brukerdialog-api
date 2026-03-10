@@ -26,7 +26,7 @@ public class KontrollerRegisterinntektOppgaveDataMapperFraEntitetTilDto implemen
         var e = (KontrollerRegisterinntektOppgaveDataEntitet) entitet;
 
         List<ArbeidOgFrilansRegisterInntektDTO> arbeidOgFrilans = e.getArbeidOgFrilansInntekter().stream()
-            .map(i -> new ArbeidOgFrilansRegisterInntektDTO(i.getInntekt(), i.getArbeidsgiverIdentifikator(), i.getArbeidsgiverIdentifikator(), i.getArbeidsgivernavn()))
+            .map(i -> new ArbeidOgFrilansRegisterInntektDTO(i.getInntekt(), i.getArbeidsgiverIdentifikator(), i.getArbeidsgivernavn()))
             .toList();
 
         List<YtelseRegisterInntektDTO> ytelse = e.getYtelseInntekter().stream()
