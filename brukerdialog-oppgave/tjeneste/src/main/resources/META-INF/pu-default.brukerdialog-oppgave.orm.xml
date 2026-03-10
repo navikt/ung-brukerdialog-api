@@ -19,7 +19,6 @@
 	<!-- Typed oppgavedata entities (one per OppgavetypeDataDTO subtype) -->
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveDataEntitet" />
-	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.fjernperiode.FjernetPeriodeOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPeriodeOppgaveDataEntitet" />
     <entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.PeriodeEndring" />
     <entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveDataEntitet" />
