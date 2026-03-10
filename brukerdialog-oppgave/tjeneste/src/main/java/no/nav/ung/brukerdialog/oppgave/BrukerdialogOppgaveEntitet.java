@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.oppgave;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BekreftelseDTO;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
@@ -41,10 +41,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @Column(name = "løst_dato")
     private LocalDateTime løstDato; // NOSONAR
 
-    @Convert(converter = OppgaveBekreftelseConverter.class)
+    @Convert(converter = OppgaveResponsConverter.class)
     @ColumnTransformer(write = "?::jsonb")
-    @Column(name = "bekreftelse", columnDefinition = "jsonb")
-    private BekreftelseDTO bekreftelse;
+    @Column(name = "respons", columnDefinition = "jsonb")
+    private OppgaveResponsDto respons;
 
     @OneToOne(mappedBy = "oppgave", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private OppgaveDataEntitet oppgaveData;
@@ -70,14 +70,14 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,
                                       AktørId aktørId,
-                                      BekreftelseDTO bekreftelse,
+                                      OppgaveResponsDto respons,
                                       OppgaveStatus status,
                                       LocalDateTime fristTid,
                                       LocalDateTime løstDato) {
         this.oppgavereferanse = oppgavereferanse;
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
-        this.bekreftelse = bekreftelse;
+        this.respons = respons;
         this.status = status;
         this.fristTid = fristTid;
         this.løstDato = løstDato;
@@ -120,12 +120,12 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         return løstDato;
     }
 
-    public BekreftelseDTO getBekreftelse() {
-        return bekreftelse;
+    public OppgaveResponsDto getRespons() {
+        return respons;
     }
 
-    public void setBekreftelse(BekreftelseDTO bekreftelse) {
-        this.bekreftelse = bekreftelse;
+    public void setRespons(OppgaveResponsDto respons) {
+        this.respons = respons;
     }
 
     Long getId() {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.RapportertInntektDto;
 
 /**
- * Interface for bekreftelse-data.
+ * Interface for respons-data.
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -13,8 +13,8 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.Rapp
     property = "type"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = SvarPåVarselDTO.class, name = "VARSEL_SVAR"),
+    @JsonSubTypes.Type(value = SvarPåVarselDto.class, name = "VARSEL_SVAR"),
     @JsonSubTypes.Type(value = RapportertInntektDto.class, name = "RAPPORTERT_INNTEKT")
 })
-public class BekreftelseDTO { }
+public class OppgaveResponsDto { }
 

@@ -24,7 +24,6 @@ import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
-import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +101,7 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.oppgaveReferanse(),
                     oppgaveDto.oppgavetype(),
                     oppgaveDto.aktørId(),
-                    oppgaveDto.bekreftelse(),
+                    oppgaveDto.respons(),
                     oppgaveDto.status(),
                     frist,
                     løstDato

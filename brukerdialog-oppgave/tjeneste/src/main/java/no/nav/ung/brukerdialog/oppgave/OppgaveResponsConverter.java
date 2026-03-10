@@ -5,18 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BekreftelseDTO;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 
 /**
  * Converter for å serialisere BekreftelseDTO til/fra JSONB.
  */
 @Converter
-public class OppgaveBekreftelseConverter implements AttributeConverter<BekreftelseDTO, String> {
+public class OppgaveResponsConverter implements AttributeConverter<OppgaveResponsDto, String> {
 
     private static final ObjectMapper MAPPER = JsonObjectMapper.getMapper();
 
     @Override
-    public String convertToDatabaseColumn(BekreftelseDTO attribute) {
+    public String convertToDatabaseColumn(OppgaveResponsDto attribute) {
         if (attribute == null) {
             return null;
         }
@@ -28,12 +28,12 @@ public class OppgaveBekreftelseConverter implements AttributeConverter<Bekreftel
     }
 
     @Override
-    public BekreftelseDTO convertToEntityAttribute(String dbData) {
+    public OppgaveResponsDto convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isEmpty()) {
             return null;
         }
         try {
-            return MAPPER.readValue(dbData, BekreftelseDTO.class);
+            return MAPPER.readValue(dbData, OppgaveResponsDto.class);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Kunne ikke deserialisere BekreftelseDTO fra JSON", e);
         }

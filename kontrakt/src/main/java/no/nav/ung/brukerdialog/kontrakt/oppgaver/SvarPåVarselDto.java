@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 /**
  * DTO for uttalelse fra bruker på et varsel.
  */
-public class SvarPåVarselDTO extends BekreftelseDTO {
+public class SvarPåVarselDto extends OppgaveResponsDto {
     @JsonProperty(value = "harUttalelse", required = true)
     @NotNull
     private Boolean harUttalelse;
@@ -18,10 +18,10 @@ public class SvarPåVarselDTO extends BekreftelseDTO {
     @Pattern(regexp = "^[\\p{Graph}\\p{Space}\\p{Sc}\\p{L}\\p{M}\\p{N}]+$")
     String uttalelseFraBruker;
 
-    public SvarPåVarselDTO() {
+    public SvarPåVarselDto() {
     }
 
-    public SvarPåVarselDTO(Boolean harUttalelse, String uttalelseFraBruker) {
+    public SvarPåVarselDto(Boolean harUttalelse, String uttalelseFraBruker) {
         this.harUttalelse = harUttalelse;
         this.uttalelseFraBruker = uttalelseFraBruker;
     }

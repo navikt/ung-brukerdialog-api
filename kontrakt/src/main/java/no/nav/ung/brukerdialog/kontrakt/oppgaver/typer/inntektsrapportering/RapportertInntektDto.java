@@ -6,12 +6,12 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BekreftelseDTO;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class RapportertInntektDto extends BekreftelseDTO {
+public class RapportertInntektDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "fraOgMed", required = true)
     @NotNull

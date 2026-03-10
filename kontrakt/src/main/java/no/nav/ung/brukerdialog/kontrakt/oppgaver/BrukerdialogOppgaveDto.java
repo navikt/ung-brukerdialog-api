@@ -27,8 +27,8 @@ public record BrukerdialogOppgaveDto(
     @NotNull
     OppgavetypeDataDto oppgavetypeData,
 
-    @JsonProperty(value = "bekreftelse")
-    BekreftelseDTO bekreftelse,
+    @JsonProperty(value = "respons")
+    OppgaveResponsDto respons,
 
     @JsonProperty(value = "status", required = true)
     @NotNull

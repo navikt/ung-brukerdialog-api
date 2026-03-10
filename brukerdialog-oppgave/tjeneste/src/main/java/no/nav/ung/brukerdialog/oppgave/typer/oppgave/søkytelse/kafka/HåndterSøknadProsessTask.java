@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.UUID;
 
 /**
- * ProsessTask for å håndtere oppgavebekreftelse mottatt fra Kafka.
+ * ProsessTask for å håndtere respons mottatt fra Kafka.
  */
 @ApplicationScoped
 @ProsessTask(value = HåndterSøknadProsessTask.TASK_NAVN)

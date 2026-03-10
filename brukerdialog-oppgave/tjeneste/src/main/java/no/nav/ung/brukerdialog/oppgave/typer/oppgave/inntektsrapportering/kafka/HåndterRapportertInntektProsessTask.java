@@ -7,8 +7,6 @@ import jakarta.inject.Inject;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
-import no.nav.k9.søknad.ytelse.ung.v1.Ungdomsytelse;
-import no.nav.k9.søknad.ytelse.ung.v1.inntekt.OppgittInntektForPeriode;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.RapportertInntektDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
@@ -20,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.UUID;
 
 /**
- * ProsessTask for å håndtere oppgavebekreftelse mottatt fra Kafka.
+ * ProsessTask for å håndtere respons mottatt fra Kafka.
  */
 @ApplicationScoped
 @ProsessTask(value = HåndterRapportertInntektProsessTask.TASK_NAVN)
@@ -63,8 +61,8 @@ public class HåndterRapportertInntektProsessTask implements ProsessTaskHandler 
             .orElseThrow(() -> new IllegalStateException(
                 "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
 
-        // Oppdater oppgaven med bekreftelse
-        oppgave.setBekreftelse(new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt()));
+        // Oppdater oppgaven med respons
+        oppgave.setRespons(new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt()));
         oppgaveLivssyklusTjeneste.løsOppgave(oppgave);
 
         log.info("Rapportert inntekt behandlet for oppgave med referanse='{}'",

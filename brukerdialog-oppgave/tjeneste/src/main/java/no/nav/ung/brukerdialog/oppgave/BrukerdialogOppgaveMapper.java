@@ -32,7 +32,7 @@ public class BrukerdialogOppgaveMapper {
             oppgave.getOppgavereferanse(),
             oppgave.getOppgaveType(),
             oppgavetypeData,
-            oppgave.getBekreftelse(),
+            oppgave.getRespons(),
             oppgave.getStatus(),
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
