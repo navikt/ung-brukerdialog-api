@@ -6,6 +6,7 @@ import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.YtelseType;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet;
@@ -52,6 +53,7 @@ class BrukerdialogOppgaveRepositoryTest {
             oppgaveReferanse,
             OppgaveType.SØK_YTELSE,
             aktørId,
+            OppgaveYtelsetype.UNGDOMSPROGRAMYTELSEN,
             null
         );
 
@@ -153,6 +155,7 @@ class BrukerdialogOppgaveRepositoryTest {
             oppgaveReferanse,
             OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT,
             aktørId,
+            OppgaveYtelsetype.UNGDOMSPROGRAMYTELSEN,
             null
         );
 
@@ -223,6 +226,7 @@ class BrukerdialogOppgaveRepositoryTest {
             oppgaveReferanse,
             type,
             aktørId,
+            OppgaveYtelsetype.UNGDOMSPROGRAMYTELSEN,
             null
         );
 

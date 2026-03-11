@@ -7,6 +7,7 @@ import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.saksbehandling.OppgaveForSaksbehandlingTjenesteImpl;
 
 import java.util.List;
@@ -38,8 +39,8 @@ public class BrukerdialogOppgaveTjenesteImpl implements BrukerdialogOppgaveTjene
     }
 
     @Override
-    public List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId) {
-        return repository.hentAlleOppgaverForAktør(aktørId).stream()
+    public List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId, OppgaveYtelsetype ytelsetype) {
+        return repository.hentAlleOppgaverForAktør(aktørId, ytelsetype).stream()
             .map(mapper::tilDto)
             .collect(Collectors.toList());
     }
