@@ -89,6 +89,7 @@ spec:
         - application: ung-sak
         - application: ung-brukerdialog-api
         - application: ung-deltakelse-opplyser
+        - application: ungdomsytelse-deltaker
   gcp:
     sqlInstances:
       - type: POSTGRES_16
