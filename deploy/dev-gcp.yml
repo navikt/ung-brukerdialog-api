@@ -90,6 +90,8 @@ spec:
         - application: ung-brukerdialog-api
         - application: ung-deltakelse-opplyser
         - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: dev-gcp
   gcp:
     sqlInstances:
       - type: POSTGRES_16

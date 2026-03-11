@@ -83,6 +83,8 @@ spec:
         - application: ung-sak
         - application: ung-brukerdialog-api
         - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: dev-gcp
   gcp:
     sqlInstances:
       - type: POSTGRES_16
