@@ -67,6 +67,8 @@ spec:
           - id: a20d759b-a32e-45d8-b283-6143702a70e4
           # 0000-CA-ung-veileder
           - id: dfb43624-edba-45de-9e91-68ec8e74b5d9
+          # 0000-CA-ung-programveileder
+          - id: 37538533-e91c-4a53-b155-f4448dcada0d
           # 0000-CA-ung-drift
           - id: 0d0da462-c300-43d9-8364-38a0a8cf2401
           # 0000-CA-aktivitetspenger-saksbehandler-del1
