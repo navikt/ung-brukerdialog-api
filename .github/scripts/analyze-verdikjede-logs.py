@@ -132,6 +132,69 @@ def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
     return entries
 
 
+# Maven Surefire failure line (with JPS_ in method name, e.g. for parameterized/display names):
+#   "ClassName.methodName__JPS_310161608  Time elapsed: ... <<< FAILURE!"
+# OR without JPS_ (when surefire strips the suffix):
+#   "ClassName.methodName -- Time elapsed: ... <<< FAILURE!"
+FAILURE_WITH_JPS_RE = re.compile(r"JPS_(\d+).*(?:<<<\s*(?:FAILURE|ERROR)|FAILED)", re.IGNORECASE)
+# Captures "ClassName.shortMethodName" from failure lines without JPS_
+FAILURE_NO_JPS_RE = re.compile(
+    r"\[ERROR\]\s+([\w$.]+\.[\w$]+(?:__[\w.$]+)?)\s+(?:--|Time elapsed).*<<<\s*(?:FAILURE|ERROR)",
+    re.IGNORECASE,
+)
+JPS_IN_TEXT_RE = re.compile(r"JPS_(\d+)")
+
+
+def find_failing_jps_ids(log_dir: Path) -> set[str]:
+    """
+    Les GHA job-loggene og finn JPS_XXXXXXX tester som eksplisitt feilet.
+
+    To strategier:
+    1. Direkte: JPS_-ID på samme linje som FAILURE/FAILED.
+    2. Indirekte: hent klasse.metode fra failure-linje, søk så etter en linje
+       som inneholder både det metodenavnet og ein JPS_-ID.
+
+    Returnerer tom mengde hvis ingen feilindikatorer finnes.
+    """
+    failing: set[str] = set()
+    failed_methods: set[str] = set()  # e.g. "EtterlysInntektrapporteringTest.inntekt_i_register_..."
+
+    for path in sorted(log_dir.glob("gha-*.log")):
+        try:
+            lines = path.read_text(errors="replace").splitlines()
+        except OSError:
+            continue
+
+        for line in lines:
+            # Strategi 1: JPS_-ID er direkte på failure-linjen
+            m = FAILURE_WITH_JPS_RE.search(line)
+            if m:
+                failing.add(m.group(1))
+                continue
+
+            # Strategi 2: samle opp metode-/klassenavn fra failure-linjer uten JPS_
+            m = FAILURE_NO_JPS_RE.search(line)
+            if m:
+                # Hent bare siste to ledd: KlasseNavn.metodenavn
+                parts = m.group(1).rsplit(".", 1)
+                if len(parts) == 2:
+                    failed_methods.add(parts[1])  # bare metodenavnet er unikt nok
+
+    if failed_methods:
+        # Andre pass: finn JPS_-IDer koblet til de feilende metodene
+        for path in sorted(log_dir.glob("gha-*.log")):
+            try:
+                lines = path.read_text(errors="replace").splitlines()
+            except OSError:
+                continue
+            for line in lines:
+                if any(method in line for method in failed_methods):
+                    for m in JPS_IN_TEXT_RE.finditer(line):
+                        failing.add(m.group(1))
+
+    return failing
+
+
 def find_test_cases(entries: list[tuple[str, str, str]]) -> dict[str, set[str]]:
     """
     Finn alle JPS_XXXXXXX testsaker og tilknyttede saksnummere.
@@ -217,18 +280,34 @@ def main() -> int:
     entries = parse_entries(LOG_DIR, year)
     print(f"  Totalt {len(entries)} logglinjer fra {len({s for _, s, _ in entries})} kilder")
 
-    print("Finner testsaker ...")
-    test_cases = find_test_cases(entries)
+    print("Finner feilende tester ...")
+    failing_ids = find_failing_jps_ids(LOG_DIR)
+    if failing_ids:
+        print(f"  Feilende tester: {', '.join(f'JPS_{j}' for j in sorted(failing_ids))}")
+    else:
+        print("  Ingen eksplisitte feilindikatorer funnet i GHA-logger – analyserer alle testsaker")
 
-    if not test_cases:
+    print("Finner alle testsaker ...")
+    all_test_cases = find_test_cases(entries)
+
+    if not all_test_cases:
         print("  Ingen JPS_XXXXXXX testsaker funnet i loggene")
-        # Skriv en tom markørfil så artefaktet ikke er tomt
         (OUT_DIR / "ingen-testsaker.txt").write_text("Ingen JPS-testsaker funnet i loggene.\n")
         return 0
 
-    print(f"  Fant {len(test_cases)} testcase(r): {', '.join(f'JPS_{j}' for j in sorted(test_cases))}\n")
+    # Filtrer til kun feilende, eller alle hvis vi ikke fant noen feilindikatorer
+    if failing_ids:
+        test_cases = {jps: snrs for jps, snrs in all_test_cases.items() if jps in failing_ids}
+        # Legg til feilende IDer som ikke ble funnet i loggene (kan ha minimalt data)
+        for jps_id in failing_ids:
+            if jps_id not in test_cases:
+                test_cases[jps_id] = set()
+        print(f"  Filtrerer til {len(test_cases)} feilende testcase(r) (av {len(all_test_cases)} totalt)")
+    else:
+        test_cases = all_test_cases
+        print(f"  Analyserer alle {len(test_cases)} testcase(r)")
 
-    print("Genererer analysefiler ...")
+    print("\nGenererer analysefiler ...")
     total = 0
     for jps_id in sorted(test_cases):
         total += write_case_file(jps_id, test_cases[jps_id], entries)
@@ -236,7 +315,11 @@ def main() -> int:
     # Skriv sammendragsfil
     summary_path = OUT_DIR / "sammendrag.txt"
     with open(summary_path, "w") as f:
-        f.write("# Sammendrag av verdikjede-logganalyse\n\n")
+        f.write("# Sammendrag av verdikjede-logganalyse\n")
+        if failing_ids:
+            f.write(f"# Viser kun {len(test_cases)} feilende test(er)\n\n")
+        else:
+            f.write(f"# Viser alle {len(test_cases)} test(er) (ingen feilindikatorer funnet)\n\n")
         for jps_id in sorted(test_cases):
             snr = ", ".join(sorted(test_cases[jps_id])) or "ukjent"
             f.write(f"JPS_{jps_id}  saksnummer: {snr}\n")
