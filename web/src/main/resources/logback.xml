@@ -19,7 +19,6 @@
                 <exclude>org\.jboss\.weld\.interceptor</exclude>
                 <exclude>org\.jboss\.resteasy\.core</exclude>
                 <rootCauseFirst>false</rootCauseFirst>
-                <lineSeparator>\t</lineSeparator>
             </throwableConverter>
         </encoder>
     </appender>
