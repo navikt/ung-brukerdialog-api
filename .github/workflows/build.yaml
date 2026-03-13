@@ -112,3 +112,63 @@ jobs:
       cluster: prod-gcp
       naiserator_file: deploy/prod-gcp.yml
     secrets: inherit
+
+  analyze-logs:
+    name: Analyser testlogger
+    needs: [verdikjede-tester, verdikjede-tester-dependabot]
+    if: ${{ always() && (needs.verdikjede-tester.result == 'failure' || needs.verdikjede-tester-dependabot.result == 'failure') }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Sjekk ut kode
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Last ned ung-logs artefakt
+        id: download
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ung-logs
+          path: ung-logs
+        continue-on-error: true
+
+      - name: Ingen loggfiler tilgjengelig
+        if: ${{ steps.download.outcome == 'failure' }}
+        run: |
+          echo "Ingen ung-logs artefakt funnet for kjøring ${{ github.run_id }} – hopper over analyse."
+
+      - name: Hent GHA job-logger for verdikjedetester
+        if: ${{ steps.download.outcome == 'success' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          job_ids=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs \
+            --jq '[.jobs[] | select(.name | test("Verdikjedetester"; "i")) | .id] | .[]')
+          for job_id in $job_ids; do
+            echo "Henter logg for jobb $job_id ..."
+            gh api repos/${{ github.repository }}/actions/jobs/${job_id}/logs \
+              > ung-logs/gha-verdikjede-${job_id}.log 2>/dev/null || true
+          done
+
+      - name: Kjør logganalyse
+        if: ${{ steps.download.outcome == 'success' }}
+        env:
+          LOG_DIR: ung-logs
+          OUT_DIR: analysert
+        run: |
+          if [ ! -d "$LOG_DIR" ] || ! ls "$LOG_DIR"/*.log >/dev/null 2>&1; then
+            echo "Ingen gyldige loggfiler funnet i ${LOG_DIR} – hopper over analyse."
+            exit 0
+          fi
+          python3 .github/scripts/analyze-verdikjede-logs.py
+
+      - name: Last opp analyserte logger
+        if: ${{ steps.download.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ung-logs-analysert
+          path: analysert/
+          retention-days: 14
+          if-no-files-found: warn
