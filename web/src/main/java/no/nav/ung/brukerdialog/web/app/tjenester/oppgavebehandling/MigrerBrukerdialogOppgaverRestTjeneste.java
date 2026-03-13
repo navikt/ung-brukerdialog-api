@@ -118,7 +118,7 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     frist,
                     løstDato,
                     opprettetTidspunkt,
-                    oppgaveDto.opprettetAv()
+                    "ung-deltakelse-opplyser"
                 );
                 opprettOppgave(nyOppgave, oppgaveDto.oppgavetypeData());
                 antallOpprettet++;
