@@ -434,12 +434,15 @@ def write_case_file(
     name_part = f"_{test_name}" if test_name else ""
     out_path = OUT_DIR / f"JPS_{jps_id}{name_part}.csv"
 
-    jps_pattern = re.compile(rf"JPS_{jps_id}\b")
-    seed_pattern = (
-        re.compile(rf"JPS_{jps_id}\b|" + "|".join(rf"\b{re.escape(did)}\b" for did in deltakelse_ids))
-        if deltakelse_ids
-        else jps_pattern
-    )
+    # Bygg seed-pattern fra JPS-ID, testnavn og deltakelseId-er.
+    # Testnavn inkluderes slik at alle logginnslag for testmetoden fanges opp,
+    # uavhengig av om de har JPS-suffiks eller tilhører en annen journalpost.
+    parts = [rf"JPS_{jps_id}\b"]
+    if test_name:
+        parts.append(re.escape(test_name))
+    if deltakelse_ids:
+        parts.extend(rf"\b{re.escape(did)}\b" for did in deltakelse_ids)
+    seed_pattern = re.compile("|".join(parts))
 
     # Steg 1+2: finn innslag via JPS_id og deltakelseId (inkl. ung-deltakelse-opplyser)
     seed_indices: set[int] = set()
