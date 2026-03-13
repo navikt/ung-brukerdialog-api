@@ -34,12 +34,12 @@
         <felles.version>10.5.0</felles.version>
         <swagger.version>2.2.42</swagger.version>
         <junit.version>6.0.3</junit.version>
-        <k9format.version>12.9.0</k9format.version>
+        <k9format.version>12.9.1</k9format.version>
         <jackson.version>2.21.0</jackson.version>
         <asm.version>9.9.1</asm.version>
         <kotlin-stdlib.version>2.3.10</kotlin-stdlib.version>
         <jandex.version>3.5.3</jandex.version>
-        <pdfgen-core.version>1.1.73</pdfgen-core.version>
+        <pdfgen-core.version>1.1.77</pdfgen-core.version>
         <flyway.version>12.0.1</flyway.version>
         <confluent.platform.version>8.1.1</confluent.platform.version>
         <mockito.version>5.21.0</mockito.version>
@@ -50,7 +50,7 @@
         <jsoup.version>1.22.1</jsoup.version>
         <commonmark.version>0.27.1</commonmark.version>
         <tms-mikrofrontend-builder.version>3.0.0</tms-mikrofrontend-builder.version>
-        <tms-java-builder.version>2.1.1</tms-java-builder.version>
+        <tms-java-builder.version>2.2.0</tms-java-builder.version>
     </properties>
 
     <!-- NB: Unngå å put scope (test, provided) i dependency management. Det
@@ -140,7 +140,7 @@
             <dependency>
                 <groupId>no.nav.k9.abakus</groupId>
                 <artifactId>abakus-kontrakt</artifactId>
-                <version>1.5.2</version>
+                <version>1.5.3</version>
             </dependency>
 
             <dependency>
