@@ -11,6 +11,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import no.nav.k9.felles.integrasjon.pdl.Pdl;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
@@ -19,6 +20,7 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.k9.sikkerhet.context.SubjectHandler;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.brukerdialog.BrukerdialogOppgaveTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
@@ -50,8 +52,12 @@ public class BrukerOppgaveRestTjeneste {
     @Path("/hent/alle")
     @Operation(summary = "Henter alle oppgaver for en bruker", tags = "brukerdialog-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.READ, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE)
-    public List<BrukerdialogOppgaveDto> hentAlleOppgaver() {
-        return oppgaveTjeneste.hentAlleOppgaverForAktør(finnAktørId());
+    public List<BrukerdialogOppgaveDto> hentAlleOppgaver(
+        @QueryParam("ytelsetype")
+        @Parameter(description = "Filtrer oppgaver på ytelsetype")
+        OppgaveYtelsetype ytelsetype
+    ) {
+        return oppgaveTjeneste.hentAlleOppgaverForAktør(finnAktørId(), ytelsetype);
     }
 
 
