@@ -44,6 +44,15 @@ BEHANDLING_ID_RE = re.compile(r"\bbehandling(?:s)?id[=:\s]+(\d+)", re.IGNORECASE
 STEG_RE = re.compile(r"\bsteg[=:\s]+([^\s,\]\[]+)", re.IGNORECASE)
 # Test name in log entries: "TestCase-...ClassName.methodName__JPS_id"
 TESTCASE_RE = re.compile(r"TestCase-[\w.]+\.([\w_$]+?)__JPS_(\d+)")
+# deltakelseId: "Opprettet ny ung deltagelse med id 12345"
+DELTAKELSE_ID_RE = re.compile(r"Opprettet ny ung deltagelse med id[=:\s]+(\d+)", re.IGNORECASE)
+# fagsakId: "fagsakId=12345" or "fagsakId: 12345"
+FAGSAK_ID_RE = re.compile(r"\bfagsakId[=:\s]+(\d+)", re.IGNORECASE)
+# saksnummer: "saksnummer=GS2024" etc.
+SAKSNUMMER_RE = re.compile(r"\bsaksnummer[='\"\s:]+([A-Z]{2}[A-Za-z0-9]{2,8})\b")
+
+# Tjenester der logginnslag kobles via saksnummer/fagsakId/behandlingId
+LINKED_SERVICES = frozenset({"k9-abakus", "ung-sak", "ung-tilbake", "k9-oppdrag"})
 
 
 @dataclass
@@ -331,6 +340,54 @@ def find_test_names(entries: list[LogEntry]) -> dict[str, str]:
     return jps_to_name
 
 
+def find_deltakelse_ids_for_jps(log_dir: Path) -> dict[str, set[str]]:
+    """
+    Les GHA-logger og finn deltakelseId for hvert JPS_id.
+
+    Finn linjer som inneholder både testnavnet og "Opprettet ny ung deltagelse med id X".
+    Første pass: bygg opp {testmetode → jps_id} fra TESTCASE_RE-mønsteret.
+    Andre pass: finn deltakelseId fra linjer som inneholder testmetodenavnet.
+    Returns {jps_id: {deltakelse_id, ...}}
+    """
+    jps_to_deltakelse: dict[str, set[str]] = defaultdict(set)
+
+    all_lines: list[str] = []
+    for path in sorted(log_dir.glob("gha-*.log")):
+        try:
+            all_lines.extend(path.read_text(errors="replace").splitlines())
+        except OSError:
+            continue
+
+    # Første pass: bygg {test_method_name → {jps_id, ...}} fra TESTCASE_RE
+    method_to_jps: dict[str, set[str]] = defaultdict(set)
+    for line in all_lines:
+        for m in TESTCASE_RE.finditer(line):
+            method_name, jps_id = m.group(1), m.group(2)
+            method_to_jps[method_name].add(jps_id)
+
+    # Andre pass: finn deltakelse-linjer som inneholder testmetodenavnet eller JPS_id
+    method_pattern = (
+        re.compile("|".join(re.escape(name) for name in method_to_jps))
+        if method_to_jps
+        else None
+    )
+    for line in all_lines:
+        m = DELTAKELSE_ID_RE.search(line)
+        if not m:
+            continue
+        deltakelse_id = m.group(1)
+
+        for jps_id in JPS_IN_TEXT_RE.findall(line):
+            jps_to_deltakelse[jps_id].add(deltakelse_id)
+
+        if method_pattern:
+            for match in method_pattern.finditer(line):
+                for jps_id in method_to_jps[match.group(0)]:
+                    jps_to_deltakelse[jps_id].add(deltakelse_id)
+
+    return dict(jps_to_deltakelse)
+
+
 def find_test_cases(entries: list[LogEntry]) -> dict[str, set[str]]:
     """
     Finn alle JPS_XXXXXXX testsaker og tilknyttede saksnummere.
@@ -369,15 +426,57 @@ def write_case_file(
     jps_id: str,
     test_name: str,
     all_entries: list[LogEntry],
+    deltakelse_ids: set[str] | None = None,
 ) -> int:
+    if deltakelse_ids is None:
+        deltakelse_ids = set()
+
     name_part = f"_{test_name}" if test_name else ""
     out_path = OUT_DIR / f"JPS_{jps_id}{name_part}.csv"
 
-    # Kun match på JPS_id for å unngå kryssbesmitning mellom tester
     jps_pattern = re.compile(rf"JPS_{jps_id}\b")
+    seed_pattern = (
+        re.compile(rf"JPS_{jps_id}\b|" + "|".join(rf"\b{re.escape(did)}\b" for did in deltakelse_ids))
+        if deltakelse_ids
+        else jps_pattern
+    )
 
-    matching = [e for e in all_entries if jps_pattern.search(e.text)]
-    matching.sort(key=lambda e: e.ts)
+    # Steg 1+2: finn innslag via JPS_id og deltakelseId (inkl. ung-deltakelse-opplyser)
+    seed_indices: set[int] = set()
+    for i, entry in enumerate(all_entries):
+        if seed_pattern.search(entry.text):
+            seed_indices.add(i)
+
+    # Steg 3: hent saksnummer, fagsakId og behandlingId fra ung-sak-innslag
+    saksnumre: set[str] = set()
+    fagsak_ids: set[str] = set()
+    behandling_ids: set[str] = set()
+    for i in seed_indices:
+        entry = all_entries[i]
+        if "ung-sak" not in entry.source:
+            continue
+        for m in SAKSNUMMER_RE.finditer(entry.text):
+            saksnumre.add(m.group(1))
+        for m in FAGSAK_ID_RE.finditer(entry.text):
+            fagsak_ids.add(m.group(1))
+        if entry.behandling_id:
+            behandling_ids.add(entry.behandling_id)
+        for m in BEHANDLING_ID_RE.finditer(entry.text):
+            behandling_ids.add(m.group(1))
+
+    # Steg 4: knytt inn logginnslag fra tjenester via saksnummer/fagsakId/behandlingId
+    link_ids = saksnumre | fagsak_ids | behandling_ids
+    if link_ids:
+        link_pattern = re.compile(
+            "|".join(rf"\b{re.escape(lid)}\b" for lid in link_ids)
+        )
+        for i, entry in enumerate(all_entries):
+            if i in seed_indices:
+                continue
+            if any(svc in entry.source for svc in LINKED_SERVICES) and link_pattern.search(entry.text):
+                seed_indices.add(i)
+
+    matching = sorted((all_entries[i] for i in seed_indices), key=lambda e: e.ts)
 
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -414,6 +513,12 @@ def main() -> int:
     all_test_cases = find_test_cases(entries)
     test_names = find_test_names(entries)
 
+    print("Finner deltakelseId fra GHA-logger ...")
+    jps_to_deltakelse = find_deltakelse_ids_for_jps(LOG_DIR)
+    if jps_to_deltakelse:
+        total_deltakelse = sum(len(v) for v in jps_to_deltakelse.values())
+        print(f"  Fant {total_deltakelse} deltakelseId-kobling(er) for {len(jps_to_deltakelse)} testcase(r)")
+
     if not all_test_cases:
         print("  Ingen JPS_XXXXXXX testsaker funnet i loggene")
         (OUT_DIR / "ingen-testsaker.txt").write_text("Ingen JPS-testsaker funnet i loggene.\n")
@@ -435,7 +540,7 @@ def main() -> int:
     total = 0
     for jps_id in sorted(test_cases):
         test_name = test_names.get(jps_id, "")
-        total += write_case_file(jps_id, test_name, entries)
+        total += write_case_file(jps_id, test_name, entries, jps_to_deltakelse.get(jps_id, set()))
 
     # Skriv sammendragsfil
     summary_path = OUT_DIR / "sammendrag.txt"
