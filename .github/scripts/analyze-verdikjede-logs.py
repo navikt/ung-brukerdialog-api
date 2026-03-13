@@ -5,11 +5,13 @@ Leser loggfiler fra LOG_DIR, finner alle JPS_XXXXXXX testsaker,
 og genererer en kombinert, kronologisk loggfil per testcase i OUT_DIR.
 """
 
+import csv
 import json
 import os
 import re
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 
 LOG_DIR = Path(os.environ.get("LOG_DIR", "ung-logs"))
@@ -31,6 +33,86 @@ SYSLOG_MONTHS = {
 
 # GHA job log timestamp: "2026-03-10T15:19:23.3442573Z logs..."
 GHA_TS_RE = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z) (.+)$")
+
+# Log level extraction from plain text: "[INFO ]", "[ERROR]", "[WARN]" etc.
+LOGLEVEL_RE = re.compile(r"\[(INFO|WARN(?:ING)?|ERROR|DEBUG|TRACE)\s*\]", re.IGNORECASE)
+# prosesstask type: "prosessTaskType=TYPE" or "taskType=TYPE"
+PROSESSTASK_RE = re.compile(r"\b(?:prosessTaskType|taskType)[=:\s]+([^\s,\]\[]+)", re.IGNORECASE)
+# behandlingId: "behandlingId=12345" or "behandlingsId=12345"
+BEHANDLING_ID_RE = re.compile(r"\bbehandling(?:s)?id[=:\s]+(\d+)", re.IGNORECASE)
+# steg: "steg=STEG_X"
+STEG_RE = re.compile(r"\bsteg[=:\s]+([^\s,\]\[]+)", re.IGNORECASE)
+# Test name in log entries: "TestCase-...ClassName.methodName__JPS_id"
+TESTCASE_RE = re.compile(r"TestCase-[\w.]+\.([\w_$]+?)__JPS_(\d+)")
+
+
+@dataclass
+class LogEntry:
+    ts: str
+    source: str
+    loglevel: str
+    text: str
+    melding: str = ""
+    prosesstask: str = ""
+    behandling_id: str = ""
+    steg: str = ""
+
+
+def _extract_loglevel(text: str, json_obj: dict | None = None) -> str:
+    if json_obj is not None:
+        level = json_obj.get("level", json_obj.get("log_level", json_obj.get("log.level", "")))
+        if level:
+            return str(level).upper()
+    m = LOGLEVEL_RE.search(text)
+    return m.group(1).upper() if m else ""
+
+
+def _extract_prosesstask(text: str, json_obj: dict | None = None) -> str:
+    if json_obj is not None:
+        for key in ("prosessTaskType", "taskType", "task_type"):
+            val = json_obj.get(key, "")
+            if val:
+                return str(val)
+        mdc = json_obj.get("mdc", {})
+        if isinstance(mdc, dict):
+            for key in ("prosessTaskType", "taskType"):
+                val = mdc.get(key, "")
+                if val:
+                    return str(val)
+    m = PROSESSTASK_RE.search(text)
+    return m.group(1) if m else ""
+
+
+def _extract_behandling_id(text: str, json_obj: dict | None = None) -> str:
+    if json_obj is not None:
+        for key in ("behandlingId", "behandlingsId", "behandling_id"):
+            val = json_obj.get(key, "")
+            if val:
+                return str(val)
+        mdc = json_obj.get("mdc", {})
+        if isinstance(mdc, dict):
+            for key in ("behandlingId", "behandlingsId"):
+                val = mdc.get(key, "")
+                if val:
+                    return str(val)
+    m = BEHANDLING_ID_RE.search(text)
+    return m.group(1) if m else ""
+
+
+def _extract_steg(text: str, json_obj: dict | None = None) -> str:
+    if json_obj is not None:
+        for key in ("steg", "prosessSteg"):
+            val = json_obj.get(key, "")
+            if val:
+                return str(val)
+        mdc = json_obj.get("mdc", {})
+        if isinstance(mdc, dict):
+            for key in ("steg", "prosessSteg"):
+                val = mdc.get(key, "")
+                if val:
+                    return str(val)
+    m = STEG_RE.search(text)
+    return m.group(1) if m else ""
 
 
 def to_utc(ts: str) -> str:
@@ -64,14 +146,18 @@ def detect_year(log_dir: Path) -> str:
     return str(__import__("datetime").date.today().year)
 
 
-def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
+def parse_entries(log_dir: Path, year: str) -> list[LogEntry]:
     """
-    Les alle loggfiler og returner liste av (ts_utc, kilde, tekst).
+    Les alle loggfiler og returner liste av LogEntry.
     """
     entries = []
 
     for path in sorted(log_dir.glob("*.log")):
         if path.name in SKIP_FILES or path.name.startswith("buildx_"):
+            continue
+
+        # Skip VTP logs
+        if "vtp" in path.stem.lower():
             continue
 
         source = path.stem
@@ -92,7 +178,16 @@ def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
             m = GHA_TS_RE.match(raw)
             if m:
                 ts, rest = m.groups()
-                entries.append((ts, source, f"[{source}] {rest}"))
+                entries.append(LogEntry(
+                    ts=ts,
+                    source=source,
+                    loglevel=_extract_loglevel(rest),
+                    text=f"[{source}] {rest}",
+                    melding=rest,
+                    prosesstask=_extract_prosesstask(rest),
+                    behandling_id=_extract_behandling_id(rest),
+                    steg=_extract_steg(rest),
+                ))
                 continue
 
             # JSON-format
@@ -107,7 +202,17 @@ def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
                     # Inkluder callId (inneholder JPS_XXXXXXX test-ID) i teksten
                     call_id = obj.get("callId", "")
                     call_tag = f" callId={call_id}" if call_id else ""
-                    entries.append((ts, source, f"[{source}]{tag}{call_tag} {msg}"))
+                    text = f"[{source}]{tag}{call_tag} {msg}"
+                    entries.append(LogEntry(
+                        ts=ts,
+                        source=source,
+                        loglevel=_extract_loglevel(text, obj),
+                        text=text,
+                        melding=msg,
+                        prosesstask=_extract_prosesstask(text, obj),
+                        behandling_id=_extract_behandling_id(text, obj),
+                        steg=_extract_steg(text, obj),
+                    ))
                     continue
                 except (json.JSONDecodeError, KeyError):
                     pass
@@ -117,7 +222,17 @@ def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
             if m:
                 date, time_s, ms, rest = m.groups()
                 ts = to_utc(f"{date}T{time_s}.{ms}+01:00")
-                entries.append((ts, source, f"[{source}] {rest}"))
+                text = f"[{source}] {rest}"
+                entries.append(LogEntry(
+                    ts=ts,
+                    source=source,
+                    loglevel=_extract_loglevel(rest),
+                    text=text,
+                    melding=rest,
+                    prosesstask=_extract_prosesstask(rest),
+                    behandling_id=_extract_behandling_id(rest),
+                    steg=_extract_steg(rest),
+                ))
                 continue
 
             # Syslog CEF: "<14>Mar 10 16:19:30 hostname appname: CEF:..."
@@ -126,7 +241,13 @@ def parse_entries(log_dir: Path, year: str) -> list[tuple[str, str, str]]:
                 mon_str, day, time_s, cef = m.groups()
                 mon = SYSLOG_MONTHS.get(mon_str, "01")
                 ts = to_utc(f"{year}-{mon}-{int(day):02d}T{time_s}+01:00")
-                entries.append((ts, source, f"[{source}] {cef}"))
+                entries.append(LogEntry(
+                    ts=ts,
+                    source=source,
+                    loglevel="",
+                    text=f"[{source}] {cef}",
+                    melding=cef,
+                ))
                 continue
 
     return entries
@@ -195,7 +316,22 @@ def find_failing_jps_ids(log_dir: Path) -> set[str]:
     return failing
 
 
-def find_test_cases(entries: list[tuple[str, str, str]]) -> dict[str, set[str]]:
+def find_test_names(entries: list[LogEntry]) -> dict[str, str]:
+    """
+    Finn testmetodenavnet for hvert JPS_XXXXXXX ID.
+    Leter etter mønster "TestCase-Klasse.metodenavn__JPS_id" i logglinjer.
+    Returns {jps_id: test_method_name}
+    """
+    jps_to_name: dict[str, str] = {}
+    for entry in entries:
+        for m in TESTCASE_RE.finditer(entry.text):
+            method_name, jps_id = m.group(1), m.group(2)
+            if jps_id not in jps_to_name:
+                jps_to_name[jps_id] = method_name
+    return jps_to_name
+
+
+def find_test_cases(entries: list[LogEntry]) -> dict[str, set[str]]:
     """
     Finn alle JPS_XXXXXXX testsaker og tilknyttede saksnummere.
     Returns {journalpost_id: {saksnummer, ...}}
@@ -208,7 +344,8 @@ def find_test_cases(entries: list[tuple[str, str, str]]) -> dict[str, set[str]]:
     jps_to_snr: dict[str, set[str]] = defaultdict(set)
     jp_to_snr: dict[str, set[str]] = defaultdict(set)
 
-    for _, _, text in entries:
+    for entry in entries:
+        text = entry.text
         jps_matches = {m.group(1) for m in JPS_RE.finditer(text)}
         snr_matches = {m.group(1) for m in SNR_RE.finditer(text)}
         jp_matches = {m.group(1) for m in JP_RE.finditer(text)}
@@ -230,40 +367,26 @@ def find_test_cases(entries: list[tuple[str, str, str]]) -> dict[str, set[str]]:
 
 def write_case_file(
     jps_id: str,
-    saksnummere: set[str],
-    all_entries: list[tuple[str, str, str]],
+    test_name: str,
+    all_entries: list[LogEntry],
 ) -> int:
-    snr_label = "_".join(sorted(saksnummere)) if saksnummere else "ukjent"
-    out_path = OUT_DIR / f"JPS_{jps_id}_{snr_label}.txt"
+    name_part = f"_{test_name}" if test_name else ""
+    out_path = OUT_DIR / f"JPS_{jps_id}{name_part}.csv"
 
-    terms = [f"JPS_{jps_id}"] + [re.escape(s) for s in saksnummere]
-    pattern = re.compile("|".join(terms), re.IGNORECASE)
+    # Kun match på JPS_id for å unngå kryssbesmitning mellom tester
+    jps_pattern = re.compile(rf"JPS_{jps_id}\b")
 
-    matching = [(ts, src, text) for ts, src, text in all_entries if pattern.search(text)]
-    matching.sort(key=lambda x: x[0])
+    matching = [e for e in all_entries if jps_pattern.search(e.text)]
+    matching.sort(key=lambda e: e.ts)
 
-    # Dedup audit-innslag (kloner av /behandlinger/alle o.l.)
-    audit_seen: set[str] = set()
-    deduped = []
-    for ts, src, text in matching:
-        if src == "audit.nais":
-            req = re.search(r"request=([^ ]+)", text)
-            act = re.search(r"act=([^ ]+)", text)
-            key = f"{act.group(1) if act else '?'}:{req.group(1) if req else text[:40]}"
-            if key in audit_seen:
-                continue
-            audit_seen.add(key)
-        deduped.append((ts, src, text))
+    with open(out_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["tidspunkt", "app", "loglevel", "prosesstask", "behandlingId", "steg", "melding"])
+        for e in matching:
+            writer.writerow([e.ts, e.source, e.loglevel, e.prosesstask, e.behandling_id, e.steg, e.melding])
 
-    with open(out_path, "w") as f:
-        f.write(f"# Logganalyse: JPS_{jps_id} / saksnummer: {snr_label}\n")
-        f.write(f"# Antall linjer: {len(deduped)}\n")
-        f.write(f"# Kilder: {', '.join(sorted({s for _, s, _ in deduped}))}\n\n")
-        for ts, _, text in deduped:
-            f.write(f"{ts} {text}\n")
-
-    print(f"  JPS_{jps_id} ({snr_label}): {len(deduped)} linjer -> {out_path.name}")
-    return len(deduped)
+    print(f"  JPS_{jps_id} ({test_name or 'ukjent'}): {len(matching)} linjer -> {out_path.name}")
+    return len(matching)
 
 
 def main() -> int:
@@ -278,7 +401,7 @@ def main() -> int:
     print(f"  Detektert årstall: {year}")
 
     entries = parse_entries(LOG_DIR, year)
-    print(f"  Totalt {len(entries)} logglinjer fra {len({s for _, s, _ in entries})} kilder")
+    print(f"  Totalt {len(entries)} logglinjer fra {len({e.source for e in entries})} kilder")
 
     print("Finner feilende tester ...")
     failing_ids = find_failing_jps_ids(LOG_DIR)
@@ -289,6 +412,7 @@ def main() -> int:
 
     print("Finner alle testsaker ...")
     all_test_cases = find_test_cases(entries)
+    test_names = find_test_names(entries)
 
     if not all_test_cases:
         print("  Ingen JPS_XXXXXXX testsaker funnet i loggene")
@@ -310,7 +434,8 @@ def main() -> int:
     print("\nGenererer analysefiler ...")
     total = 0
     for jps_id in sorted(test_cases):
-        total += write_case_file(jps_id, test_cases[jps_id], entries)
+        test_name = test_names.get(jps_id, "")
+        total += write_case_file(jps_id, test_name, entries)
 
     # Skriv sammendragsfil
     summary_path = OUT_DIR / "sammendrag.txt"
@@ -321,8 +446,8 @@ def main() -> int:
         else:
             f.write(f"# Viser alle {len(test_cases)} test(er) (ingen feilindikatorer funnet)\n\n")
         for jps_id in sorted(test_cases):
-            snr = ", ".join(sorted(test_cases[jps_id])) or "ukjent"
-            f.write(f"JPS_{jps_id}  saksnummer: {snr}\n")
+            test_name = test_names.get(jps_id, "ukjent")
+            f.write(f"JPS_{jps_id}  testnavn: {test_name}\n")
 
     print(f"\nFerdig. {len(test_cases)} filer + sammendrag i {OUT_DIR}/")
     return 0
