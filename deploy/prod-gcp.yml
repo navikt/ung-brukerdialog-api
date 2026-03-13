@@ -77,6 +77,8 @@ spec:
           - "azp_name"
   accessPolicy:
     outbound:
+      rules:
+        - application: sif-abac-pdp
       external:
         - host: "pdl-api.prod-fss-pub.nais.io"
     inbound:
