@@ -116,7 +116,7 @@ jobs:
   analyze-logs:
     name: Analyser testlogger
     needs: [verdikjede-tester, verdikjede-tester-dependabot]
-    if: ${{ always() && (needs.verdikjede-tester.result == 'failure' || needs.verdikjede-tester-dependabot.result == 'failure') }}
+    if: ${{ always() && github.ref_name == 'master' && (needs.verdikjede-tester.result == 'failure' || needs.verdikjede-tester-dependabot.result == 'failure') }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
