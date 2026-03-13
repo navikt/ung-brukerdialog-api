@@ -26,7 +26,6 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraDtoTilEntitet;
-import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +58,6 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
     @Inject
     public MigrerBrukerdialogOppgaverRestTjeneste(
         BrukerdialogOppgaveRepository repository,
-        OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste,
         @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
         this.repository = repository;
         this.oppgaveDataMapper = oppgaveDataMapper;
