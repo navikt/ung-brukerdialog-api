@@ -94,13 +94,13 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_16
-        name: ung-sak-db
+        name: ung-brukerdialog-api-db
         tier: db-custom-2-5120 # 2 CPU, 5 GB RAM
         diskSize: 100
         diskAutoresize: true
         highAvailability: true
         databases:
-          - name: ung-sak
+          - name: ung-brukerdialog-api
             envVarPrefix: DB
         flags:
           - name: "cloudsql.enable_pgaudit"
