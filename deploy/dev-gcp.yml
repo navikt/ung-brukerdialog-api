@@ -86,6 +86,8 @@ spec:
         - host: "pdl-api.dev-fss-pub.nais.io"
     inbound:
       rules:
+        - application: aktivitetspenger-innsyn
+        - application: aktivitetspenger-soknad
         - application: ung-sak
         - application: ung-brukerdialog-api
         - application: ung-deltakelse-opplyser
