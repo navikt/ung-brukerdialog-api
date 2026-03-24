@@ -15,6 +15,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.kafka.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -61,9 +62,9 @@ public class HåndterRapportertInntektProsessTask implements ProsessTaskHandler 
             .orElseThrow(() -> new IllegalStateException(
                 "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
 
-        // Oppdater oppgaven med respons
-        oppgave.setRespons(new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt()));
-        oppgaveLivssyklusTjeneste.løsOppgave(oppgave);
+        // Løser oppgave
+        RapportertInntektDto rapportertInntektDto = new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt());
+        oppgaveLivssyklusTjeneste.løsOppgave(oppgave, Optional.of(rapportertInntektDto));
 
         log.info("Rapportert inntekt behandlet for oppgave med referanse='{}'",
             oppgave.getOppgavereferanse());

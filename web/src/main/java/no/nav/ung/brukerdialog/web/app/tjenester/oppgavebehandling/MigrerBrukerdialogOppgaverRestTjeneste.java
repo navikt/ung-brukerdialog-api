@@ -3,6 +3,8 @@ package no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -20,9 +22,10 @@ import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigrerOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsRequest;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsResultat;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
-import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
+import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraDtoTilEntitet;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +48,8 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
     private static final Logger log = LoggerFactory.getLogger(MigrerBrukerdialogOppgaverRestTjeneste.class);
 
     private BrukerdialogOppgaveRepository repository;
-    private OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste;
+    private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper;
+
 
     public MigrerBrukerdialogOppgaverRestTjeneste() {
         // CDI proxy
@@ -54,9 +58,9 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
     @Inject
     public MigrerBrukerdialogOppgaverRestTjeneste(
         BrukerdialogOppgaveRepository repository,
-        OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste) {
+        @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
         this.repository = repository;
-        this.oppgaveLivssyklusTjeneste = oppgaveLivssyklusTjeneste;
+        this.oppgaveDataMapper = oppgaveDataMapper;
     }
 
     /**
@@ -84,6 +88,12 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
             var eksisterende = repository.hentOppgaveForOppgavereferanse(oppgaveDto.oppgaveReferanse());
 
             if (eksisterende.isPresent()) {
+                // Pga feil i migreringslogikk ved kjøring i test
+                if (eksisterende.get().getStatus() != oppgaveDto.status()) {
+                    eksisterende.get().setStatus(oppgaveDto.status());
+                    repository.oppdater(eksisterende.get());
+                }
+
                 log.debug("Oppgave med referanse {} eksisterer allerede, hopper over", oppgaveDto.oppgaveReferanse());
                 antallHoppetOver++;
             } else {
@@ -97,6 +107,8 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     ? oppgaveDto.løstDato().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
                     : null;
 
+                LocalDateTime opprettetTidspunkt = oppgaveDto.opprettetDato().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+
                 var nyOppgave = new BrukerdialogOppgaveEntitet(
                     oppgaveDto.oppgaveReferanse(),
                     oppgaveDto.oppgavetype(),
@@ -104,9 +116,11 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.respons(),
                     oppgaveDto.status(),
                     frist,
-                    løstDato
+                    løstDato,
+                    opprettetTidspunkt,
+                    "migrert"
                 );
-                oppgaveLivssyklusTjeneste.opprettOppgave(nyOppgave, oppgaveDto.oppgavetypeData());
+                opprettOppgave(nyOppgave, oppgaveDto.oppgavetypeData());
                 antallOpprettet++;
             }
         }
@@ -116,6 +130,13 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
             resultat.antallOpprettet(), resultat.antallHoppetOver(), resultat.antallTotalt());
 
         return Response.ok(resultat).build();
+    }
+
+
+    private void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData) {
+        var oppgaveData = OppgaveDataMapperFraDtoTilEntitet.finnTjeneste(oppgaveDataMapper, oppgaveEntitet.getOppgaveType()).map(oppgavetypeData);
+        oppgaveEntitet.setOppgaveData(oppgaveData);
+        repository.lagre(oppgaveEntitet);
     }
 
 }

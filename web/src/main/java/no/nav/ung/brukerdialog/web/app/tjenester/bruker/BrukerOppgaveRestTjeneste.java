@@ -7,10 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import no.nav.k9.felles.integrasjon.pdl.Pdl;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
@@ -19,11 +16,14 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.k9.sikkerhet.context.SubjectHandler;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.LøsOppgaveRequest;
 import no.nav.ung.brukerdialog.oppgave.brukerdialog.BrukerdialogOppgaveTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Path(BrukerOppgaveRestTjeneste.BASE_PATH)
@@ -50,8 +50,12 @@ public class BrukerOppgaveRestTjeneste {
     @Path("/hent/alle")
     @Operation(summary = "Henter alle oppgaver for en bruker", tags = "brukerdialog-oppgave")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.READ, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE)
-    public List<BrukerdialogOppgaveDto> hentAlleOppgaver() {
-        return oppgaveTjeneste.hentAlleOppgaverForAktør(finnAktørId());
+    public List<BrukerdialogOppgaveDto> hentAlleOppgaver(
+        @QueryParam("ytelsetype")
+        @Parameter(description = "Filtrer oppgaver på ytelsetype")
+        OppgaveYtelsetype ytelsetype
+    ) {
+        return oppgaveTjeneste.hentAlleOppgaverForAktør(finnAktørId(), ytelsetype);
     }
 
 
@@ -67,6 +71,26 @@ public class BrukerOppgaveRestTjeneste {
         @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
         UUID oppgavereferanse) {
         return oppgaveTjeneste.hentOppgaveForOppgavereferanse(oppgavereferanse, finnAktørId());
+    }
+
+    @POST
+    @Path("/{oppgavereferanse}/løs")
+    @Operation(summary = "Løser en spesifikk oppgave basert på oppgaveReferanse", tags = "brukerdialog-oppgave")
+    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.TOKENX_RESOURCE)
+    public BrukerdialogOppgaveDto løsOppgave(
+        @Valid
+        @NotNull
+        @PathParam("oppgavereferanse")
+        @Parameter(description = "Unik referanse til oppgaven")
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
+        UUID oppgavereferanse,
+        @Valid
+        @NotNull
+        @Parameter(description = "Løsningsdata for oppgaven")
+        @TilpassetAbacAttributt(supplierClass =  AbacAttributtEmptySupplier.class)
+        LøsOppgaveRequest løsningsdata
+        ) {
+        return oppgaveTjeneste.løsOppgave(oppgavereferanse, finnAktørId(), Optional.ofNullable(løsningsdata.oppgaveRespons()));
     }
 
     /**

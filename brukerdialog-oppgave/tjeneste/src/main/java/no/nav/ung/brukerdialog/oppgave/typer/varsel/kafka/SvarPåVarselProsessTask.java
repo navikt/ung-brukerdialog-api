@@ -15,6 +15,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka.model.SvarPåVarselTop
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -62,8 +63,8 @@ public class SvarPåVarselProsessTask implements ProsessTaskHandler {
                 "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
 
         // Oppdater oppgaven med respons
-        oppgave.setRespons(new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker()));
-        oppgaveLivssyklusTjeneste.løsOppgave(oppgave);
+        SvarPåVarselDto respons = new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker());
+        oppgaveLivssyklusTjeneste.løsOppgave(oppgave, Optional.of(respons));
 
         log.info("Svar på varsel behandlet for oppgave med referanse='{}'",
             oppgave.getOppgavereferanse());

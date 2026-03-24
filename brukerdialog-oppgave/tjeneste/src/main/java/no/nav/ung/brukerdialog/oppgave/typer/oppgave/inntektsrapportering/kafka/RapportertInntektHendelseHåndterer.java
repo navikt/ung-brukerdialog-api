@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.ung.brukerdialog.oppgave.kafka.KafkaMessageHandler;
+import no.nav.k9.felles.integrasjon.kafka.KafkaMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

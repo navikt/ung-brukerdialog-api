@@ -3,6 +3,7 @@ package no.nav.ung.brukerdialog.oppgave.kafka;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.apptjeneste.AppServiceHandler;
+import no.nav.k9.felles.integrasjon.kafka.KafkaConsumerManager;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.kafka.RapportertInntektHendelseHåndterer;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka.SøknadHendelseHåndterer;

@@ -68,6 +68,8 @@ spec:
           - id: a7b4ffd6-d512-4b0d-991d-24d582b83a57
           # 0000-CA-ung-veileder
           - id: 9fe53d71-5eca-4b26-b77a-534468e0db4a
+          # 0000-CA-ung-programveileder
+          - id: 7de1df55-11f7-4b65-853c-01f2e775ad0a
           # 0000-CA-ung-drift
           - id: 873ae729-e918-4f35-9a26-652ca994b9c3
         extra:
@@ -75,6 +77,8 @@ spec:
           - "azp_name"
   accessPolicy:
     outbound:
+      rules:
+        - application: sif-abac-pdp
       external:
         - host: "pdl-api.prod-fss-pub.nais.io"
     inbound:
@@ -83,18 +87,22 @@ spec:
         - application: aktivitetspenger-soknad
         - application: ung-deltakelse-opplyser
         - application: ung-sak
-        - application: ung-brukerdialog-api
+        - application: k9-brukerdialog-prosessering
+          namespace: dusseldorf
+          cluster: prod-gcp
         - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: prod-gcp
   gcp:
     sqlInstances:
       - type: POSTGRES_16
-        name: ung-sak-db
+        name: ung-brukerdialog-api-db
         tier: db-custom-2-5120 # 2 CPU, 5 GB RAM
         diskSize: 100
         diskAutoresize: true
         highAvailability: true
         databases:
-          - name: ung-sak
+          - name: ung-brukerdialog-api
             envVarPrefix: DB
         flags:
           - name: "cloudsql.enable_pgaudit"

@@ -24,6 +24,10 @@ public record OpprettOppgaveDto(
     @Valid
     AktørId aktørId,
 
+    @JsonProperty(value = "ytelsetype")
+    @Valid
+    OppgaveYtelsetype ytelsetype,
+
     @JsonProperty(value = "oppgaveReferanse", required = true)
     @NotNull
     UUID oppgaveReferanse,

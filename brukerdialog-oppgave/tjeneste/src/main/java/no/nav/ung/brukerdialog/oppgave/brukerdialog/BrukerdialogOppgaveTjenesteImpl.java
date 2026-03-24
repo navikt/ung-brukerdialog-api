@@ -2,14 +2,17 @@ package no.nav.ung.brukerdialog.oppgave.brukerdialog;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.saksbehandling.OppgaveForSaksbehandlingTjenesteImpl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,8 +41,8 @@ public class BrukerdialogOppgaveTjenesteImpl implements BrukerdialogOppgaveTjene
     }
 
     @Override
-    public List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId) {
-        return repository.hentAlleOppgaverForAktør(aktørId).stream()
+    public List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId, OppgaveYtelsetype ytelsetype) {
+        return repository.hentAlleOppgaverForAktør(aktørId, ytelsetype).stream()
             .map(mapper::tilDto)
             .collect(Collectors.toList());
     }
@@ -52,10 +55,10 @@ public class BrukerdialogOppgaveTjenesteImpl implements BrukerdialogOppgaveTjene
     }
 
     @Override
-    public BrukerdialogOppgaveDto løsOppgave(UUID oppgavereferanse, AktørId aktørId) {
+    public BrukerdialogOppgaveDto løsOppgave(UUID oppgavereferanse, AktørId aktørId, Optional<OppgaveResponsDto> oppgaveResponsDto) {
         var oppgave = repository.hentOppgaveForOppgavereferanse(oppgavereferanse, aktørId)
             .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgaveReferanse: " + oppgavereferanse));
-        var oppdatertOppgave = oppgaveLivssyklusTjeneste.løsOppgave(oppgave);
+        var oppdatertOppgave = oppgaveLivssyklusTjeneste.løsOppgave(oppgave, oppgaveResponsDto);
         return mapper.tilDto(oppdatertOppgave);
     }
 }
