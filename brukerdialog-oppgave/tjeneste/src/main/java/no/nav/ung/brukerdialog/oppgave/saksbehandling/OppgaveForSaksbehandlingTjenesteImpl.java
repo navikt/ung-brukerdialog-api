@@ -51,7 +51,11 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
     @Override
     public void opprettOppgave(OpprettOppgaveDto oppgave) {
         BrukerdialogOppgaveEntitet oppgaveEntitet = new BrukerdialogOppgaveEntitet(
-            oppgave.oppgaveReferanse(), oppgave.oppgavetypeData().oppgavetype(), oppgave.aktørId(), oppgave.frist());
+            oppgave.oppgaveReferanse(),
+            oppgave.oppgavetypeData().oppgavetype(),
+            oppgave.aktørId(),
+            oppgave.ytelsetype(),
+            oppgave.frist());
         oppgaveLivssyklusTjeneste.opprettOppgave(oppgaveEntitet, oppgave.oppgavetypeData());
     }
 

@@ -5,6 +5,7 @@ import no.nav.ung.brukerdialog.BaseEntitet;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.hibernate.annotations.ColumnTransformer;
@@ -31,6 +32,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @Enumerated(EnumType.STRING)
     private OppgaveStatus status = OppgaveStatus.ULØST;
 
+    @Column(name = "ytelsetype")
+    @Enumerated(EnumType.STRING)
+    private OppgaveYtelsetype ytelsetype;
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private OppgaveType oppgaveType;
@@ -56,11 +61,13 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,
                                       AktørId aktørId,
+                                      OppgaveYtelsetype ytelsetype,
                                       LocalDateTime fristTid) {
         this.oppgavereferanse = oppgavereferanse;
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
         this.fristTid = fristTid;
+        this.ytelsetype = ytelsetype != null ? ytelsetype : OppgaveYtelsetype.UNGDOMSYTELSE;
     }
 
     /**
@@ -83,6 +90,7 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.status = status;
         this.fristTid = fristTid;
         this.løstDato = løstDato;
+        this.ytelsetype = OppgaveYtelsetype.UNGDOMSYTELSE;
         this.setOpprettetTidspunkt(opprettetTidspunkt);
         this.opprettetAv = opprettetAv;
     }
@@ -101,6 +109,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
 
     public OppgaveType getOppgaveType() {
         return oppgaveType;
+    }
+
+    public OppgaveYtelsetype getYtelsetype() {
+        return ytelsetype;
     }
 
 

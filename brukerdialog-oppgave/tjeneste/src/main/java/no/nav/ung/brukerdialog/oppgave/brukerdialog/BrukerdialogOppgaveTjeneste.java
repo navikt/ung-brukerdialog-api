@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.oppgave.brukerdialog;
 
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.typer.AktørId;
 
@@ -18,9 +19,10 @@ public interface BrukerdialogOppgaveTjeneste {
      * Henter alle oppgaver for en gitt aktør.
      *
      * @param aktørId aktørId for bruker
+     * @param ytelsetype valgfritt filter på ytelsetype
      * @return liste med oppgaver
      */
-    List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId);
+    List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId, OppgaveYtelsetype ytelsetype);
 
     /**
      * Henter en spesifikk oppgave basert på oppgaveReferanse og aktørId.
