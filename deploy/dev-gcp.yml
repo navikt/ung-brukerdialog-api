@@ -90,14 +90,18 @@ spec:
         - host: "pdl-api.dev-fss-pub.nais.io"
     inbound:
       rules:
-        - application: aktivitetspenger-innsyn
-        - application: aktivitetspenger-soknad
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
           namespace: dusseldorf
           cluster: dev-gcp
         - application: ung-deltakelse-opplyser
         - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: dev-gcp
+        - application: aktivitetspenger-innsyn
+          namespace: dusseldorf
+          cluster: dev-gcp
+        - application: aktivitetspenger-soknad
           namespace: dusseldorf
           cluster: dev-gcp
   gcp:

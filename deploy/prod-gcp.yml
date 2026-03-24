@@ -83,14 +83,18 @@ spec:
         - host: "pdl-api.prod-fss-pub.nais.io"
     inbound:
       rules:
-        - application: aktivitetspenger-innsyn
-        - application: aktivitetspenger-soknad
         - application: ung-deltakelse-opplyser
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
           namespace: dusseldorf
           cluster: prod-gcp
         - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: aktivitetspenger-innsyn
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: aktivitetspenger-soknad
           namespace: dusseldorf
           cluster: prod-gcp
   gcp:
