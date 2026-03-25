@@ -14,10 +14,6 @@ import java.util.UUID;
  */
 public interface OppgaveForSaksbehandlingTjeneste {
 
-    default boolean isEnabled() {
-        return true;
-    }
-
     /**
      * Oppretter en oppgave. Oppgavetypen bestemmes av {@code oppgave.oppgavetypeData()}.
      */

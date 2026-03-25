@@ -167,10 +167,6 @@ spec:
     - name: ABAC_ATTRIBUTT_DRIFT
       value: "no.nav.abac.attributter.k9.drift"
 
-    # Feature-flag
-    - name: OPPGAVER_I_UNGBRUKERDIALOG_ENABLED
-      value: "false"
-
     # Konfigurasjoner
     - name: FLYWAY_REPAIR_ON_FAIL
       value: "false"

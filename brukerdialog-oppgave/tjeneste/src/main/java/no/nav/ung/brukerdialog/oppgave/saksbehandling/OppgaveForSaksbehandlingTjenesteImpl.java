@@ -2,15 +2,14 @@ package no.nav.ung.brukerdialog.oppgave.saksbehandling;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
-import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
-import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
-import no.nav.ung.brukerdialog.oppgave.OppgaveForSaksbehandlingTjeneste;
-import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.EndreOppgaveStatusDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OpprettOppgaveDto;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
+import no.nav.ung.brukerdialog.oppgave.OppgaveForSaksbehandlingTjeneste;
+import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveDataEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
 
     private BrukerdialogOppgaveRepository repository;
     private OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste;
-    private boolean isEnabled;
 
     public OppgaveForSaksbehandlingTjenesteImpl() {
         // CDI proxy
@@ -36,16 +34,9 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
 
     @Inject
     public OppgaveForSaksbehandlingTjenesteImpl(BrukerdialogOppgaveRepository repository,
-                                                OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste,
-                                                @KonfigVerdi(value = "OPPGAVER_I_UNGBRUKERDIALOG_ENABLED", defaultVerdi = "true") boolean oppgaverIUngsakEnabled) {
+                                                OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste) {
         this.repository = repository;
         this.oppgaveLivssyklusTjeneste = oppgaveLivssyklusTjeneste;
-        this.isEnabled = oppgaverIUngsakEnabled;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isEnabled;
     }
 
     @Override
