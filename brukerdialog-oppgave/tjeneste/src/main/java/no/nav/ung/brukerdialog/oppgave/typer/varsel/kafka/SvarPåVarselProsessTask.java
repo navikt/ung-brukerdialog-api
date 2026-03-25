@@ -58,17 +58,19 @@ public class SvarPåVarselProsessTask implements ProsessTaskHandler {
         log.info("Behandler svar på varsel for oppgaveReferanse='{}'", oppgavereferanse);
 
         // Finn oppgaven basert på oppgaveReferanse
-        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)
-            .orElseThrow(() -> new IllegalStateException(
-                "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
+        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse);
 
-        // Oppdater oppgaven med respons
-        SvarPåVarselDto respons = new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker());
-        oppgaveLivssyklusTjeneste.løsOppgave(oppgave, Optional.of(respons));
+        if (oppgave.isEmpty()) {
+            log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
+        } else {
+            // Oppdater oppgaven med respons
+            SvarPåVarselDto respons = new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker());
+            oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.of(respons));
 
-        log.info("Svar på varsel behandlet for oppgave med referanse='{}'",
-            oppgave.getOppgavereferanse());
+            log.info("Svar på varsel behandlet for oppgave med referanse='{}'",
+                oppgave.get().getOppgavereferanse());
 
+        }
     }
 }
 

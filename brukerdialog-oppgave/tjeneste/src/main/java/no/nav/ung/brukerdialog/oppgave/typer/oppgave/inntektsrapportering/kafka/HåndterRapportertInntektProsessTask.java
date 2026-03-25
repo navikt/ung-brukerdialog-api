@@ -58,16 +58,18 @@ public class HåndterRapportertInntektProsessTask implements ProsessTaskHandler 
         log.info("Behandler rapportert inntekt for oppgaveReferanse='{}'", oppgavereferanse);
 
         // Finn oppgaven basert på oppgaveReferanse
-        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(UUID.fromString(oppgavereferanse))
-            .orElseThrow(() -> new IllegalStateException(
-                "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
+        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(UUID.fromString(oppgavereferanse));
 
-        // Løser oppgave
-        RapportertInntektDto rapportertInntektDto = new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt());
-        oppgaveLivssyklusTjeneste.løsOppgave(oppgave, Optional.of(rapportertInntektDto));
+        if (oppgave.isEmpty()) {
+            log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
+        } else {
+            // Løser oppgave
+            RapportertInntektDto rapportertInntektDto = new RapportertInntektDto(rapportertInntekt.getPeriode().getFraOgMed(), rapportertInntekt.getPeriode().getTilOgMed(), rapportertInntekt.getArbeidstakerOgFrilansInntekt());
+            oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.of(rapportertInntektDto));
 
-        log.info("Rapportert inntekt behandlet for oppgave med referanse='{}'",
-            oppgave.getOppgavereferanse());
+            log.info("Rapportert inntekt behandlet for oppgave med referanse='{}'",
+                oppgave.get().getOppgavereferanse());
+        }
 
     }
 }
