@@ -91,6 +91,12 @@ spec:
         - application: ungdomsytelse-deltaker
           namespace: dusseldorf
           cluster: prod-gcp
+        - application: aktivitetspenger-innsyn
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: aktivitetspenger-soknad
+          namespace: dusseldorf
+          cluster: prod-gcp
   gcp:
     sqlInstances:
       - type: POSTGRES_16
