@@ -22,7 +22,6 @@ public class OppgaveLivssyklusTjeneste {
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
     private Instance<OppgavelInnholdUtleder> varselInnholdUtledere;
     private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper;
-    private boolean skalPublisereVarsel;
 
     public OppgaveLivssyklusTjeneste() {
     }
@@ -31,13 +30,11 @@ public class OppgaveLivssyklusTjeneste {
     public OppgaveLivssyklusTjeneste(ProsessTaskTjeneste prosessTaskTjeneste,
                                      BrukerdialogOppgaveRepository brukerdialogOppgaveRepository,
                                      @Any Instance<OppgavelInnholdUtleder> varselInnholdUtledere,
-                                     @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper,
-                                     @KonfigVerdi(value = "SKAL_PUBLISERE_VARSEL", defaultVerdi = "false") boolean skalPublisereVarsel) {
+                                     @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.brukerdialogOppgaveRepository = brukerdialogOppgaveRepository;
         this.varselInnholdUtledere = varselInnholdUtledere;
         this.oppgaveDataMapper = oppgaveDataMapper;
-        this.skalPublisereVarsel = skalPublisereVarsel;
     }
 
     /**
@@ -96,9 +93,7 @@ public class OppgaveLivssyklusTjeneste {
         var oppgaveData = OppgaveDataMapperFraDtoTilEntitet.finnTjeneste(oppgaveDataMapper, oppgaveEntitet.getOppgaveType()).map(oppgavetypeData);
         oppgaveEntitet.setOppgaveData(oppgaveData);
         brukerdialogOppgaveRepository.lagre(oppgaveEntitet);
-        if (skalPublisereVarsel) {
-            opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
-        }
+        opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
     }
 
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
@@ -112,9 +107,6 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     private void opprettTaskForDeaktiveringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
-        if (!skalPublisereVarsel) {
-            return;
-        }
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(DeaktiverMinSideVarselTask.class);
         prosessTaskData.setProperty(DeaktiverMinSideVarselTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
         prosessTaskTjeneste.lagre(prosessTaskData);

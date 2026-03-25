@@ -170,8 +170,6 @@ spec:
       # Konfigurasjoner
     - name: FLYWAY_REPAIR_ON_FAIL
       value: "false"
-    - name: SKAL_PUBLISERE_VARSEL
-      value: "true"
 
     # Audit logging
     - name: AUDITLOGGER_ENABLED
