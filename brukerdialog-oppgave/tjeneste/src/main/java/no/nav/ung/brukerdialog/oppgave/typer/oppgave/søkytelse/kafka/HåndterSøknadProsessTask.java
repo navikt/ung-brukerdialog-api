@@ -56,14 +56,16 @@ public class HåndterSøknadProsessTask implements ProsessTaskHandler {
         log.info("Behandler søknad for oppgaveReferanse='{}'", oppgavereferanse);
 
         // Finn oppgaven basert på oppgaveReferanse
-        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(UUID.fromString(oppgavereferanse))
-            .orElseThrow(() -> new IllegalStateException(
-                "Fant ingen oppgave for oppgaveReferanse=" + oppgavereferanse));
+        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(UUID.fromString(oppgavereferanse));
 
-        oppgaveLivssyklusTjeneste.løsOppgave(oppgave, Optional.empty());
+        if (oppgave.isEmpty()) {
+            log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
+        } else {
+            oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.empty());
 
-        log.info("Mottatt søknad behandlet for oppgave med referanse='{}'",
-            oppgave.getOppgavereferanse());
+            log.info("Mottatt søknad behandlet for oppgave med referanse='{}'",
+                oppgave.get().getOppgavereferanse());
+        }
 
     }
 }
