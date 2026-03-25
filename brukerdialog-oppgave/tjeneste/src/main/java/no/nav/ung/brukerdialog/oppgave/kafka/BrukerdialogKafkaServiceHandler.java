@@ -25,16 +25,13 @@ public class BrukerdialogKafkaServiceHandler implements AppServiceHandler {
 
     @Inject
     public BrukerdialogKafkaServiceHandler(
-        @KonfigVerdi(value = "OPPGAVER_I_UNGBRUKERDIALOG_ENABLED", defaultVerdi = "true") boolean oppgaverIUngsakEnabled,
         SvarPåVarselHendelseHåndterer svarPåVarselHendelseHåndterer,
         RapportertInntektHendelseHåndterer rapportertInntektHendelseHåndterer,
         SøknadHendelseHåndterer søknadHendelseHåndterer) {
-        this.kcm = oppgaverIUngsakEnabled ?
-            new KafkaConsumerManager<>(List.of(
+        this.kcm = new KafkaConsumerManager<>(List.of(
                 svarPåVarselHendelseHåndterer,
                 rapportertInntektHendelseHåndterer,
-                søknadHendelseHåndterer)) :
-            new KafkaConsumerManager<>(List.of());
+                søknadHendelseHåndterer));
     }
 
     @Override

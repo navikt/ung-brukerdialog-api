@@ -167,11 +167,6 @@ spec:
     - name: AZURE_LOGIN_URL
       value: "https://login.microsoftonline.com/navnoq.onmicrosoft.com/oauth2/v2.0"
 
-
-    # Feature-flag
-    - name: OPPGAVER_I_UNGBRUKERDIALOG_ENABLED
-      value: "true"
-
       # Konfigurasjoner
     - name: FLYWAY_REPAIR_ON_FAIL
       value: "false"
