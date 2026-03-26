@@ -8,6 +8,7 @@ import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.SvarPåVarselDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
@@ -62,7 +63,9 @@ public class SvarPåVarselProsessTask implements ProsessTaskHandler {
 
         if (oppgave.isEmpty()) {
             log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
-        } else {
+        } else if (oppgave.get().getStatus() != OppgaveStatus.LØST) {
+            log.warn("Forventer at status skulle oppdateres synkront til LØST, men status var " + oppgave.get().getStatus());
+
             // Oppdater oppgaven med respons
             SvarPåVarselDto respons = new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker());
             oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.of(respons));
