@@ -8,6 +8,7 @@ import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.kafka.model.SøknadTopicEntry;
@@ -60,7 +61,8 @@ public class HåndterSøknadProsessTask implements ProsessTaskHandler {
 
         if (oppgave.isEmpty()) {
             log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
-        } else {
+        } else if (oppgave.get().getStatus() != OppgaveStatus.LØST) {
+            log.warn("Forventer at status skulle oppdateres synkront til LØST, men status var " + oppgave.get().getStatus());
             oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.empty());
 
             log.info("Mottatt søknad behandlet for oppgave med referanse='{}'",
