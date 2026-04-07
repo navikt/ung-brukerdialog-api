@@ -83,6 +83,7 @@ spec:
         - host: "pdl-api.prod-fss-pub.nais.io"
     inbound:
       rules:
+        - application: k9-swagger
         - application: ung-deltakelse-opplyser
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
