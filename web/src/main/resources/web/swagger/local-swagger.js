@@ -5,7 +5,7 @@ window.onload = function() {
       { url: "/ung/brukerdialog/ekstern/api/openapi.json", name: "ekstern-API" },
       { url: "/ung/brukerdialog/intern/api/openapi.json", name: "intern-API" }
     ],
-    "urls.primaryName": "Bruker-API",
+    "urls.primaryName": "intern-API",
     dom_id: '#swagger-ui',
     deepLinking: true,
     oauth2RedirectUrl: window.location.origin + "/ung/brukerdialog/swagger/oauth2-redirect.html",
