@@ -1,0 +1,79 @@
+package no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import no.nav.k9.prosesstask.api.ProsessTask;
+import no.nav.k9.prosesstask.api.ProsessTaskData;
+import no.nav.k9.prosesstask.api.ProsessTaskHandler;
+import no.nav.ung.brukerdialog.JsonObjectMapper;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.SvarPåVarselDto;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
+import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.kafka.model.SvarPåVarselTopicEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * ProsessTask for å håndtere oppgavebekreftelse mottatt fra Kafka.
+ */
+@ApplicationScoped
+@ProsessTask(value = SvarPåVarselProsessTask.TASK_NAVN)
+public class SvarPåVarselProsessTask implements ProsessTaskHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(SvarPåVarselProsessTask.class);
+    private static final ObjectMapper MAPPER = JsonObjectMapper.getMapper();
+    public static final String TASK_NAVN = "handle.varsel.uttalelse";
+
+    private BrukerdialogOppgaveRepository oppgaveRepository;
+    private OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste;
+
+    SvarPåVarselProsessTask() {
+        // CDI
+    }
+
+    @Inject
+    public SvarPåVarselProsessTask(BrukerdialogOppgaveRepository oppgaveRepository, OppgaveLivssyklusTjeneste oppgaveLivssyklusTjeneste) {
+        this.oppgaveRepository = oppgaveRepository;
+        this.oppgaveLivssyklusTjeneste = oppgaveLivssyklusTjeneste;
+    }
+
+    @Override
+    public void doTask(ProsessTaskData prosessTaskData) {
+        var payload = prosessTaskData.getPayloadAsString();
+
+        SvarPåVarselTopicEntry topicEntry = null;
+        try {
+            topicEntry = MAPPER.readValue(payload, SvarPåVarselTopicEntry.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Ugyldig payload", e);
+        }
+        var svar = topicEntry.data().oppgave();
+        var oppgavereferanse = UUID.fromString(svar.oppgaveReferanse());
+
+        log.info("Behandler svar på varsel for oppgaveReferanse='{}'", oppgavereferanse);
+
+        // Finn oppgaven basert på oppgaveReferanse
+        var oppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse);
+
+        if (oppgave.isEmpty()) {
+            log.warn("Fant ikke oppgave for referanse " + oppgavereferanse);
+        } else if (oppgave.get().getStatus() != OppgaveStatus.LØST) {
+            log.warn("Forventer at status skulle oppdateres synkront til LØST, men status var " + oppgave.get().getStatus());
+
+            // Oppdater oppgaven med respons
+            SvarPåVarselDto respons = new SvarPåVarselDto(svar.uttalelse().harUttalelse(), svar.uttalelse().uttalelseFraDeltaker());
+            oppgaveLivssyklusTjeneste.løsOppgave(oppgave.get(), Optional.of(respons));
+
+            log.info("Svar på varsel behandlet for oppgave med referanse='{}'",
+                oppgave.get().getOppgavereferanse());
+
+        }
+    }
+}
+
