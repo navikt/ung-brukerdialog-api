@@ -91,6 +91,10 @@ spec:
     inbound:
       rules:
         - application: k9-swagger
+          namespace: k9saksbehandling
+          permissions:
+            scopes:
+              - swagger
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
           namespace: dusseldorf
