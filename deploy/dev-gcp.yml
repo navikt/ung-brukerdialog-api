@@ -90,6 +90,7 @@ spec:
         - host: "pdl-api.dev-fss-pub.nais.io"
     inbound:
       rules:
+        - application: k9-swagger
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
           namespace: dusseldorf
