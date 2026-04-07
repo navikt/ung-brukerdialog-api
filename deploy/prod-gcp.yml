@@ -84,6 +84,10 @@ spec:
     inbound:
       rules:
         - application: k9-swagger
+          namespace: k9saksbehandling
+          permissions:
+            scopes:
+              - swagger
         - application: ung-deltakelse-opplyser
         - application: ung-sak
         - application: k9-brukerdialog-prosessering
