@@ -1,5 +1,6 @@
 package no.nav.ung.brukerdialog.web.server.batch;
 
+import com.google.cloud.bigquery.InsertAllRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.integrasjon.bigquery.klient.BigQueryKlient;
@@ -18,9 +19,9 @@ import no.nav.ung.brukerdialog.web.server.batch.bigquery.RapporterInntektRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Comparator;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,7 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
             .map(this::tilRecord)
             .filter(Objects::nonNull)
             .map(r -> RapporterInntektOppgaveTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
+            .map(InsertAllRequest.RowToInsert::of)
             .collect(Collectors.toList());
 
         bigQueryKlient.publiser(DATASET, RapporterInntektOppgaveTabellDefinisjon.INSTANCE, rows);

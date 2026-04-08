@@ -17,7 +17,7 @@ import java.util.function.Function;
 public final class OppgaveSvartidTabellDefinisjon implements BigQueryTabellDefinisjon {
 
     public static final OppgaveSvartidTabellDefinisjon INSTANCE = new OppgaveSvartidTabellDefinisjon();
-    static final String TABELL_NAVN = "oppgave_svartid";
+    public static final String TABELL_NAVN = "oppgave_svartid";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private OppgaveSvartidTabellDefinisjon() {

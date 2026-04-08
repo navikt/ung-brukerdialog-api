@@ -15,7 +15,7 @@ import java.util.function.Function;
 public final class RapporterInntektOppgaveTabellDefinisjon implements BigQueryTabellDefinisjon {
 
     public static final RapporterInntektOppgaveTabellDefinisjon INSTANCE = new RapporterInntektOppgaveTabellDefinisjon();
-    static final String TABELL_NAVN = "oppgave_rapporter_inntekt_v2";
+    public static final String TABELL_NAVN = "oppgave_rapporter_inntekt_v2";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 

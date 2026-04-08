@@ -1,6 +1,7 @@
 package no.nav.ung.brukerdialog.web.server.batch.bigquery;
 
 import no.nav.k9.felles.integrasjon.bigquery.tabell.BigQueryRecord;
+import no.nav.k9.felles.integrasjon.bigquery.tabell.BigQueryTabellDefinisjon;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,4 +16,8 @@ public record BekreftAvvikRecord(
     boolean harRegisterInntekt,
     LocalDateTime opprettetTidspunkt
 ) implements BigQueryRecord {
+    @Override
+    public BigQueryTabellDefinisjon tabellDefinisjon() {
+        return BekreftAvvikOppgaveTabellDefinisjon.INSTANCE;
+    }
 }

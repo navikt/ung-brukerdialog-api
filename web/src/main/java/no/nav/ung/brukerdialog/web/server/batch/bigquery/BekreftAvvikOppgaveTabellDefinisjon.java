@@ -15,7 +15,7 @@ import java.util.function.Function;
 public final class BekreftAvvikOppgaveTabellDefinisjon implements BigQueryTabellDefinisjon {
 
     public static final BekreftAvvikOppgaveTabellDefinisjon INSTANCE = new BekreftAvvikOppgaveTabellDefinisjon();
-    static final String TABELL_NAVN = "oppgave_bekreft_avvik_2";
+    public static final String TABELL_NAVN = "oppgave_bekreft_avvik_2";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 

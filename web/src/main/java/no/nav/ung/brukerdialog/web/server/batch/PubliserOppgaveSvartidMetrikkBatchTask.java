@@ -1,5 +1,6 @@
 package no.nav.ung.brukerdialog.web.server.batch;
 
+import com.google.cloud.bigquery.InsertAllRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.integrasjon.bigquery.klient.BigQueryKlient;
@@ -54,6 +55,7 @@ public class PubliserOppgaveSvartidMetrikkBatchTask implements BatchProsessTaskH
         Instant now = Instant.now();
         var rows = records.stream()
             .map(r -> OppgaveSvartidTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
+            .map(InsertAllRequest.RowToInsert::of)
             .collect(Collectors.toList());
 
         bigQueryKlient.publiser(DATASET, OppgaveSvartidTabellDefinisjon.INSTANCE, rows);
