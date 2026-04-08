@@ -68,7 +68,7 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
         if (!(data instanceof KontrollerRegisterinntektOppgaveDataEntitet kontrollerData)) {
             return null;
         }
-        LocalDateTime sistEndret = finnSistEndret(oppgave);
+        LocalDateTime sisteTidspunkt = finnSisteTidspunkt(oppgave);
         return new BekreftAvvikRecord(
             oppgave.getOppgavereferanse(),
             oppgave.getStatus().name(),
@@ -76,7 +76,7 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
             kontrollerData.getTilOgMed(),
             kontrollerData.isGjelderDelerAvMåned(),
             harRegisterInntekt(kontrollerData),
-            sistEndret
+            sisteTidspunkt
         );
     }
 
@@ -94,7 +94,8 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
         return false;
     }
 
-    private LocalDateTime finnSistEndret(BrukerdialogOppgaveEntitet oppgave) {
+    private LocalDateTime finnSisteTidspunkt(BrukerdialogOppgaveEntitet oppgave) {
+        // For bekreft-avvik-oppgaver brukes endretTidspunkt (settes ved lukking/avbrudd) som det siste relevante tidspunktet
         return Stream.of(oppgave.getOpprettetTidspunkt(), oppgave.getLøstDato(), oppgave.getEndretTidspunkt())
             .filter(Objects::nonNull)
             .max(Comparator.naturalOrder())

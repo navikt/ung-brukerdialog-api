@@ -69,18 +69,19 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
         if (!(data instanceof InntektsrapporteringOppgaveDataEntitet inntektsdata)) {
             return null;
         }
-        LocalDateTime sistEndret = finnSistEndret(oppgave);
+        LocalDateTime sisteTidspunkt = finnSisteTidspunkt(oppgave);
         return new RapporterInntektRecord(
             oppgave.getOppgavereferanse(),
             oppgave.getStatus().name(),
             inntektsdata.getFraOgMed(),
             inntektsdata.getTilOgMed(),
             inntektsdata.isGjelderDelerAvMåned(),
-            sistEndret
+            sisteTidspunkt
         );
     }
 
-    private LocalDateTime finnSistEndret(BrukerdialogOppgaveEntitet oppgave) {
+    private LocalDateTime finnSisteTidspunkt(BrukerdialogOppgaveEntitet oppgave) {
+        // For utløpte oppgaver brukes fristTid som det siste relevante tidspunktet
         LocalDateTime fristForUtløpt = oppgave.getStatus() == OppgaveStatus.UTLØPT ? oppgave.getFristTid() : null;
         return Stream.of(oppgave.getOpprettetTidspunkt(), oppgave.getLøstDato(), fristForUtløpt)
             .filter(Objects::nonNull)
