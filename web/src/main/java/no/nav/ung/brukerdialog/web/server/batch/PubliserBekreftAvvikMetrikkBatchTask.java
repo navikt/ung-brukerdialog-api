@@ -9,6 +9,7 @@ import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskStatus;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.k9.prosesstask.impl.cron.CronExpression;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.statistikk.OppgaveStatistikkRepository;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveDataEntitet;
@@ -58,7 +59,7 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
         var sisteKjøring = finnSisteKjørtTidspunkt();
         log.info("Henter {} oppgaver endret siden {}", TASKTYPE, sisteKjøring);
 
-        var oppgaver = statistikkRepository.finnBekreftAvvikOppgaverEndretEtter(sisteKjøring);
+        var oppgaver = statistikkRepository.finnOppgaverEndretEtter(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, sisteKjøring);
         if (oppgaver.isEmpty()) {
             log.info("Ingen endringer siden siste kjøring for tabell {}. Hopper over publisering.", BekreftAvvikOppgaveTabellDefinisjon.TABELL_NAVN);
             return;

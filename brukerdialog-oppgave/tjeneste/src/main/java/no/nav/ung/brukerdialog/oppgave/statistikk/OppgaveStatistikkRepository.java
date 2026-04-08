@@ -41,29 +41,15 @@ public class OppgaveStatistikkRepository {
     }
 
     /**
-     * Henter RAPPORTER_INNTEKT-oppgaver som er opprettet eller endret etter angitt tidspunkt.
+     * Henter oppgaver av angitt type som er opprettet eller endret etter angitt tidspunkt.
      */
-    public List<BrukerdialogOppgaveEntitet> finnRapporterInntektOppgaverEndretEtter(LocalDateTime sisteKjøring) {
+    public List<BrukerdialogOppgaveEntitet> finnOppgaverEndretEtter(OppgaveType oppgaveType, LocalDateTime sisteKjøring) {
         return entityManager.createQuery(
                 "SELECT o FROM BrukerdialogOppgave o " +
                 "WHERE o.oppgaveType = :type " +
                 "AND (o.opprettetTidspunkt >= :sisteKjøring OR o.endretTidspunkt >= :sisteKjøring)",
                 BrukerdialogOppgaveEntitet.class)
-            .setParameter("type", OppgaveType.RAPPORTER_INNTEKT)
-            .setParameter("sisteKjøring", sisteKjøring)
-            .getResultList();
-    }
-
-    /**
-     * Henter BEKREFT_AVVIK_REGISTERINNTEKT-oppgaver som er opprettet eller endret etter angitt tidspunkt.
-     */
-    public List<BrukerdialogOppgaveEntitet> finnBekreftAvvikOppgaverEndretEtter(LocalDateTime sisteKjøring) {
-        return entityManager.createQuery(
-                "SELECT o FROM BrukerdialogOppgave o " +
-                "WHERE o.oppgaveType = :type " +
-                "AND (o.opprettetTidspunkt >= :sisteKjøring OR o.endretTidspunkt >= :sisteKjøring)",
-                BrukerdialogOppgaveEntitet.class)
-            .setParameter("type", OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT)
+            .setParameter("type", oppgaveType)
             .setParameter("sisteKjøring", sisteKjøring)
             .getResultList();
     }
