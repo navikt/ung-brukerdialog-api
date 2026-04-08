@@ -57,7 +57,7 @@ public class PubliserOppgaveSvartidMetrikkBatchTask implements BatchProsessTaskH
             .map(r -> OppgaveSvartidTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
             .collect(Collectors.toList());
 
-        bigQueryKlient.tømOgPubliserAtomisk(DATASET, OppgaveSvartidTabellDefinisjon.INSTANCE, rows);
+        bigQueryKlient.publiser(DATASET, OppgaveSvartidTabellDefinisjon.INSTANCE, rows);
         log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), OppgaveSvartidTabellDefinisjon.TABELL_NAVN);
     }
 

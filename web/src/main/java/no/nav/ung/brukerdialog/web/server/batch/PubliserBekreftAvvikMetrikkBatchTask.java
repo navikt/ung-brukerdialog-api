@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ApplicationScoped
 @ProsessTask(value = PubliserBekreftAvvikMetrikkBatchTask.TASKTYPE)
@@ -72,7 +71,7 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
             .map(r -> BekreftAvvikOppgaveTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
             .collect(Collectors.toList());
 
-        bigQueryKlient.tømOgPubliserAtomisk(DATASET, BekreftAvvikOppgaveTabellDefinisjon.INSTANCE, rows);
+        bigQueryKlient.publiser(DATASET, BekreftAvvikOppgaveTabellDefinisjon.INSTANCE, rows);
         log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), BekreftAvvikOppgaveTabellDefinisjon.TABELL_NAVN);
     }
 
@@ -116,10 +115,6 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
     }
 
     private LocalDateTime finnSisteTidspunkt(BrukerdialogOppgaveEntitet oppgave) {
-        // For bekreft-avvik-oppgaver brukes endretTidspunkt (settes ved lukking/avbrudd) som det siste relevante tidspunktet
-        return Stream.of(oppgave.getOpprettetTidspunkt(), oppgave.getLøstDato(), oppgave.getEndretTidspunkt())
-            .filter(Objects::nonNull)
-            .max(Comparator.naturalOrder())
-            .orElse(oppgave.getOpprettetTidspunkt());
+        return Objects.requireNonNullElse(oppgave.getEndretTidspunkt(), oppgave.getOpprettetTidspunkt());
     }
 }

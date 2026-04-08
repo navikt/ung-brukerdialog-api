@@ -9,7 +9,6 @@ import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskStatus;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.k9.prosesstask.impl.cron.CronExpression;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.statistikk.OppgaveStatistikkRepository;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveDataEntitet;
@@ -23,7 +22,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ApplicationScoped
 @ProsessTask(value = PubliserRapporterInntektMetrikkBatchTask.TASKTYPE)
@@ -73,7 +71,7 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
             .map(r -> RapporterInntektOppgaveTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
             .collect(Collectors.toList());
 
-        bigQueryKlient.tømOgPubliserAtomisk(DATASET, RapporterInntektOppgaveTabellDefinisjon.INSTANCE, rows);
+        bigQueryKlient.publiser(DATASET, RapporterInntektOppgaveTabellDefinisjon.INSTANCE, rows);
         log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), RapporterInntektOppgaveTabellDefinisjon.TABELL_NAVN);
     }
 
@@ -102,11 +100,6 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
     }
 
     private LocalDateTime finnSisteTidspunkt(BrukerdialogOppgaveEntitet oppgave) {
-        // For utløpte oppgaver brukes fristTid som det siste relevante tidspunktet
-        LocalDateTime fristForUtløpt = oppgave.getStatus() == OppgaveStatus.UTLØPT ? oppgave.getFristTid() : null;
-        return Stream.of(oppgave.getOpprettetTidspunkt(), oppgave.getLøstDato(), fristForUtløpt)
-            .filter(Objects::nonNull)
-            .max(Comparator.naturalOrder())
-            .orElse(oppgave.getOpprettetTidspunkt());
+        return Objects.requireNonNullElse(oppgave.getEndretTidspunkt(), oppgave.getOpprettetTidspunkt());
     }
 }
