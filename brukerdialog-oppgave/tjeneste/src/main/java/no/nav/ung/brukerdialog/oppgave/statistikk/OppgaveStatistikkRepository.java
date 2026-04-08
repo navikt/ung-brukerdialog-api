@@ -47,7 +47,7 @@ public class OppgaveStatistikkRepository {
         return entityManager.createQuery(
                 "SELECT o FROM BrukerdialogOppgave o " +
                 "WHERE o.oppgaveType = :type " +
-                "AND (o.opprettetTidspunkt > :sisteKjøring OR o.endretTidspunkt > :sisteKjøring)",
+                "AND (o.opprettetTidspunkt >= :sisteKjøring OR o.endretTidspunkt >= :sisteKjøring)",
                 BrukerdialogOppgaveEntitet.class)
             .setParameter("type", OppgaveType.RAPPORTER_INNTEKT)
             .setParameter("sisteKjøring", sisteKjøring)
@@ -61,7 +61,7 @@ public class OppgaveStatistikkRepository {
         return entityManager.createQuery(
                 "SELECT o FROM BrukerdialogOppgave o " +
                 "WHERE o.oppgaveType = :type " +
-                "AND (o.opprettetTidspunkt > :sisteKjøring OR o.endretTidspunkt > :sisteKjøring)",
+                "AND (o.opprettetTidspunkt >= :sisteKjøring OR o.endretTidspunkt >= :sisteKjøring)",
                 BrukerdialogOppgaveEntitet.class)
             .setParameter("type", OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT)
             .setParameter("sisteKjøring", sisteKjøring)
