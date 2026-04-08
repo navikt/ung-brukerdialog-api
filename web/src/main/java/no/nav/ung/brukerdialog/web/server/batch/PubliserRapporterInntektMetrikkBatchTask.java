@@ -81,7 +81,7 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
             .map(ProsessTaskData::getSistKjørt)
             .filter(Objects::nonNull)
             .max(Comparator.naturalOrder())
-            .orElse(LocalDateTime.of(2000, 1, 1, 0, 0, 0));
+            .orElse(LocalDateTime.now().minusHours(1));
     }
 
     private RapporterInntektRecord tilRecord(BrukerdialogOppgaveEntitet oppgave) {
