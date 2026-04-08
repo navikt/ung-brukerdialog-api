@@ -6,6 +6,8 @@ import no.nav.k9.felles.integrasjon.bigquery.klient.BigQueryKlient;
 import no.nav.k9.prosesstask.api.BatchProsessTaskHandler;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
+import no.nav.k9.prosesstask.api.ProsessTaskStatus;
+import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.k9.prosesstask.impl.cron.CronExpression;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.statistikk.OppgaveStatistikkRepository;
@@ -15,9 +17,9 @@ import no.nav.ung.brukerdialog.web.server.batch.bigquery.BekreftAvvikRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Comparator;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +34,7 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
 
     private OppgaveStatistikkRepository statistikkRepository;
     private BigQueryKlient bigQueryKlient;
+    private ProsessTaskTjeneste prosessTaskTjeneste;
 
     PubliserBekreftAvvikMetrikkBatchTask() {
         // CDI proxy
@@ -39,9 +42,11 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
 
     @Inject
     public PubliserBekreftAvvikMetrikkBatchTask(OppgaveStatistikkRepository statistikkRepository,
-                                                BigQueryKlient bigQueryKlient) {
+                                                BigQueryKlient bigQueryKlient,
+                                                ProsessTaskTjeneste prosessTaskTjeneste) {
         this.statistikkRepository = statistikkRepository;
         this.bigQueryKlient = bigQueryKlient;
+        this.prosessTaskTjeneste = prosessTaskTjeneste;
     }
 
     @Override
@@ -51,7 +56,15 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var oppgaver = statistikkRepository.finnAlleBekreftAvvikOppgaver();
+        var sisteKjøring = finnSisteKjørtTidspunkt();
+        log.info("Henter {} oppgaver endret siden {}", TASKTYPE, sisteKjøring);
+
+        var oppgaver = statistikkRepository.finnBekreftAvvikOppgaverEndretEtter(sisteKjøring);
+        if (oppgaver.isEmpty()) {
+            log.info("Ingen endringer siden siste kjøring for tabell {}. Hopper over publisering.", BekreftAvvikOppgaveTabellDefinisjon.TABELL_NAVN);
+            return;
+        }
+
         Instant now = Instant.now();
         var rows = oppgaver.stream()
             .map(this::tilRecord)
@@ -61,6 +74,14 @@ public class PubliserBekreftAvvikMetrikkBatchTask implements BatchProsessTaskHan
 
         bigQueryKlient.tømOgPubliserAtomisk(DATASET, BekreftAvvikOppgaveTabellDefinisjon.INSTANCE, rows);
         log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), BekreftAvvikOppgaveTabellDefinisjon.TABELL_NAVN);
+    }
+
+    private LocalDateTime finnSisteKjørtTidspunkt() {
+        return prosessTaskTjeneste.finnAlle(TASKTYPE, ProsessTaskStatus.FERDIG).stream()
+            .map(ProsessTaskData::getSistKjørt)
+            .filter(Objects::nonNull)
+            .max(Comparator.naturalOrder())
+            .orElse(LocalDateTime.of(2000, 1, 1, 0, 0, 0));
     }
 
     private BekreftAvvikRecord tilRecord(BrukerdialogOppgaveEntitet oppgave) {
