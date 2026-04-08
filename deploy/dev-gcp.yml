@@ -154,7 +154,8 @@ spec:
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/ung
     - name: UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL
       value: https://ungdomsytelse-deltaker.intern.dev.nav.no/ungdomsprogrammet/ytelsen
-
+    - name: AKTIVITETSPENGER_INNSYN_BASE_URL
+      value: https://aktivitetspenger-innsyn.intern.dev.nav.no/aktivitetspenger/innsyn
 
      # Sikkerhet:
     - name: NAV_ANSATT_URL

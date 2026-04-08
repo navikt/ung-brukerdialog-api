@@ -158,10 +158,12 @@ spec:
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/ung/nav-ansatt
     - name: UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL
       value: https://www.nav.no/ungdomsprogrammet/ytelsen
-    - name: AZURE_LOGIN_URL
-      value: "https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/v2.0"
+    - name: AKTIVITETSPENGER_INNSYN_BASE_URL
+      value: https://www.nav.no/aktivitetspenger/innsyn
 
     # Sikkerhet:
+    - name: AZURE_LOGIN_URL
+      value: "https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/v2.0"
     - name: CLIENT_SCOPE
       value: "api://prod-gcp.k9saksbehandling.ung-brukerdialog-api/.default"
     - name: ABAC_ATTRIBUTT_DRIFT

@@ -3,8 +3,8 @@ package no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinn
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
-import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 import no.nav.ung.brukerdialog.oppgave.OppgavelInnholdUtleder;
 
@@ -15,12 +15,15 @@ import java.time.Month;
 public class KontrollerRegisterinntektOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
 
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private String aktivitetspengerInnsynBaseUrl;
 
     @Inject
     public KontrollerRegisterinntektOppgavelInnholdUtleder(
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl
     ) {
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.aktivitetspengerInnsynBaseUrl = aktivitetspengerInnsynBaseUrl;
     }
 
     public KontrollerRegisterinntektOppgavelInnholdUtleder() {
@@ -35,7 +38,10 @@ public class KontrollerRegisterinntektOppgavelInnholdUtleder implements Oppgavel
 
     @Override
     public String utledVarselLenke(BrukerdialogOppgaveEntitet oppgave) {
-        return ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+        return switch (oppgave.getYtelsetype()) {
+            case AKTIVITETSPENGER -> aktivitetspengerInnsynBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+            case UNGDOMSYTELSE -> ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+        };
     }
 
     public String finnNorskMånedNavn(Month måned) {
