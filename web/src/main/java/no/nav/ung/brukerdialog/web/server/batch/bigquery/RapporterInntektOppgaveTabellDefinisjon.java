@@ -1,0 +1,72 @@
+package no.nav.ung.brukerdialog.web.server.batch.bigquery;
+
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.StandardSQLTypeName;
+import no.nav.k9.felles.integrasjon.bigquery.tabell.BigQueryRecord;
+import no.nav.k9.felles.integrasjon.bigquery.tabell.BigQueryTabellDefinisjon;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+public final class RapporterInntektOppgaveTabellDefinisjon implements BigQueryTabellDefinisjon {
+
+    public static final RapporterInntektOppgaveTabellDefinisjon INSTANCE = new RapporterInntektOppgaveTabellDefinisjon();
+    static final String TABELL_NAVN = "oppgave_rapporter_inntekt_v2";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+
+    private RapporterInntektOppgaveTabellDefinisjon() {
+    }
+
+    @Override
+    public String getTabellNavn() {
+        return TABELL_NAVN;
+    }
+
+    @Override
+    public Schema getSchema() {
+        return Schema.of(
+            Field.of("opprettetTidspunkt", StandardSQLTypeName.DATETIME),
+            Field.of("eksternReferanse", StandardSQLTypeName.STRING),
+            Field.of("oppgaveStatus", StandardSQLTypeName.STRING),
+            Field.of("fom", StandardSQLTypeName.DATE),
+            Field.of("tom", StandardSQLTypeName.DATE),
+            Field.of("gjelderDelerAvPerioden", StandardSQLTypeName.BOOL)
+        );
+    }
+
+    @Override
+    public Function<BigQueryRecord, Map<String, ?>> getRowMapper(Instant now) {
+        return record -> {
+            var r = (RapporterInntektRecord) record;
+            var row = new HashMap<String, Object>();
+            row.put("opprettetTidspunkt", r.opprettetTidspunkt().format(DATE_TIME_FORMATTER));
+            row.put("eksternReferanse", r.oppgaveReferanse().toString());
+            row.put("oppgaveStatus", r.oppgaveStatus());
+            row.put("fom", r.fraOgMed().format(DATE_FORMATTER));
+            row.put("tom", r.tilOgMed().format(DATE_FORMATTER));
+            row.put("gjelderDelerAvPerioden", r.gjelderDelerAvMåned());
+            return row;
+        };
+    }
+
+    @Override
+    public boolean skalTømmeFørSkriv() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof BigQueryTabellDefinisjon other
+            && getTabellNavn().equals(other.getTabellNavn()));
+    }
+
+    @Override
+    public int hashCode() {
+        return getTabellNavn().hashCode();
+    }
+}

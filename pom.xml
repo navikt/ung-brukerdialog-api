@@ -118,6 +118,11 @@
                 <type>pom</type>
             </dependency>
             <dependency>
+                <groupId>no.nav.k9.felles.integrasjon</groupId>
+                <artifactId>k9-bigquery-klient</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
+            <dependency>
                 <!-- Importer først for å sikre samme avhengigheter gjennom hele. -->
                 <groupId>no.nav.k9.felles</groupId>
                 <artifactId>k9-felles-db</artifactId>
