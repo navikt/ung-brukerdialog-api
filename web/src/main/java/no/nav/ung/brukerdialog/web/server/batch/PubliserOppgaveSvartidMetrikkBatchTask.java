@@ -7,7 +7,6 @@ import no.nav.k9.prosesstask.api.BatchProsessTaskHandler;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.impl.cron.CronExpression;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.statistikk.OppgaveStatistikkRepository;
 import no.nav.ung.brukerdialog.web.server.batch.bigquery.OppgaveSvartidRecord;
@@ -79,27 +78,9 @@ public class PubliserOppgaveSvartidMetrikkBatchTask implements BatchProsessTaskH
                 gruppe.size()
             )));
 
-        // Avbrutte oppgaver (tilsvarer "lukket" i ung-deltakelse-opplyser)
+        // Oppgaver som ikke er løst og er eldre enn 14 dager
         oppgaver.stream()
-            .filter(o -> o.getLøstDato() == null && o.getStatus() == OppgaveStatus.AVBRUTT)
-            .collect(Collectors.groupingBy(o -> {
-                var avbrutt = o.getEndretTidspunkt() != null ? o.getEndretTidspunkt() : o.getOpprettetTidspunkt();
-                return svartidOgTypeKey(
-                    ChronoUnit.DAYS.between(o.getOpprettetTidspunkt(), avbrutt),
-                    o.getOppgaveType().name());
-            }))
-            .forEach((key, gruppe) -> records.add(new OppgaveSvartidRecord(
-                key.svartidDager(),
-                false,
-                true,
-                false,
-                key.oppgaveType(),
-                gruppe.size()
-            )));
-
-        // Oppgaver som verken er løst eller avbrutt og er eldre enn 14 dager
-        oppgaver.stream()
-            .filter(o -> o.getLøstDato() == null && o.getStatus() != OppgaveStatus.AVBRUTT)
+            .filter(o -> o.getLøstDato() == null)
             .collect(Collectors.groupingBy(o -> o.getOppgaveType().name()))
             .forEach((oppgaveType, gruppe) -> records.add(new OppgaveSvartidRecord(
                 null,
