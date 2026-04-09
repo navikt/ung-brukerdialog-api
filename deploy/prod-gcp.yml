@@ -122,6 +122,10 @@ spec:
             value: "on"
         pointInTimeRecovery: true
         retainedBackups : 30
+    bigQueryDatasets:
+      - name: ung_deltakelse_opplyser_statistikk_dataset
+        description: Inneholder tabeller for ung-sak ment for statistikk
+        permission: READWRITE
   env:
     - name: TZ
       value: "Europe/Oslo"
