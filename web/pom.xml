@@ -122,6 +122,10 @@
             <groupId>no.nav.k9.felles.integrasjon</groupId>
             <artifactId>k9-microsoft-graph-klient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-bigquery-klient</artifactId>
+        </dependency>
 
         <!-- Server Provided Libraries. Transitive avhengigheter som ikke burde
             vært her da de trekkes inn av server. -->
