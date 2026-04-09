@@ -121,6 +121,10 @@ spec:
           - name: ung-brukerdialog-api
             envVarPrefix: DB
         pointInTimeRecovery: true
+    bigQueryDatasets:
+      - name: ung_deltakelse_opplyser_statistikk_dataset
+        description: Inneholder tabeller for ung-sak ment for statistikk
+        permission: READWRITE
   env:
     - name: TZ
       value: "Europe/Oslo"
@@ -157,7 +161,7 @@ spec:
     - name: AKTIVITETSPENGER_INNSYN_BASE_URL
       value: https://aktivitetspenger-innsyn.intern.dev.nav.no/aktivitetspenger/innsyn
 
-     # Sikkerhet:
+    # Sikkerhet:
     - name: NAV_ANSATT_URL
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/ung/nav-ansatt
     - name: CLIENT_SCOPE
