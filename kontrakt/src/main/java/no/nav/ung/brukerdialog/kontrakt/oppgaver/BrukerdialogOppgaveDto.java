@@ -27,6 +27,10 @@ public record BrukerdialogOppgaveDto(
     @NotNull
     OppgavetypeDataDto oppgavetypeData,
 
+    @JsonProperty(value = "ytelsetype", required = true)
+    @NotNull
+    OppgaveYtelsetype ytelsetype,
+
     @JsonProperty(value = "respons")
     OppgaveResponsDto respons,
 
