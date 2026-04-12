@@ -7,11 +7,14 @@
 	<!-- Sequence generator for brukerdialog oppgave (varsel and søknad) -->
 	<sequence-generator name="SEQ_BD_OPPGAVE" allocation-size="50" sequence-name="SEQ_BD_OPPGAVE" />
 
-	<!-- Sequence generators for typed oppgavedata tables -->
-	<sequence-generator name="SEQ_BD_OPPGAVE_DATA"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_DATA" />
+    <!-- Sequence generators for typed oppgavedata tables -->
+    <sequence-generator name="SEQ_BD_OPPGAVE_DATA"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_DATA" />
     <sequence-generator name="SEQ_BD_OPPGAVE_DATA_ARBEID_FRILANS_INNTEKT"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_DATA_ARBEID_FRILANS_INNTEKT" />
     <sequence-generator name="SEQ_BD_OPPGAVE_DATA_YTELSE_INNTEKT"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_DATA_YTELSE_INNTEKT" />
     <sequence-generator name="SEQ_BD_OPPGAVE_DATA_PERIODE_ENDRING"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_DATA_PERIODE_ENDRING" />
+
+    <!-- Sequence generator for diagnostikk-->
+    <sequence-generator name="SEQ_DIAGNOSTIKK_OPPGAVE_LOGG"        allocation-size="50" sequence-name="SEQ_DIAGNOSTIKK_OPPGAVE_LOGG" />
 
     <!-- Entity mappings -->
 	<entity class="no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet" />
@@ -26,6 +29,10 @@
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.YtelseInntektEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet" />
+
+
+    <!-- Diagnostikk -->
+    <entity class="no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkOppgaveLogg" />
 
 
 </entity-mappings>

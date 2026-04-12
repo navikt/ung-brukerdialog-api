@@ -11,8 +11,6 @@ public class DiagnostikkOppgaveLogg extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_DIAGNOSTIKK_OPPGAVE_LOGG")
-    @SequenceGenerator(name = "SEQ_DIAGNOSTIKK_OPPGAVE_LOGG", sequenceName = "SEQ_DIAGNOSTIKK_OPPGAVE_LOGG", allocationSize = 50)
-    @Column(name = "id")
     private Long id;
 
     @Column(name = "oppgavereferanse", nullable = false, updatable = false)
