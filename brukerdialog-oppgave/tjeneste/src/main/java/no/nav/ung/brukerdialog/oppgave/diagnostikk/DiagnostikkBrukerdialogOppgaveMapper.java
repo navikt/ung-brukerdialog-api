@@ -57,7 +57,7 @@ public class DiagnostikkBrukerdialogOppgaveMapper {
                 new DiagnostikkSvarPåVarselDto(dto.getHarUttalelse(), dto.getUttalelseFraBruker());
             case RapportertInntektDto dto ->
                 new DiagnostikkRapportertInntektDto(dto.getFraOgMed(), dto.getTilOgMed(), dto.getArbeidstakerOgFrilansInntekt());
-            default -> throw new IllegalStateException("Fikk uventet respons.");
+            default -> throw new IllegalStateException("Fikk uventet respons-type: " + oppgave.getRespons().getClass().getName());
         };
 
     }
