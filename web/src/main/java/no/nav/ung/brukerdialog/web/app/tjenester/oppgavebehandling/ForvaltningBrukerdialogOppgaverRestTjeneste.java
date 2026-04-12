@@ -56,7 +56,7 @@ public class ForvaltningBrukerdialogOppgaverRestTjeneste {
     }
 
     @POST
-    @Path("/løs")
+    @Path("/los")
 
     @Operation(
         summary = "Setter oppgave til løst og setter respons",
@@ -67,7 +67,7 @@ public class ForvaltningBrukerdialogOppgaverRestTjeneste {
         @Valid
         @NotNull
         @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) ForvaltningSettLøstDto requestDto) {
-        entityManager.persist(new DiagnostikkOppgaveLogg(requestDto.oppgaveReferanse(), "/forvaltning/oppgave/løs", requestDto.begrunnelse()));
+        entityManager.persist(new DiagnostikkOppgaveLogg(requestDto.oppgaveReferanse(), "/forvaltning/oppgave/los", requestDto.begrunnelse()));
         entityManager.flush();
         var oppgave = repository.hentOppgaveForOppgavereferanse(requestDto.oppgaveReferanse())
             .orElseThrow(() -> new IllegalStateException("Forventer å finne oppgave"));
