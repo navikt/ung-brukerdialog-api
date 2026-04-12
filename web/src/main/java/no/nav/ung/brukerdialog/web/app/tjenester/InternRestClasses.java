@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.web.app.tjenester;
 
 import no.nav.k9.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.DiagnostikkBrukerdialogOppgaverRestTjeneste;
+import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.ForvaltningBrukerdialogOppgaverRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.MigrerBrukerdialogOppgaverRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.OppgavebehandlingRestTjeneste;
 
@@ -15,6 +16,7 @@ public class InternRestClasses implements RestClasses {
         Set<Class<?>> classes = new HashSet<>(List.of(ProsessTaskRestTjeneste.class,
             MigrerBrukerdialogOppgaverRestTjeneste.class,
             DiagnostikkBrukerdialogOppgaverRestTjeneste.class,
+            ForvaltningBrukerdialogOppgaverRestTjeneste.class,
             OppgavebehandlingRestTjeneste.class));
         return Set.copyOf(classes);
     }
