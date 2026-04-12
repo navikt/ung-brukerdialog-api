@@ -3,6 +3,7 @@ package no.nav.ung.brukerdialog.web.server.abac;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.env.Cluster;
 import no.nav.k9.felles.konfigurasjon.env.Environment;
 import no.nav.k9.felles.sikkerhet.abac.*;
@@ -28,9 +29,15 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         CLUSTER.PROD_GCP.clusterName() + ":dusseldorf"
     );
 
-    private BrukerdialogOppgaveRepository oppgaveRepository;
+    private final BrukerdialogOppgaveRepository oppgaveRepository;
 
     public AppPdpRequestBuilderImpl() {
+        this(null);
+    }
+
+    @Inject
+    public AppPdpRequestBuilderImpl(BrukerdialogOppgaveRepository oppgaveRepository) {
+        this.oppgaveRepository = oppgaveRepository;
     }
 
 
