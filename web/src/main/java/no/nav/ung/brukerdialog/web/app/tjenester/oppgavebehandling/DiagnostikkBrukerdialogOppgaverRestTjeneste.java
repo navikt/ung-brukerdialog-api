@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -17,11 +18,12 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveEksternReferanseDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkBrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkOppgaveRequestDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkBrukerdialogOppgaveMapper;
+import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkOppgaveLogg;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 
 import java.util.Optional;
@@ -40,6 +42,7 @@ public class DiagnostikkBrukerdialogOppgaverRestTjeneste {
 
     private BrukerdialogOppgaveRepository repository;
     private DiagnostikkBrukerdialogOppgaveMapper oppgaveMapper;
+    private EntityManager entityManager;
 
     public DiagnostikkBrukerdialogOppgaverRestTjeneste() {
         // CDI proxy
@@ -48,22 +51,27 @@ public class DiagnostikkBrukerdialogOppgaverRestTjeneste {
     @Inject
     public DiagnostikkBrukerdialogOppgaverRestTjeneste(
         BrukerdialogOppgaveRepository repository,
-        DiagnostikkBrukerdialogOppgaveMapper oppgaveMapper) {
+        DiagnostikkBrukerdialogOppgaveMapper oppgaveMapper,
+        EntityManager entityManager) {
         this.repository = repository;
         this.oppgaveMapper = oppgaveMapper;
+        this.entityManager = entityManager;
     }
 
     @POST
     @Operation(
         summary = "Henter oppgave for bruk til diagnostikk",
-        description = "Henter oppgave for diagnostikkformål."
+        description = "Henter oppgave for diagnostikkformål. Logger aksess i DIAGNOSTIKK_OPPGAVE_LOGG."
     )
     @BeskyttetRessurs(action = BeskyttetRessursActionType.READ, resource = BeskyttetRessursResourceType.DRIFT)
     public Response hentDiagnostikk(
         @Valid
         @NotNull
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) OppgaveEksternReferanseDto eksternReferanseDto) {
-        Optional<BrukerdialogOppgaveEntitet> oppgave = repository.hentOppgaveForOppgavereferanse(eksternReferanseDto.oppgaveReferanse());
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) DiagnostikkOppgaveRequestDto requestDto) {
+        entityManager.persist(new DiagnostikkOppgaveLogg(requestDto.oppgaveReferanse(), "/forvaltning/oppgave/diagnostikk", requestDto.begrunnelse()));
+        entityManager.flush();
+
+        Optional<BrukerdialogOppgaveEntitet> oppgave = repository.hentOppgaveForOppgavereferanse(requestDto.oppgaveReferanse());
         Optional<DiagnostikkBrukerdialogOppgaveDto> mappetOppgave = oppgave.map(oppgaveMapper::tilDto);
         return mappetOppgave.map(Response::ok)
             .map(Response.ResponseBuilder::build)
