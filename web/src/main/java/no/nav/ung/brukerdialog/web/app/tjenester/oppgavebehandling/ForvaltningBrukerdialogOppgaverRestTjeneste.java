@@ -30,7 +30,7 @@ import java.util.Optional;
  * REST-tjeneste for forvaltning av brukerdialogoppgaver.
  * Tilgjengelig kun for driftstilgang.
  */
-@Path("/forvaltning/oppgave/")
+@Path("/forvaltning/oppgave")
 @ApplicationScoped
 @Transactional
 @Produces(MediaType.APPLICATION_JSON)
