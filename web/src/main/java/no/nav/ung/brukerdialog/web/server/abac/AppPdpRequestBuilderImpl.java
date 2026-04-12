@@ -7,11 +7,12 @@ import no.nav.k9.felles.konfigurasjon.env.Cluster;
 import no.nav.k9.felles.konfigurasjon.env.Environment;
 import no.nav.k9.felles.sikkerhet.abac.*;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Dependent
@@ -22,10 +23,12 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(AppPdpRequestBuilderImpl.class);
     private static final Cluster CLUSTER = Environment.current().getCluster();
     private static final List<String> INTERNAL_CLUSTER_NAMESPACE = List.of(
-            CLUSTER.clusterName() + ":k9saksbehandling",
-            CLUSTER.DEV_GCP.clusterName() + ":dusseldorf",
-            CLUSTER.PROD_GCP.clusterName() + ":dusseldorf"
+        CLUSTER.clusterName() + ":k9saksbehandling",
+        CLUSTER.DEV_GCP.clusterName() + ":dusseldorf",
+        CLUSTER.PROD_GCP.clusterName() + ":dusseldorf"
     );
+
+    private BrukerdialogOppgaveRepository oppgaveRepository;
 
     public AppPdpRequestBuilderImpl() {
     }
@@ -38,8 +41,10 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         pdpRequest.setActionType(attributter.getActionType());
         pdpRequest.setResourceType(attributter.getResourceType());
         pdpRequest.setFagsakYtelseTyper(attributter.getVerdier(AppAbacAttributtType.YTELSETYPE));
+        Set<String> aktørIder = new HashSet<>(attributter.getVerdier(StandardAbacAttributtType.AKTØR_ID));
 
-        Set<String> aktørIder = attributter.getVerdier(StandardAbacAttributtType.AKTØR_ID);
+        mapAktørIdFraEksternReferanser(attributter, aktørIder);
+
         Set<String> fødselsnumre = attributter.getVerdier(StandardAbacAttributtType.FNR);
         pdpRequest.setAktørIderStr(aktørIder);
         pdpRequest.setFødselsnumreStr(fødselsnumre);
@@ -47,6 +52,17 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
             fødselsnumre.stream().map(Fnr::new).collect(Collectors.toSet()),
             aktørIder.stream().map(AktørId::new).collect(Collectors.toSet())));
         return pdpRequest;
+    }
+
+    private void mapAktørIdFraEksternReferanser(AbacAttributtSamling attributter, Set<String> aktørIder) {
+        Set<String> eksternReferanser = attributter.getVerdier(AppAbacAttributtType.OPPGAVE_EKSTERN_REFERANSE);
+        if (!eksternReferanser.isEmpty()) {
+            eksternReferanser.stream().map(UUID::fromString).map(oppgaveRepository::hentOppgaveForOppgavereferanse)
+                .flatMap(Optional::stream)
+                .map(BrukerdialogOppgaveEntitet::getAktørId)
+                .map(no.nav.ung.brukerdialog.typer.AktørId::getId)
+                .forEach(aktørIder::add);
+        }
     }
 
 
