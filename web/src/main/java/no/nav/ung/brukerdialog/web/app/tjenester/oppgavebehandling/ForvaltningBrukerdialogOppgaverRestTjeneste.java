@@ -18,13 +18,9 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkBrukerdialogOppgaveDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkOppgaveRequestDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.ForvaltningSettLøstDto;
-import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
-import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkBrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkOppgaveLogg;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 
