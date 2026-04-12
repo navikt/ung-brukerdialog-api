@@ -3,11 +3,14 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributt;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
 
 import java.util.UUID;
+
+import static no.nav.k9.felles.validering.InputValideringRegex.FRITEKST;
 
 public record DiagnostikkOppgaveRequestDto(
     @JsonProperty("oppgaveReferanse")
@@ -18,6 +21,7 @@ public record DiagnostikkOppgaveRequestDto(
     @JsonProperty("begrunnelse")
     @NotNull
     @Size(max = 4000)
+    @Pattern(regexp = FRITEKST)
     String begrunnelse
 ) {
     @AppAbacAttributt(value = AppAbacAttributtType.OPPGAVE_EKSTERN_REFERANSE)
