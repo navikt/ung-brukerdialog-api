@@ -10,9 +10,9 @@ public enum AppAbacAttributtType implements AbacAttributtType {
 
     DOKUMENT_ID,
     /**
-     * egen-definert oppgaveId i Gsak.
+     * referanse generert av konsument
      */
-    OPPGAVE_ID,
+    OPPGAVE_EKSTERN_REFERANSE,
     SAKER_MED_FNR(true),
     SAKER_MED_AKTØR_ID(true),
 
