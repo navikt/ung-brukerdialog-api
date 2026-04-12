@@ -62,7 +62,7 @@ public class ForvaltningBrukerdialogOppgaverRestTjeneste {
         summary = "Setter oppgave til løst og setter respons",
         description = "Setter oppgave til løst med oppgitt respons"
     )
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.CREATE, resource = BeskyttetRessursResourceType.DRIFT)
+    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.DRIFT)
     public Response løsOppgave(
         @Valid
         @NotNull
