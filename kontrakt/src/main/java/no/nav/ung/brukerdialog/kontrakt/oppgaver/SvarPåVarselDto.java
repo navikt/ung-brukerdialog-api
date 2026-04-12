@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import static no.nav.k9.felles.validering.InputValideringRegex.FRITEKST;
+
 /**
  * DTO for uttalelse fra bruker på et varsel.
  */
@@ -15,7 +17,7 @@ public class SvarPåVarselDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "uttalelseFraBruker")
     @Size(max = 4000)
-    @Pattern(regexp = "^[\\p{Graph}\\p{Space}\\p{Sc}\\p{L}\\p{M}\\p{N}]+$")
+    @Pattern(regexp = FRITEKST)
     String uttalelseFraBruker;
 
     public SvarPåVarselDto() {
