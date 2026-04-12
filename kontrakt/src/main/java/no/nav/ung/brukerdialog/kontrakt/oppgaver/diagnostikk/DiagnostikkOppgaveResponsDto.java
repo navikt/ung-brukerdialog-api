@@ -6,7 +6,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.SvarPåVarselDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.RapportertInntektDto;
 
 /**
- * Interface for respons-data.
+ * Basisklasse for respons-data brukt ved polymorf serialisering og deserialisering.
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
