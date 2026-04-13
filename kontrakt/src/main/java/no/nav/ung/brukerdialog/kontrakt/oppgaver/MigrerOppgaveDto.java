@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import no.nav.k9.felles.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.ung.brukerdialog.abac.StandardAbacAttributt;
 import no.nav.ung.brukerdialog.typer.AktørId;
@@ -34,9 +35,9 @@ public record MigrerOppgaveDto(
     @Valid
     OppgavetypeDataDto oppgavetypeData,
 
-    @JsonProperty(value = "bekreftelse")
+    @JsonProperty(value = "respons")
     @Valid
-    BekreftelseDTO bekreftelse,
+    OppgaveResponsDto respons,
 
     @JsonProperty(value = "status", required = true)
     @NotNull
@@ -50,14 +51,6 @@ public record MigrerOppgaveDto(
     @JsonProperty(value = "løstDato")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime løstDato,
-
-    @JsonProperty(value = "åpnetDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime åpnetDato,
-
-    @JsonProperty(value = "lukketDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime lukketDato,
 
     @JsonProperty(value = "frist")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")

@@ -1,9 +1,9 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
@@ -14,13 +14,6 @@ import java.time.LocalDate;
  * Data for oppgave om å kontrollere registerinntekt.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.NONE,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-    creatorVisibility = JsonAutoDetect.Visibility.NONE
-)
 public record KontrollerRegisterinntektOppgavetypeDataDto(
     @JsonProperty(value = "fraOgMed", required = true)
     @NotNull
@@ -33,6 +26,7 @@ public record KontrollerRegisterinntektOppgavetypeDataDto(
     LocalDate tilOgMed,
 
     @JsonProperty(value = "registerinntekt", required = true)
+    @Valid
     @NotNull
     RegisterinntektDTO registerinntekt,
 

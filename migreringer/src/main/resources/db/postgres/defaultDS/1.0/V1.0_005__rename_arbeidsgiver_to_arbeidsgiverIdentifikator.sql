@@ -1,0 +1,3 @@
+-- Migration: Rename column arbeidsgiver to arbeidsgiverIdentifikator in BD_OPPGAVE_DATA_ARBEID_FRILANS_INNTEKT
+ALTER TABLE BD_OPPGAVE_DATA_ARBEID_FRILANS_INNTEKT RENAME COLUMN arbeidsgiver TO arbeidsgiverIdentifikator;
+

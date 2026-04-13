@@ -1,6 +1,5 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,13 +13,6 @@ import java.time.LocalDate;
  * Data for inntektsrapportering oppgave.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.NONE,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-    creatorVisibility = JsonAutoDetect.Visibility.NONE
-)
 public record InntektsrapporteringOppgavetypeDataDto(
     @JsonProperty(value = "fraOgMed", required = true)
     @NotNull

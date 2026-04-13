@@ -16,30 +16,38 @@ public class ArbeidOgFrilansInntektEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_OPPGAVE_DATA_ARBEID_FRILANS_INNTEKT")
     private Long id;
 
-    @Column(name = "arbeidsgiver", nullable = false, updatable = false)
-    private String arbeidsgiver;
+    @Column(name = "arbeidsgiverIdentifikator", nullable = false, updatable = false)
+    private String arbeidsgiverIdentifikator;
 
     @Column(name = "inntekt", nullable = false, updatable = false)
     private int inntekt;
+
+    @Column(name = "arbeidsgivernavn", nullable = true, updatable = false)
+    private String arbeidsgivernavn;
 
     protected ArbeidOgFrilansInntektEntitet() {
         // For JPA
     }
 
-    ArbeidOgFrilansInntektEntitet(String arbeidsgiver, int inntekt) {
-        this.arbeidsgiver = arbeidsgiver;
+    ArbeidOgFrilansInntektEntitet(String arbeidsgiverIdentifikator, String arbeidsgivernavn, int inntekt) {
+        this.arbeidsgiverIdentifikator = arbeidsgiverIdentifikator;
         this.inntekt = inntekt;
+        this.arbeidsgivernavn = arbeidsgivernavn;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getArbeidsgiver() {
-        return arbeidsgiver;
+    public String getArbeidsgiverIdentifikator() {
+        return arbeidsgiverIdentifikator;
     }
 
     public int getInntekt() {
         return inntekt;
+    }
+
+    public String getArbeidsgivernavn() {
+        return arbeidsgivernavn;
     }
 }

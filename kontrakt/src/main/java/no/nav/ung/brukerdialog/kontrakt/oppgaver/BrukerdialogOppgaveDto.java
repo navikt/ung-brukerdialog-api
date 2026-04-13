@@ -1,6 +1,5 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,13 +13,6 @@ import java.util.UUID;
  * DTO for oppgave med all nødvendig informasjon for visning og håndtering.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.NONE,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-    creatorVisibility = JsonAutoDetect.Visibility.NONE
-)
 public record BrukerdialogOppgaveDto(
     @JsonProperty(value = "oppgaveReferanse", required = true)
     @NotNull
@@ -35,8 +27,12 @@ public record BrukerdialogOppgaveDto(
     @NotNull
     OppgavetypeDataDto oppgavetypeData,
 
-    @JsonProperty(value = "bekreftelse")
-    BekreftelseDTO bekreftelse,
+    @JsonProperty(value = "ytelsetype", required = true)
+    @NotNull
+    OppgaveYtelsetype ytelsetype,
+
+    @JsonProperty(value = "respons")
+    OppgaveResponsDto respons,
 
     @JsonProperty(value = "status", required = true)
     @NotNull
@@ -50,14 +46,6 @@ public record BrukerdialogOppgaveDto(
     @JsonProperty(value = "løstDato")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime løstDato,
-
-    @JsonProperty(value = "åpnetDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime åpnetDato,
-
-    @JsonProperty(value = "lukketDato")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime lukketDato,
 
     @JsonProperty(value = "frist")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")

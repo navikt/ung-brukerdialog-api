@@ -5,17 +5,17 @@
 
     <parent>
         <groupId>no.nav.ung.brukerdialog</groupId>
-        <artifactId>ung-brukerdialog</artifactId>
+        <artifactId>ung-brukerdialog-api</artifactId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
 
     <artifactId>web-webapp</artifactId>
     <packaging>jar</packaging>
-    <name>ung-brukerdialog :: Webapp</name>
+    <name>ung-brukerdialog-api :: Webapp</name>
 
     <properties>
-        <swagger-ui.version>5.31.0</swagger-ui.version>
-        <jetty.version>12.1.6</jetty.version>
+        <swagger-ui.version>5.32.1</swagger-ui.version>
+        <jetty.version>12.1.8</jetty.version>
         <metrics.version>4.2.38</metrics.version>
     </properties>
 
@@ -122,6 +122,10 @@
             <groupId>no.nav.k9.felles.integrasjon</groupId>
             <artifactId>k9-microsoft-graph-klient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-bigquery-klient</artifactId>
+        </dependency>
 
         <!-- Server Provided Libraries. Transitive avhengigheter som ikke burde
             vært her da de trekkes inn av server. -->
@@ -173,7 +177,7 @@
         <dependency>
             <groupId>no.nav.openapi.spec.utils</groupId>
             <artifactId>openapi-spec-utils</artifactId>
-            <version>2.0.5</version>
+            <version>2.1.0</version>
         </dependency>
 
         <!-- CDI -->
@@ -355,7 +359,7 @@
 
                 The compile phase must have run before this so that the classes that defines the api has been built.
 
-                By default the plugin writes the result to the file target/ung-brukerdialog.openapi.json. One can override this
+                By default the plugin writes the result to the file target/ung-brukerdialog-api.openapi.json. One can override this
                 with an argument override from the command line.
 
                 Example of invocation from root project dir:
@@ -369,53 +373,9 @@
                     <mainClass>no.nav.ung.brukerdialog.web.app.util.OpenapiGenerate</mainClass>
                     <classpathScope>compile</classpathScope>
                     <arguments>
-                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/ung-brukerdialog.openapi.json</argument>
+                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/ung-brukerdialog-api.openapi.json</argument>
                     </arguments>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!-- trengs her for at lokal kjøring av applikasjonen (fra IDE) skal finne pdfgen ressursene -->
-                        <id>copy-ungdomsprogramytelsen-pdfgen-resources</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/pdfgen</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>../ytelse-ungdomsprogramytelsen/src/main/resources/pdfgen</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <!-- trengs her for at lokal kjøring av applikasjonen (fra IDE) skal finne pdfgen ressursene -->
-                        <id>copy-felles-pdfgen-resources</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/pdfgen</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>../formidling/src/main/resources/pdfgen</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

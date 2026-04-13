@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.typer.AktørId;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,19 @@ public class BrukerdialogOppgaveRepository {
     }
 
     public List<BrukerdialogOppgaveEntitet> hentAlleOppgaverForAktør(AktørId aktørId) {
+        return hentAlleOppgaverForAktør(aktørId, null);
+    }
+
+    public List<BrukerdialogOppgaveEntitet> hentAlleOppgaverForAktør(AktørId aktørId, OppgaveYtelsetype ytelsetype) {
+        if (ytelsetype != null) {
+            TypedQuery<BrukerdialogOppgaveEntitet> query = entityManager.createQuery(
+                "SELECT o FROM BrukerdialogOppgave o WHERE o.aktørId = :aktørId AND o.ytelsetype = :ytelsetype ORDER BY o.opprettetTidspunkt DESC",
+                BrukerdialogOppgaveEntitet.class
+            );
+            query.setParameter("aktørId", aktørId);
+            query.setParameter("ytelsetype", ytelsetype);
+            return query.getResultList();
+        }
         TypedQuery<BrukerdialogOppgaveEntitet> query = entityManager.createQuery(
             "SELECT o FROM BrukerdialogOppgave o WHERE o.aktørId = :aktørId ORDER BY o.opprettetTidspunkt DESC",
             BrukerdialogOppgaveEntitet.class
@@ -68,23 +82,11 @@ public class BrukerdialogOppgaveRepository {
 
     public BrukerdialogOppgaveEntitet endreFrist(UUID oppgaveReferanse, AktørId aktørId, LocalDateTime nyFrist) {
         var brukerdialogOppgaveEntitet = hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).orElseThrow(() ->
-            new IllegalArgumentException("Fant ingen oppgave for oppgavereferanse " + oppgaveReferanse)
+            new IllegalArgumentException("Fant ingen oppgave for oppgaveReferanse " + oppgaveReferanse)
         );
         brukerdialogOppgaveEntitet.setFristTid(nyFrist);
         return oppdater(brukerdialogOppgaveEntitet);
     }
-
-    public BrukerdialogOppgaveEntitet lukkOppgave(BrukerdialogOppgaveEntitet oppgave) {
-        oppgave.setStatus(OppgaveStatus.LUKKET);
-        oppgave.setLukketDato(LocalDateTime.now());
-        return oppdater(oppgave);
-    }
-
-    public BrukerdialogOppgaveEntitet åpneOppgave(BrukerdialogOppgaveEntitet oppgave) {
-        oppgave.setÅpnetDato(LocalDateTime.now());
-        return oppdater(oppgave);
-    }
-
 
     public void lagre(BrukerdialogOppgaveEntitet oppgave) {
         entityManager.persist(oppgave);

@@ -6,6 +6,7 @@ import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.YtelseType;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet;
@@ -52,6 +53,7 @@ class BrukerdialogOppgaveRepositoryTest {
             oppgaveReferanse,
             OppgaveType.SØK_YTELSE,
             aktørId,
+            OppgaveYtelsetype.UNGDOMSYTELSE,
             null
         );
 
@@ -94,49 +96,6 @@ class BrukerdialogOppgaveRepositoryTest {
     }
 
     @Test
-    void skal_oppdatere_oppgave_til_lukket() {
-        // Arrange
-        BrukerdialogOppgaveEntitet oppgave = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
-        UUID oppgaveReferanse = oppgave.getOppgavereferanse();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Act
-        BrukerdialogOppgaveEntitet hentetOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        repository.lukkOppgave(hentetOppgave);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Assert
-        BrukerdialogOppgaveEntitet verifisertOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        assertThat(verifisertOppgave.getStatus()).isEqualTo(OppgaveStatus.LUKKET);
-        assertThat(verifisertOppgave.getLukketDato()).isNotNull();
-    }
-
-    @Test
-    void skal_oppdatere_oppgave_til_åpnet() {
-        // Arrange
-        BrukerdialogOppgaveEntitet oppgave = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
-        UUID oppgaveReferanse = oppgave.getOppgavereferanse();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Act
-        BrukerdialogOppgaveEntitet hentetOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        repository.åpneOppgave(hentetOppgave);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // Assert
-        BrukerdialogOppgaveEntitet verifisertOppgave = repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId).get();
-        assertThat(verifisertOppgave.getÅpnetDato()).isNotNull();
-    }
-
-    @Test
     void skal_hente_oppgaver_basert_på_type_og_status() {
         // Arrange
         BrukerdialogOppgaveEntitet oppgave1 = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
@@ -144,7 +103,8 @@ class BrukerdialogOppgaveRepositoryTest {
         BrukerdialogOppgaveEntitet oppgave3 = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
 
         // Løs én av SØK_YTELSE oppgavene
-        repository.lukkOppgave(oppgave3);
+        oppgave3.setStatus(OppgaveStatus.LØST);
+        repository.oppdater(oppgave3);
 
         entityManager.flush();
         entityManager.clear();
@@ -195,6 +155,7 @@ class BrukerdialogOppgaveRepositoryTest {
             oppgaveReferanse,
             OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT,
             aktørId,
+            OppgaveYtelsetype.UNGDOMSYTELSE,
             null
         );
 
@@ -208,7 +169,7 @@ class BrukerdialogOppgaveRepositoryTest {
             0,
             30000
         );
-        oppgaveData.leggTilArbeidOgFrilansInntekt("123456789", 30000);
+        oppgaveData.leggTilArbeidOgFrilansInntekt("123456789", "Bedriften AS", 30000);
         oppgaveData.leggTilYtelseInntekt(YtelseType.DAGPENGER, 0);
 
         oppgave.setOppgaveData(oppgaveData);
@@ -230,7 +191,8 @@ class BrukerdialogOppgaveRepositoryTest {
         assertThat(hentetData.getTotalInntektYtelse()).isZero();
         assertThat(hentetData.getTotalInntekt()).isEqualTo(30000);
         assertThat(hentetData.getArbeidOgFrilansInntekter()).hasSize(1);
-        assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getArbeidsgiver()).isEqualTo("123456789");
+        assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getArbeidsgiverIdentifikator()).isEqualTo("123456789");
+        assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getArbeidsgivernavn()).isEqualTo("Bedriften AS");
         assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getInntekt()).isEqualTo(30000);
         assertThat(hentetData.getYtelseInntekter()).hasSize(1);
         assertThat(hentetData.getYtelseInntekter().get(0).getYtelsetype()).isEqualTo(YtelseType.DAGPENGER);
@@ -247,7 +209,7 @@ class BrukerdialogOppgaveRepositoryTest {
             0,
             30000
         );
-        oppgaveData.leggTilArbeidOgFrilansInntekt("123456789", 30000);
+        oppgaveData.leggTilArbeidOgFrilansInntekt("123456789", "Bedriften AS", 30000);
         oppgaveData.leggTilYtelseInntekt(YtelseType.DAGPENGER, 0);
         return oppgaveData;
     }
@@ -256,14 +218,58 @@ class BrukerdialogOppgaveRepositoryTest {
         return new SøkYtelseOppgaveDataEntitet(LocalDate.now());
     }
 
+    @Test
+    void skal_filtrere_oppgaver_på_ytelsetype() {
+        // Arrange
+        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
+        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
+        opprettOppgave(aktørId, OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, lagKontrollerInntektOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<BrukerdialogOppgaveEntitet> ungdomsytelseOppgaver = repository.hentAlleOppgaverForAktør(aktørId, OppgaveYtelsetype.UNGDOMSYTELSE);
+        List<BrukerdialogOppgaveEntitet> aktivitetspengerOppgaver = repository.hentAlleOppgaverForAktør(aktørId, OppgaveYtelsetype.AKTIVITETSPENGER);
+
+        // Assert
+        assertThat(ungdomsytelseOppgaver).hasSize(2);
+        assertThat(ungdomsytelseOppgaver).allMatch(o -> o.getYtelsetype() == OppgaveYtelsetype.UNGDOMSYTELSE);
+        assertThat(aktivitetspengerOppgaver).hasSize(1);
+        assertThat(aktivitetspengerOppgaver).allMatch(o -> o.getYtelsetype() == OppgaveYtelsetype.AKTIVITETSPENGER);
+    }
+
+    @Test
+    void skal_hente_alle_oppgaver_uavhengig_av_ytelsetype_når_ytelsetype_er_null() {
+        // Arrange
+        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
+        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<BrukerdialogOppgaveEntitet> alleOppgaver = repository.hentAlleOppgaverForAktør(aktørId);
+
+        // Assert
+        assertThat(alleOppgaver).hasSize(2);
+        assertThat(alleOppgaver).anyMatch(o -> o.getYtelsetype() == OppgaveYtelsetype.UNGDOMSYTELSE);
+        assertThat(alleOppgaver).anyMatch(o -> o.getYtelsetype() == OppgaveYtelsetype.AKTIVITETSPENGER);
+    }
+
     // Hjelpemetode for å opprette testoppgaver
     private BrukerdialogOppgaveEntitet opprettOppgave(AktørId aktørId, OppgaveType type, OppgaveDataEntitet oppgaveData) {
+        return opprettOppgave(aktørId, type, oppgaveData, OppgaveYtelsetype.UNGDOMSYTELSE);
+    }
+
+    private BrukerdialogOppgaveEntitet opprettOppgave(AktørId aktørId, OppgaveType type, OppgaveDataEntitet oppgaveData, OppgaveYtelsetype ytelsetype) {
         UUID oppgaveReferanse = UUID.randomUUID();
 
         BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
             oppgaveReferanse,
             type,
             aktørId,
+            ytelsetype,
             null
         );
 

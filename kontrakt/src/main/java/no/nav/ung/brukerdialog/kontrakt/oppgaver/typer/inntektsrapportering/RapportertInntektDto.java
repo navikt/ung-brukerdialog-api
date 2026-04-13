@@ -2,13 +2,16 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.*;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BekreftelseDTO;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class RapportertInntektDto extends BekreftelseDTO {
+public class RapportertInntektDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "fraOgMed", required = true)
     @NotNull

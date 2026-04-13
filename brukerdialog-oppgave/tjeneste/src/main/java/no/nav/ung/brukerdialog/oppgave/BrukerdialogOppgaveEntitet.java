@@ -2,9 +2,10 @@ package no.nav.ung.brukerdialog.oppgave;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BekreftelseDTO;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.hibernate.annotations.ColumnTransformer;
@@ -24,12 +25,16 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", nullable = false, updatable = false)))
     private AktørId aktørId;
 
-    @Column(name = "oppgavereferanse", nullable = false, updatable = false, unique = true)
+    @Column(name = "oppgaveReferanse", nullable = false, updatable = false, unique = true)
     private UUID oppgavereferanse;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OppgaveStatus status = OppgaveStatus.ULØST;
+
+    @Column(name = "ytelsetype")
+    @Enumerated(EnumType.STRING)
+    private OppgaveYtelsetype ytelsetype;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
@@ -41,16 +46,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @Column(name = "løst_dato")
     private LocalDateTime løstDato; // NOSONAR
 
-    @Column(name = "åpnet_dato")
-    private LocalDateTime åpnetDato; // NOSONAR
-
-    @Column(name = "lukket_dato")
-    private LocalDateTime lukketDato; // NOSONAR
-
-    @Convert(converter = OppgaveBekreftelseConverter.class)
+    @Convert(converter = OppgaveResponsConverter.class)
     @ColumnTransformer(write = "?::jsonb")
-    @Column(name = "bekreftelse", columnDefinition = "jsonb")
-    private BekreftelseDTO bekreftelse;
+    @Column(name = "respons", columnDefinition = "jsonb")
+    private OppgaveResponsDto respons;
 
     @OneToOne(mappedBy = "oppgave", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private OppgaveDataEntitet oppgaveData;
@@ -62,11 +61,13 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,
                                       AktørId aktørId,
+                                      OppgaveYtelsetype ytelsetype,
                                       LocalDateTime fristTid) {
         this.oppgavereferanse = oppgavereferanse;
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
         this.fristTid = fristTid;
+        this.ytelsetype = ytelsetype != null ? ytelsetype : OppgaveYtelsetype.UNGDOMSYTELSE;
     }
 
     /**
@@ -76,21 +77,22 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,
                                       AktørId aktørId,
-                                      BekreftelseDTO bekreftelse,
+                                      OppgaveResponsDto respons,
                                       OppgaveStatus status,
                                       LocalDateTime fristTid,
                                       LocalDateTime løstDato,
-                                      LocalDateTime åpnetDato,
-                                      LocalDateTime lukketDato) {
+                                      LocalDateTime opprettetTidspunkt,
+                                      String opprettetAv) {
         this.oppgavereferanse = oppgavereferanse;
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
-        this.bekreftelse = bekreftelse;
+        this.respons = respons;
         this.status = status;
         this.fristTid = fristTid;
         this.løstDato = løstDato;
-        this.åpnetDato = åpnetDato;
-        this.lukketDato = lukketDato;
+        this.ytelsetype = OppgaveYtelsetype.UNGDOMSYTELSE;
+        this.setOpprettetTidspunkt(opprettetTidspunkt);
+        this.opprettetAv = opprettetAv;
     }
 
     public AktørId getAktørId() {
@@ -109,6 +111,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         return oppgaveType;
     }
 
+    public OppgaveYtelsetype getYtelsetype() {
+        return ytelsetype;
+    }
+
 
     public LocalDateTime getFristTid() {
         return fristTid;
@@ -118,7 +124,7 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.fristTid = fristTid;
     }
 
-    protected void setStatus(OppgaveStatus status) {
+    public void setStatus(OppgaveStatus status) {
         this.status = status;
     }
 
@@ -130,28 +136,12 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         return løstDato;
     }
 
-    public void setÅpnetDato(LocalDateTime åpnetDato) {
-        this.åpnetDato = åpnetDato;
+    public OppgaveResponsDto getRespons() {
+        return respons;
     }
 
-    public LocalDateTime getÅpnetDato() {
-        return åpnetDato;
-    }
-
-    public void setLukketDato(LocalDateTime lukketDato) {
-        this.lukketDato = lukketDato;
-    }
-
-    public LocalDateTime getLukketDato() {
-        return lukketDato;
-    }
-
-    public BekreftelseDTO getBekreftelse() {
-        return bekreftelse;
-    }
-
-    public void setBekreftelse(BekreftelseDTO bekreftelse) {
-        this.bekreftelse = bekreftelse;
+    public void setRespons(OppgaveResponsDto respons) {
+        this.respons = respons;
     }
 
     Long getId() {

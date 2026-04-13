@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: ung-brukerdialog
+  name: ung-brukerdialog-api
   namespace: k9saksbehandling
   labels:
     team: k9saksbehandling
@@ -50,7 +50,7 @@ spec:
       cpu: "500m"
       memory: "4096Mi"
   ingresses:
-    - "https://ung-brukerdialog.intern.nav.no"
+    - "https://ung-brukerdialog-api.intern.nav.no"
   kafka:
     pool: "nav-prod"
   vault:
@@ -61,13 +61,15 @@ spec:
     application:
       enabled: true
       replyURLs:
-        - "https://ung-brukerdialog.intern.nav.no/ung/brukerdialog/cb"
+        - "https://ung-brukerdialog-api.intern.nav.no/ung/brukerdialog/cb"
       claims:
         groups:
           # 0000-CA-ung-saksbehandler
           - id: a7b4ffd6-d512-4b0d-991d-24d582b83a57
           # 0000-CA-ung-veileder
           - id: 9fe53d71-5eca-4b26-b77a-534468e0db4a
+          # 0000-CA-ung-programveileder
+          - id: 7de1df55-11f7-4b65-853c-01f2e775ad0a
           # 0000-CA-ung-drift
           - id: 873ae729-e918-4f35-9a26-652ca994b9c3
         extra:
@@ -75,22 +77,41 @@ spec:
           - "azp_name"
   accessPolicy:
     outbound:
+      rules:
+        - application: sif-abac-pdp
       external:
         - host: "pdl-api.prod-fss-pub.nais.io"
     inbound:
       rules:
+        - application: k9-swagger
+          namespace: k9saksbehandling
+          permissions:
+            scopes:
+              - swagger
         - application: ung-deltakelse-opplyser
         - application: ung-sak
+        - application: k9-brukerdialog-prosessering
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: ungdomsytelse-deltaker
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: aktivitetspenger-innsyn
+          namespace: dusseldorf
+          cluster: prod-gcp
+        - application: aktivitetspenger-soknad
+          namespace: dusseldorf
+          cluster: prod-gcp
   gcp:
     sqlInstances:
       - type: POSTGRES_16
-        name: ung-sak-db
+        name: ung-brukerdialog-api-db
         tier: db-custom-2-5120 # 2 CPU, 5 GB RAM
         diskSize: 100
         diskAutoresize: true
         highAvailability: true
         databases:
-          - name: ung-sak
+          - name: ung-brukerdialog-api
             envVarPrefix: DB
         flags:
           - name: "cloudsql.enable_pgaudit"
@@ -101,27 +122,28 @@ spec:
             value: "on"
         pointInTimeRecovery: true
         retainedBackups : 30
-  envFrom:
-    - secret: ung-brukerdialog-secrets
+    bigQueryDatasets:
+      - name: ung_deltakelse_opplyser_statistikk_dataset
+        description: Inneholder tabeller for ung-sak ment for statistikk
+        permission: READWRITE
   env:
     - name: TZ
       value: "Europe/Oslo"
     - name: APP_NAME
-      value: "ung-brukerdialog"
+      value: "ung-brukerdialog-api"
 
     # open telemetry
     - name: OTEL_RESOURCE_ATTRIBUTES
-      value: "service.name=ung-brukerdialog,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
+      value: "service.name=ung-brukerdialog-api,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
 
     # Integrasjoner (Kafka)
     - name: KAFKA_MINSIDE_VARSEL_TOPIC
       value: min-side.aapen-brukervarsel-v1
-    - name: KAFKA_OPPGAVEBEKREFTELSE_TOPIC
-      value: dusseldorf.ungdomsytelse-oppgavebekreftelse-cleanup
+
 
     # Loadbalancerconfig
     - name: LOADBALANCER_URL
-      value: https://ung-brukerdialog.intern.nav.no
+      value: https://ung-brukerdialog-api.intern.nav.no
 
     # PDL
     - name: PDL_TEMA
@@ -138,20 +160,24 @@ spec:
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/ung
     - name: NAV_ANSATT_URL
       value: http://sif-abac-pdp/sif/sif-abac-pdp/api/ung/nav-ansatt
+    - name: UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL
+      value: https://www.nav.no/ungdomsprogrammet/ytelsen
+    - name: AKTIVITETSPENGER_INNSYN_BASE_URL
+      value: https://www.nav.no/aktivitetspenger/innsyn
 
     # Sikkerhet:
+    - name: AZURE_LOGIN_URL
+      value: "https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/v2.0"
     - name: CLIENT_SCOPE
-      value: "api://prod-gcp.k9saksbehandling.ung-brukerdialog/.default"
+      value: "api://prod-gcp.k9saksbehandling.ung-brukerdialog-api/.default"
     - name: ABAC_ATTRIBUTT_DRIFT
       value: "no.nav.abac.attributter.k9.drift"
-
-    # Feature-flag
-    - name: OPPGAVER_I_UNGBRUKERDIALOG_ENABLED
-      value: "false"
 
     # Konfigurasjoner
     - name: FLYWAY_REPAIR_ON_FAIL
       value: "false"
+    - name: BIGQUERY_ENABLED
+      value: "true"
 
     # Audit logging
     - name: AUDITLOGGER_ENABLED
@@ -159,4 +185,4 @@ spec:
     - name: AUDITLOGGER_VENDOR
       value: "ung"
     - name: AUDITLOGGER_PRODUCT
-      value: "ung-brukerdialog"
+      value: "ung-brukerdialog-api"

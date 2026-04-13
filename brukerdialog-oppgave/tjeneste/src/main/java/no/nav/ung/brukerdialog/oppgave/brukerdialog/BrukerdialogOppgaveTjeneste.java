@@ -2,9 +2,12 @@ package no.nav.ung.brukerdialog.oppgave.brukerdialog;
 
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.typer.AktørId;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -16,12 +19,13 @@ public interface BrukerdialogOppgaveTjeneste {
      * Henter alle oppgaver for en gitt aktør.
      *
      * @param aktørId aktørId for bruker
+     * @param ytelsetype valgfritt filter på ytelsetype
      * @return liste med oppgaver
      */
-    List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId);
+    List<BrukerdialogOppgaveDto> hentAlleOppgaverForAktør(AktørId aktørId, OppgaveYtelsetype ytelsetype);
 
     /**
-     * Henter en spesifikk oppgave basert på oppgavereferanse og aktørId.
+     * Henter en spesifikk oppgave basert på oppgaveReferanse og aktørId.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
@@ -31,32 +35,12 @@ public interface BrukerdialogOppgaveTjeneste {
     BrukerdialogOppgaveDto hentOppgaveForOppgavereferanse(UUID oppgavereferanse, AktørId aktørId);
 
     /**
-     * Lukker en oppgave basert på oppgavereferanse.
-     *
-     * @param oppgavereferanse unik referanse til oppgaven
-     * @param aktørId aktørId for bruker
-     * @return den lukkede oppgaven som DTO
-     * @throws IllegalArgumentException hvis oppgaven ikke finnes
-     */
-    BrukerdialogOppgaveDto lukkOppgave(UUID oppgavereferanse, AktørId aktørId);
-
-    /**
-     * Åpner en oppgave basert på oppgavereferanse.
-     *
-     * @param oppgavereferanse unik referanse til oppgaven
-     * @param aktørId aktørId for bruker
-     * @return den åpnede oppgaven som DTO
-     * @throws IllegalArgumentException hvis oppgaven ikke finnes
-     */
-    BrukerdialogOppgaveDto åpneOppgave(UUID oppgavereferanse, AktørId aktørId);
-
-    /**
-     * Løser en oppgave basert på oppgavereferanse.
+     * Løser en oppgave basert på oppgaveReferanse.
      *
      * @param oppgavereferanse unik referanse til oppgaven
      * @param aktørId aktørId for bruker
      * @return den løste oppgaven som DTO
      * @throws IllegalArgumentException hvis oppgaven ikke finnes
      */
-    BrukerdialogOppgaveDto løsOppgave(UUID oppgavereferanse, AktørId aktørId);
+    BrukerdialogOppgaveDto løsOppgave(UUID oppgavereferanse, AktørId aktørId, Optional<OppgaveResponsDto> oppgaveResponsDto);
 }

@@ -44,6 +44,10 @@
             <artifactId>k9-pdl-klient</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-kafka-klient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.k9.prosesstask</groupId>
             <artifactId>prosesstask</artifactId>
         </dependency>

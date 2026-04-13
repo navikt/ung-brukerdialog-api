@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import no.nav.ung.brukerdialog.web.app.tjenester.RestImplementationClasses;
+import no.nav.ung.brukerdialog.web.app.tjenester.BrukerRestClasses;
+import no.nav.ung.brukerdialog.web.app.tjenester.InternRestClasses;
+import no.nav.ung.brukerdialog.web.app.tjenester.RestClasses;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ObjectMapperFactory {
@@ -36,10 +35,13 @@ public class ObjectMapperFactory {
         return indexClasses.getClassesWithAnnotation(JsonTypeName.class);
     }
 
-    public static Collection<Class<?>> allJsonTypeNameClasses() {
-        // registrer jackson JsonTypeName subtypes basert på rest implementasjoner
-        final Collection<Class<?>> restClasses = new RestImplementationClasses().getImplementationClasses();
+    public static Collection<Class<?>> allJsonTypeNameClasses(RestClasses findRestClasses) {
+        return allJsonTypeNameClasses(findRestClasses.getRestClasses());
+    }
 
+
+        public static Collection<Class<?>> allJsonTypeNameClasses(Collection<Class<?>> restClasses) {
+        // registrer jackson JsonTypeName subtypes basert på rest implementasjoner
         final Set<Class<?>> scanClasses = new LinkedHashSet<>(restClasses);
 
         // avled code location fra klassene
@@ -68,7 +70,11 @@ public class ObjectMapperFactory {
 
         // Registrer alle klasser med JsonTypeName annotasjon som subtyper i object mapper.
         // Slik at ein ikkje må deklarere disse manuelt som subtyper på alle superklasser.
-        om.registerSubtypes(allJsonTypeNameClasses());
+        HashSet<Class<?>> restClasses = new HashSet<>(new InternRestClasses().getRestClasses());
+        restClasses.addAll(new BrukerRestClasses().getRestClasses());
+        om.registerSubtypes(allJsonTypeNameClasses(
+            restClasses
+        ));
 
         return om;
     }

@@ -1,0 +1,1 @@
+ALTER TABLE BD_OPPGAVE RENAME COLUMN bekreftelse TO respons;

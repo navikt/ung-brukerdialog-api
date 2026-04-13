@@ -15,12 +15,15 @@ import java.time.Month;
 public class InntektsrapporteringOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
 
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private String aktivitetspengerInnsynBaseUrl;
 
     @Inject
     public InntektsrapporteringOppgavelInnholdUtleder(
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl
     ) {
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.aktivitetspengerInnsynBaseUrl = aktivitetspengerInnsynBaseUrl;
     }
 
     public InntektsrapporteringOppgavelInnholdUtleder() {
@@ -35,7 +38,10 @@ public class InntektsrapporteringOppgavelInnholdUtleder implements OppgavelInnho
 
     @Override
     public String utledVarselLenke(BrukerdialogOppgaveEntitet oppgave) {
-        return ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+        return switch (oppgave.getYtelsetype()) {
+            case AKTIVITETSPENGER -> aktivitetspengerInnsynBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+            case UNGDOMSYTELSE -> ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+        };
     }
 
     public String finnNorskMånedNavn(Month måned) {

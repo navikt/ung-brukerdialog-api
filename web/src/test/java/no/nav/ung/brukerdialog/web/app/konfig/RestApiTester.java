@@ -12,7 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Application;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import no.nav.ung.brukerdialog.web.app.ApplicationConfig;
+import no.nav.ung.brukerdialog.web.app.InternApiConfig;
 
 public class RestApiTester {
 
@@ -35,7 +35,7 @@ public class RestApiTester {
 
         List<Class<?>> klasser = new ArrayList<>();
 
-        klasser.addAll(finnAlleRestTjenester(new ApplicationConfig()));
+        klasser.addAll(finnAlleRestTjenester(new InternApiConfig()));
         return klasser;
     }
 

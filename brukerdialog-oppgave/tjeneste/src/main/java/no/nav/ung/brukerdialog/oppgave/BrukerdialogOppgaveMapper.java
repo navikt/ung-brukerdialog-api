@@ -32,12 +32,11 @@ public class BrukerdialogOppgaveMapper {
             oppgave.getOppgavereferanse(),
             oppgave.getOppgaveType(),
             oppgavetypeData,
-            oppgave.getBekreftelse(),
+            oppgave.getYtelsetype(),
+            oppgave.getRespons(),
             oppgave.getStatus(),
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
-            toZonedDateTime(oppgave.getÅpnetDato()),
-            toZonedDateTime(oppgave.getLukketDato()),
             toZonedDateTime(oppgave.getFristTid())
         );
     }

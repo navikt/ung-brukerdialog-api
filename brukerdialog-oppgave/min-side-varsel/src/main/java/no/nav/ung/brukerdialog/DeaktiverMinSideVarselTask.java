@@ -45,7 +45,7 @@ public class DeaktiverMinSideVarselTask implements ProsessTaskHandler {
         @KonfigVerdi(value = "KAFKA_KEYSTORE_PATH", required = false) String keyStoreLocation,
         @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String keyStorePassword,
         @KonfigVerdi(value = "NAIS_NAMESPACE", defaultVerdi = "k9saksbehandling") String appNamespace,
-        @KonfigVerdi(value = "NAIS_APP_NAME", defaultVerdi = "ung-brukerdialog") String appNavn,
+        @KonfigVerdi(value = "NAIS_APP_NAME", defaultVerdi = "ung-brukerdialog-api") String appNavn,
         @KonfigVerdi(value = "NAIS_CLUSTER_NAME", defaultVerdi = "prod-gcp") String clusterNavn
     ) {
         this.appNamespace = appNamespace;

@@ -4,8 +4,8 @@ package no.nav.ung.brukerdialog.web.server.jetty;
 public class JettyDevDbKonfigurasjon {
 
     private String datasource = "defaultDS";
-    private String url = "jdbc:postgresql://127.0.0.1:5432/ung_brukerdialog?reWriteBatchedInserts=true";
-    private String user = "ung_brukerdialog";
+    private String url = "jdbc:postgresql://127.0.0.1:5432/ung_brukerdialog_api?reWriteBatchedInserts=true";
+    private String user = "ung_brukerdialog_api";
     private String password = user;
 
     JettyDevDbKonfigurasjon() {

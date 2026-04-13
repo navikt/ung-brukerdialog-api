@@ -5,9 +5,8 @@ import jakarta.inject.Inject;
 import no.nav.k9.felles.integrasjon.rest.OidcRestClient;
 import no.nav.k9.felles.integrasjon.rest.ScopedRestIntegration;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
-import no.nav.k9.felles.sikkerhet.abac.Decision;
+import no.nav.sif.abac.kontrakt.abac.dto.OperasjonDto;
 import no.nav.sif.abac.kontrakt.abac.dto.PersonerOperasjonDto;
-import no.nav.sif.abac.kontrakt.abac.dto.SaksinformasjonOgPersonerTilgangskontrollInputDto;
 import no.nav.sif.abac.kontrakt.abac.resultat.Tilgangsbeslutning;
 
 import java.net.URI;
@@ -18,7 +17,8 @@ import java.net.URISyntaxException;
 public class SifAbacPdpRestKlient {
 
     private OidcRestClient restClient;
-    private URI uriTilgangskontrollMedSaksinformasjon;
+    private URI uriTilgangskontrollPersoner;
+    private URI uriTilgangskontrollOperasjon;
 
     SifAbacPdpRestKlient() {
         // for CDI proxy
@@ -28,12 +28,19 @@ public class SifAbacPdpRestKlient {
     public SifAbacPdpRestKlient(OidcRestClient restClient,
                                 @KonfigVerdi(value = "sif.abac.pdp.url", defaultVerdi = "http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/ung") String urlSifAbacPdp) {
         this.restClient = restClient;
-        this.uriTilgangskontrollMedSaksinformasjon = tilUri(urlSifAbacPdp, "personer");
+        this.uriTilgangskontrollPersoner = tilUri(urlSifAbacPdp, "personer");
+        this.uriTilgangskontrollOperasjon = tilUri(urlSifAbacPdp, "operasjon");
+
     }
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(PersonerOperasjonDto input) {
-        return restClient.post(uriTilgangskontrollMedSaksinformasjon, input, Tilgangsbeslutning.class);
+        return restClient.post(uriTilgangskontrollPersoner, input, Tilgangsbeslutning.class);
     }
+
+    public Tilgangsbeslutning sjekkTilgangTilOperasjon(OperasjonDto input) {
+        return restClient.post(uriTilgangskontrollOperasjon, input, Tilgangsbeslutning.class);
+    }
+
 
     private static URI tilUri(String baseUrl, String path) {
         try {

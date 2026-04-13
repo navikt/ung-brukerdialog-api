@@ -1,11 +1,11 @@
-# ung-brukerdialog
+# ung-brukerdialog-api
 Tilbyr funksjonalitet for innsyn og brukervarsling for ungdomsprogramytelsen og aktivitetspenger
 
 
 # Utvikling
 
 ## Enhetstester
-Start postgres først for å kjøre alle enhetstester. Bruker schema ung_brukerdialog_unit i
+Start postgres først for å kjøre alle enhetstester. Bruker schema ung_brukerdialog_api_unit i
 [Verdikjede](https://github.com/navikt/k9-verdikjede/tree/master/saksbehandling)
 `git clone git@github.com:navikt/k9-verdikjede.git; cd k9-verdikjede/saksbehandling; ./update-versions.sh; docker-compose up postgres`
 
@@ -25,7 +25,7 @@ Swagger: http://localhost:8902/ung/brukerdialog/swagger
 For å koble til databasen i dev-gcp kan man kjøre denne hjelpe-scriptet:
 
 ```shell script
-./scripts/nais-postgres.sh --context dev-gcp --namespace k9saksbehandling --app ung-brukerdialog
+./scripts/nais-postgres.sh --context dev-gcp --namespace k9saksbehandling --app ung-brukerdialog-api
 ```
 
 ## Kode generert av GitHub Copilot

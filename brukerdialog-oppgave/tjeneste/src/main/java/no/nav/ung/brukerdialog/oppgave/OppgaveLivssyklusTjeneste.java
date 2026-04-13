@@ -4,12 +4,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.DeaktiverMinSideVarselTask;
 import no.nav.ung.brukerdialog.PubliserMinSideVarselTask;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+
+import java.util.Optional;
 
 @ApplicationScoped
 public class OppgaveLivssyklusTjeneste {
@@ -40,9 +44,10 @@ public class OppgaveLivssyklusTjeneste {
      * @param oppgaveEntitet Oppgaven som skal løses
      * @return
      */
-    public BrukerdialogOppgaveEntitet løsOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet) {
+    public BrukerdialogOppgaveEntitet løsOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, Optional<OppgaveResponsDto> responsDto) {
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
         oppgaveEntitet.setStatus(OppgaveStatus.LØST);
+        responsDto.ifPresent(oppgaveEntitet::setRespons);
         oppgaveEntitet.setLøstDato(java.time.LocalDateTime.now());
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
         return oppgaveEntitet;
@@ -77,7 +82,7 @@ public class OppgaveLivssyklusTjeneste {
     /**
      * Persisterer oppgave og publiserer varsel til Min Side.
      *
-     * @param oppgaveEntitet     Oppgave som skal opprettes og publiseres.
+     * @param oppgaveEntitet  Oppgave som skal opprettes og publiseres.
      * @param oppgavetypeData
      */
     public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData) {
