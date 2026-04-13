@@ -7,7 +7,6 @@ import no.nav.k9.felles.integrasjon.bigquery.klient.BigQueryKlient;
 import no.nav.k9.prosesstask.api.BatchProsessTaskHandler;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
-import no.nav.k9.prosesstask.api.ProsessTaskStatus;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.k9.prosesstask.impl.cron.CronExpression;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
@@ -21,8 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -31,6 +31,7 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
 
     public static final String TASKTYPE = "batch.metrikk.rapporterInntekt";
     private static final String DATASET = "ung_deltakelse_opplyser_statistikk_dataset";
+    private static final String SISTE_KJØRING_PROPERTY = "sisteKjøring";
     private static final Logger log = LoggerFactory.getLogger(PubliserRapporterInntektMetrikkBatchTask.class);
 
     private OppgaveStatistikkRepository statistikkRepository;
@@ -57,32 +58,33 @@ public class PubliserRapporterInntektMetrikkBatchTask implements BatchProsessTas
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var sisteKjøring = finnSisteKjørtTidspunkt();
+        LocalDateTime now = LocalDateTime.now();
+        var sisteKjøring = finnSisteKjørtTidspunkt(prosessTaskData);
         log.info("Henter {} oppgaver endret siden {}", TASKTYPE, sisteKjøring);
 
         var oppgaver = statistikkRepository.finnOppgaverEndretEtter(OppgaveType.RAPPORTER_INNTEKT, sisteKjøring);
         if (oppgaver.isEmpty()) {
             log.info("Ingen endringer siden siste kjøring for tabell {}. Hopper over publisering.", RapporterInntektOppgaveTabellDefinisjon.TABELL_NAVN);
-            return;
+        } else {
+            Instant nowInstant = now.toInstant(java.time.ZoneOffset.UTC);
+            var rows = oppgaver.stream()
+                .map(this::tilRecord)
+                .filter(Objects::nonNull)
+                .map(r -> RapporterInntektOppgaveTabellDefinisjon.INSTANCE.getRowMapper(nowInstant).apply(r))
+                .map(InsertAllRequest.RowToInsert::of)
+                .collect(Collectors.toList());
+
+            bigQueryKlient.publiser(DATASET, RapporterInntektOppgaveTabellDefinisjon.INSTANCE, rows);
+            log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), RapporterInntektOppgaveTabellDefinisjon.TABELL_NAVN);
         }
 
-        Instant now = Instant.now();
-        var rows = oppgaver.stream()
-            .map(this::tilRecord)
-            .filter(Objects::nonNull)
-            .map(r -> RapporterInntektOppgaveTabellDefinisjon.INSTANCE.getRowMapper(now).apply(r))
-            .map(InsertAllRequest.RowToInsert::of)
-            .collect(Collectors.toList());
-
-        bigQueryKlient.publiser(DATASET, RapporterInntektOppgaveTabellDefinisjon.INSTANCE, rows);
-        log.info("Publiserte {} rader til BigQuery tabell {}", rows.size(), RapporterInntektOppgaveTabellDefinisjon.TABELL_NAVN);
+        prosessTaskData.setProperty(SISTE_KJØRING_PROPERTY, now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        prosessTaskTjeneste.lagre(prosessTaskData);
     }
 
-    private LocalDateTime finnSisteKjørtTidspunkt() {
-        return prosessTaskTjeneste.finnAlle(TASKTYPE, ProsessTaskStatus.FERDIG).stream()
-            .map(ProsessTaskData::getSistKjørt)
-            .filter(Objects::nonNull)
-            .max(Comparator.naturalOrder())
+    private LocalDateTime finnSisteKjørtTidspunkt(ProsessTaskData prosessTaskData) {
+        return Optional.ofNullable(prosessTaskData.getPropertyValue(SISTE_KJØRING_PROPERTY))
+            .map(LocalDateTime::parse)
             .orElse(LocalDateTime.now().minusHours(1));
     }
 
