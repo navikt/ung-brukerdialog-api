@@ -18,11 +18,11 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkBrukerdialogOppgaveDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.diagnostikk.DiagnostikkOppgaveRequestDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
+import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
-import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkBrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkOppgaveLogg;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 
@@ -41,7 +41,7 @@ import java.util.Optional;
 public class DiagnostikkBrukerdialogOppgaverRestTjeneste {
 
     private BrukerdialogOppgaveRepository repository;
-    private DiagnostikkBrukerdialogOppgaveMapper oppgaveMapper;
+    private BrukerdialogOppgaveMapper oppgaveMapper;
     private EntityManager entityManager;
 
     public DiagnostikkBrukerdialogOppgaverRestTjeneste() {
@@ -51,7 +51,7 @@ public class DiagnostikkBrukerdialogOppgaverRestTjeneste {
     @Inject
     public DiagnostikkBrukerdialogOppgaverRestTjeneste(
         BrukerdialogOppgaveRepository repository,
-        DiagnostikkBrukerdialogOppgaveMapper oppgaveMapper,
+        BrukerdialogOppgaveMapper oppgaveMapper,
         EntityManager entityManager) {
         this.repository = repository;
         this.oppgaveMapper = oppgaveMapper;
@@ -70,9 +70,8 @@ public class DiagnostikkBrukerdialogOppgaverRestTjeneste {
         @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) DiagnostikkOppgaveRequestDto requestDto) {
         entityManager.persist(new DiagnostikkOppgaveLogg(requestDto.oppgaveReferanse(), "/forvaltning/oppgave/diagnostikk", requestDto.begrunnelse()));
         entityManager.flush();
-
         Optional<BrukerdialogOppgaveEntitet> oppgave = repository.hentOppgaveForOppgavereferanse(requestDto.oppgaveReferanse());
-        Optional<DiagnostikkBrukerdialogOppgaveDto> mappetOppgave = oppgave.map(oppgaveMapper::tilDto);
+        Optional<BrukerdialogOppgaveDto> mappetOppgave = oppgave.map(oppgaveMapper::tilDto);
         return mappetOppgave.map(Response::ok)
             .map(Response.ResponseBuilder::build)
             .orElse(Response.noContent().build());

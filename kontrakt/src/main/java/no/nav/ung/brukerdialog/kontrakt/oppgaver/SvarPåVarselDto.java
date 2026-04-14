@@ -17,8 +17,7 @@ public class SvarPåVarselDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "uttalelseFraBruker")
     @Size(max = 4000)
-    @Pattern(regexp = FRITEKST)
-    String uttalelseFraBruker;
+    private String uttalelseFraBruker;
 
     public SvarPåVarselDto() {
     }
