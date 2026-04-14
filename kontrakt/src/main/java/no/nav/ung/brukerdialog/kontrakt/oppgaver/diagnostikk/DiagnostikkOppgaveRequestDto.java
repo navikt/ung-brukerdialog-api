@@ -10,8 +10,6 @@ import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
 
 import java.util.UUID;
 
-import static no.nav.k9.felles.validering.InputValideringRegex.FRITEKST;
-
 public record DiagnostikkOppgaveRequestDto(
     @JsonProperty("oppgaveReferanse")
     @NotNull
@@ -21,7 +19,7 @@ public record DiagnostikkOppgaveRequestDto(
     @JsonProperty("begrunnelse")
     @NotNull
     @Size(max = 4000)
-    @Pattern(regexp = FRITEKST)
+    @Pattern(regexp = "^[\\p{Graph}\\p{IsWhite_Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$")
     String begrunnelse
 ) {
     @AppAbacAttributt(value = AppAbacAttributtType.OPPGAVE_EKSTERN_REFERANSE)
