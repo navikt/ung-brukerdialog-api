@@ -20,7 +20,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppg
     property = "type"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = BekreftBostedOppgavetypeDataDto.class, name = "BEKREFT_BOSTED"),
+    @JsonSubTypes.Type(value = BekreftBostedOppgavetypeDataDto.class, name = "BOSTED"),
     @JsonSubTypes.Type(value = EndretStartdatoDataDto.class, name = "ENDRET_STARTDATO"),
     @JsonSubTypes.Type(value = EndretSluttdatoDataDto.class, name = "ENDRET_SLUTTDATO"),
     @JsonSubTypes.Type(value = EndretPeriodeDataDto.class, name = "ENDRET_PERIODE"),
