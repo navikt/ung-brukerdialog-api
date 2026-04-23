@@ -19,6 +19,6 @@ public class BekreftBostedOppgaveDataMapperFraEntitetTilDto implements OppgaveDa
     @Override
     public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
         var e = (BekreftBostedOppgaveDataEntitet) entitet;
-        return new BekreftBostedOppgavetypeDataDto(e.getFraOgMed(), e.getTilOgMed(), e.getErBosattITrondheim());
+        return new BekreftBostedOppgavetypeDataDto(e.getFom(), e.getTom(), e.isErBosattITrondheim());
     }
 }

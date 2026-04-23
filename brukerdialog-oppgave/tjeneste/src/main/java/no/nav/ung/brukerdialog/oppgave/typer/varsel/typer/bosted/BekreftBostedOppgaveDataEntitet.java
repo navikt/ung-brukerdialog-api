@@ -13,34 +13,34 @@ import java.time.LocalDate;
 @OppgaveTypeRef(OppgaveType.BEKREFT_BOSTED)
 public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
 
-    @Column(name = "fra_og_med", nullable = false, updatable = false)
-    private LocalDate fraOgMed;
+    @Column(name = "fom", nullable = false, updatable = false)
+    private LocalDate fom;
 
-    @Column(name = "til_og_med", nullable = false, updatable = false)
-    private LocalDate tilOgMed;
+    @Column(name = "tom", nullable = false, updatable = false)
+    private LocalDate tom;
 
     @Column(name = "er_bosatt_i_trondheim", nullable = false, updatable = false)
-    private Boolean erBosattITrondheim;
+    private boolean erBosattITrondheim;
 
     protected BekreftBostedOppgaveDataEntitet() {
         // For JPA
     }
 
-    public BekreftBostedOppgaveDataEntitet(LocalDate fraOgMed, LocalDate tilOgMed, Boolean erBosattITrondheim) {
-        this.fraOgMed = fraOgMed;
-        this.tilOgMed = tilOgMed;
+    public BekreftBostedOppgaveDataEntitet(LocalDate fom, LocalDate tom, boolean erBosattITrondheim) {
+        this.fom = fom;
+        this.tom = tom;
         this.erBosattITrondheim = erBosattITrondheim;
     }
 
-    public LocalDate getFraOgMed() {
-        return fraOgMed;
+    public LocalDate getFom() {
+        return fom;
     }
 
-    public LocalDate getTilOgMed() {
-        return tilOgMed;
+    public LocalDate getTom() {
+        return tom;
     }
 
-    public Boolean getErBosattITrondheim() {
+    public boolean isErBosattITrondheim() {
         return erBosattITrondheim;
     }
 }

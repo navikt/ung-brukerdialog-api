@@ -14,15 +14,15 @@ import java.time.LocalDate;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record BekreftBostedOppgavetypeDataDto(
-    @JsonProperty(value = "fraOgMed", required = true)
+    @JsonProperty(value = "fom", required = true)
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate fraOgMed,
+    LocalDate fom,
 
-    @JsonProperty(value = "tilOgMed", required = true)
+    @JsonProperty(value = "tom", required = true)
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate tilOgMed,
+    LocalDate tom,
 
     @JsonProperty(value = "erBosattITrondheim", required = true)
     @NotNull
