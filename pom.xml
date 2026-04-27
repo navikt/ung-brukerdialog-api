@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>no.nav.k9.prosesstask</groupId>
                 <artifactId>prosesstask-root</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.10</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -229,7 +229,7 @@
             <dependency>
                 <groupId>no.nav.sif.abac</groupId>
                 <artifactId>kontrakt</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
 
             <dependency>
@@ -298,7 +298,7 @@
             <dependency>
                 <groupId>no.nav.teamdokumenthandtering</groupId>
                 <artifactId>teamdokumenthandtering-avro-schemas</artifactId>
-                <version>1.1.8</version>
+                <version>1.1.10</version>
             </dependency>
 
             <dependency>
