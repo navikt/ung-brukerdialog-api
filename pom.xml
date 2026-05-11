@@ -39,11 +39,11 @@
         <asm.version>9.9.1</asm.version>
         <kotlin-stdlib.version>2.3.20</kotlin-stdlib.version>
         <jandex.version>3.5.3</jandex.version>
-        <pdfgen-core.version>1.1.79</pdfgen-core.version>
+        <pdfgen-core.version>1.1.80</pdfgen-core.version>
         <flyway.version>12.3.0</flyway.version>
         <confluent.platform.version>8.2.0</confluent.platform.version>
         <mockito.version>5.23.0</mockito.version>
-        <ung-deltakelse-opplyser.version>2.10.0</ung-deltakelse-opplyser.version>
+        <ung-deltakelse-opplyser.version>2.11.0</ung-deltakelse-opplyser.version>
         <handlebars.version>4.5.0</handlebars.version>
         <validation-model-jakarta.version>1.28.2</validation-model-jakarta.version>
         <openhtmltopdf.version>1.1.37</openhtmltopdf.version>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>no.nav.k9.prosesstask</groupId>
                 <artifactId>prosesstask-root</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.10</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -229,7 +229,7 @@
             <dependency>
                 <groupId>no.nav.sif.abac</groupId>
                 <artifactId>kontrakt</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
 
             <dependency>
@@ -298,7 +298,7 @@
             <dependency>
                 <groupId>no.nav.teamdokumenthandtering</groupId>
                 <artifactId>teamdokumenthandtering-avro-schemas</artifactId>
-                <version>1.1.8</version>
+                <version>1.1.10</version>
             </dependency>
 
             <dependency>
