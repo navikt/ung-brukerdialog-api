@@ -10,6 +10,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.YtelseType;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.automatiskopphor.BekreftAutomatiskOpphorOppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveDataEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.BeforeEach;
@@ -196,6 +197,44 @@ class BrukerdialogOppgaveRepositoryTest {
         assertThat(hentetData.getArbeidOgFrilansInntekter().get(0).getInntekt()).isEqualTo(30000);
         assertThat(hentetData.getYtelseInntekter()).hasSize(1);
         assertThat(hentetData.getYtelseInntekter().get(0).getYtelsetype()).isEqualTo(YtelseType.DAGPENGER);
+    }
+
+    @Test
+    void skal_persistere_og_hente_bekreft_automatisk_opphor_oppgave() {
+        // Arrange
+        UUID oppgaveReferanse = UUID.randomUUID();
+        LocalDate sluttdato = LocalDate.of(2026, 3, 31);
+        LocalDate maxDato = LocalDate.of(2026, 6, 30);
+
+        BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
+            oppgaveReferanse,
+            OppgaveType.BEKREFT_AUTOMATISK_OPPHOR,
+            aktørId,
+            OppgaveYtelsetype.UNGDOMSYTELSE,
+            null
+        );
+
+        var oppgaveData = new BekreftAutomatiskOpphorOppgaveDataEntitet(sluttdato, maxDato);
+        oppgave.setOppgaveData(oppgaveData);
+        repository.lagre(oppgave);
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert
+        Optional<BrukerdialogOppgaveEntitet> hentetOppgave =
+            repository.hentOppgaveForOppgavereferanse(oppgaveReferanse, aktørId);
+
+        assertThat(hentetOppgave).isPresent();
+        assertThat(hentetOppgave.get().getOppgavereferanse()).isEqualTo(oppgaveReferanse);
+        assertThat(hentetOppgave.get().getOppgaveType()).isEqualTo(OppgaveType.BEKREFT_AUTOMATISK_OPPHOR);
+        assertThat(hentetOppgave.get().getAktørId()).isEqualTo(aktørId);
+        assertThat(hentetOppgave.get().getStatus()).isEqualTo(OppgaveStatus.ULØST);
+        assertThat(hentetOppgave.get().getOppgaveData())
+            .isInstanceOf(BekreftAutomatiskOpphorOppgaveDataEntitet.class);
+
+        var hentetData = (BekreftAutomatiskOpphorOppgaveDataEntitet) hentetOppgave.get().getOppgaveData();
+        assertThat(hentetData.getSluttdato()).isEqualTo(sluttdato);
+        assertThat(hentetData.getMaxDato()).isEqualTo(maxDato);
     }
 
     private static KontrollerRegisterinntektOppgaveDataEntitet lagKontrollerInntektOppgaveData() {
