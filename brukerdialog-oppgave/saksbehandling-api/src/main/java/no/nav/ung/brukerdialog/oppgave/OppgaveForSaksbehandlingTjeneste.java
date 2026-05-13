@@ -47,6 +47,13 @@ public interface OppgaveForSaksbehandlingTjeneste {
     void løsSøkYtelseOppgave(AktørId aktørId);
 
     /**
+     * Avbryter en søk-ytelse-oppgave basert på aktørId.
+     *
+     * @param aktørId aktørId for deltakeren
+     */
+    void avbrytSøkYtelseOppgave(AktørId aktørId);
+
+    /**
      * Endrer frist for en oppgave.
      *
      * @param aktørId          aktørId for den oppgaven gjelder
