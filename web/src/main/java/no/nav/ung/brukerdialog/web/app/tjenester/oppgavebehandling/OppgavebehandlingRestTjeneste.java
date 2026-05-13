@@ -127,13 +127,13 @@ public class OppgavebehandlingRestTjeneste {
     @Path("/avbryt-sok-ytelse")
     @Operation(summary = "Avbryter alle uløste søk-ytelse-oppgaver for en deltaker", tags = "oppgavebehandling")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.OPPGAVE, auditlogg = false)
-    public Response avbrytSøkYtelseOppgave(
+    public Response avbrytSøkYtelseOppgaver(
         @Valid
         @NotNull
         @Parameter(description = "AktørId for deltakeren")
         @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
         AktørIdDto aktørId) {
-        oppgaveForSaksbehandlingTjeneste.avbrytSøkYtelseOppgave(aktørId.getAktørId());
+        oppgaveForSaksbehandlingTjeneste.avbrytSøkYtelseOppgaver(aktørId.getAktørId());
         return Response.ok().build();
     }
 

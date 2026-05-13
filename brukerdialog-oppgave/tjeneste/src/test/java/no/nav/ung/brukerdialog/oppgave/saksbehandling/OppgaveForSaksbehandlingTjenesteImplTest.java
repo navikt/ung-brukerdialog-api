@@ -39,7 +39,7 @@ class OppgaveForSaksbehandlingTjenesteImplTest {
     }
 
     @Test
-    void avbrytSøkYtelseOppgave_skal_avbryte_uløst_søkytelse_oppgave() {
+    void avbrytSøkYtelseOppgave_skal_avbryte_uløst_søkytelse_oppgaver() {
         // Arrange
         BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(),
@@ -52,27 +52,27 @@ class OppgaveForSaksbehandlingTjenesteImplTest {
             .thenReturn(List.of(oppgave));
 
         // Act
-        tjeneste.avbrytSøkYtelseOppgave(aktørId);
+        tjeneste.avbrytSøkYtelseOppgaver(aktørId);
 
         // Assert
         verify(oppgaveLivssyklusTjeneste).avbrytOppgave(oppgave);
     }
 
     @Test
-    void avbrytSøkYtelseOppgave_skal_ikke_feile_når_ingen_oppgave_finnes() {
+    void avbrytSøkYtelseOppgave_skal_ikke_feile_når_ingen_oppgaver_finnes() {
         // Arrange
         when(repository.hentOppgaveForType(OppgaveType.SØK_YTELSE, OppgaveStatus.ULØST, aktørId))
             .thenReturn(List.of());
 
         // Act
-        tjeneste.avbrytSøkYtelseOppgave(aktørId);
+        tjeneste.avbrytSøkYtelseOppgaver(aktørId);
 
         // Assert
         verifyNoInteractions(oppgaveLivssyklusTjeneste);
     }
 
     @Test
-    void avbrytSøkYtelseOppgave_skal_avbryte_alle_dersom_flere_uløste_oppgaver_finnes() {
+    void avbrytSøkYtelseOppgaver_skal_avbryte_alle_dersom_flere_uløste_oppgaver_finnes() {
         // Arrange
         BrukerdialogOppgaveEntitet oppgave1 = new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(), OppgaveType.SØK_YTELSE, aktørId, OppgaveYtelsetype.UNGDOMSYTELSE, null);
@@ -82,7 +82,7 @@ class OppgaveForSaksbehandlingTjenesteImplTest {
             .thenReturn(List.of(oppgave1, oppgave2));
 
         // Act
-        tjeneste.avbrytSøkYtelseOppgave(aktørId);
+        tjeneste.avbrytSøkYtelseOppgaver(aktørId);
 
         // Assert
         verify(oppgaveLivssyklusTjeneste).avbrytOppgave(oppgave1);

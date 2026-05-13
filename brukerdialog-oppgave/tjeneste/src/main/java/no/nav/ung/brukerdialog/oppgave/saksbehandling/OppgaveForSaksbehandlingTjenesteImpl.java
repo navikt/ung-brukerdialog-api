@@ -113,7 +113,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
     }
 
     @Override
-    public void avbrytSøkYtelseOppgave(AktørId aktørId) {
+    public void avbrytSøkYtelseOppgaver(AktørId aktørId) {
         List<BrukerdialogOppgaveEntitet> søkYtelseOppgaver = repository.hentOppgaveForType(
             OppgaveType.SØK_YTELSE, OppgaveStatus.ULØST, aktørId);
         if (søkYtelseOppgaver.size() > 1) {
