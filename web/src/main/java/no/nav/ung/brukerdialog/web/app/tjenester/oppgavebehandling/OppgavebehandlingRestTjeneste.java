@@ -125,7 +125,7 @@ public class OppgavebehandlingRestTjeneste {
 
     @POST
     @Path("/avbryt-sok-ytelse")
-    @Operation(summary = "Avbryter en søk-ytelse-oppgave for en deltaker", tags = "oppgavebehandling")
+    @Operation(summary = "Avbryter alle uløste søk-ytelse-oppgaver for en deltaker", tags = "oppgavebehandling")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.OPPGAVE, auditlogg = false)
     public Response avbrytSøkYtelseOppgave(
         @Valid
