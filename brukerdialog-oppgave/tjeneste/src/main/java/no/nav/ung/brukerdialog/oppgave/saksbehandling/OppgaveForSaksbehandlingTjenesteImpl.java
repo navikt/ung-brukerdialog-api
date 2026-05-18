@@ -71,7 +71,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         repository.hentAlleOppgaverForAktør(aktørId).stream()
             .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
-            .filter(o -> gjelderSammePeriodeForInntektsrapportering(o, dto))
+            .filter(o -> gjelderSammePeriode(o, dto))
             .findFirst()
             .ifPresentOrElse(
                 oppgave -> {
@@ -90,7 +90,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         repository.hentAlleOppgaverForAktør(aktørId).stream()
             .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
-            .filter(o -> gjelderSammePeriodeForInntektsrapportering(o, dto))
+            .filter(o -> gjelderSammePeriode(o, dto))
             .findFirst()
             .ifPresentOrElse(
                 oppgave -> {
@@ -128,12 +128,13 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
     }
 
 
-    // Vurder om denne logikken skal ligge i denne tjenesten eller håndteres av konsument
-    private boolean gjelderSammePeriodeForInntektsrapportering(BrukerdialogOppgaveEntitet oppgave,
-                                                               EndreOppgaveStatusDto dto) {
+    // For periode-baserte oppgavetyper (inntektsrapportering) sjekkes perioden eksplisitt.
+    // For andre typer (f.eks. SØK_YTELSE) er det ingen periode, og filteret godtar alltid.
+    private boolean gjelderSammePeriode(BrukerdialogOppgaveEntitet oppgave,
+                                        EndreOppgaveStatusDto dto) {
         if (oppgave.getOppgaveData() instanceof InntektsrapporteringOppgaveDataEntitet data) {
             return data.getFraOgMed().equals(dto.fomDato()) && data.getTilOgMed().equals(dto.tomDato());
         }
-        return false;
+        return true;
     }
 }

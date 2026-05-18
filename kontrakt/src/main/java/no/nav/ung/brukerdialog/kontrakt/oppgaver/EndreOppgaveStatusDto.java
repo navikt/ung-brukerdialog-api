@@ -12,9 +12,13 @@ import no.nav.ung.brukerdialog.typer.AktørId;
 import java.time.LocalDate;
 
 /**
- * DTO for å sette en oppgave av en gitt type og periode til utløpt eller avbrutt.
+ * DTO for å sette en oppgave av en gitt type til utløpt eller avbrutt.
+ * For periode-baserte oppgavetyper (f.eks. RAPPORTER_INNTEKT) er fomDato og tomDato påkrevd.
+ * For ikke-periode-baserte oppgavetyper (f.eks. SØK_YTELSE) kan fomDato og tomDato utelates.
+ * Se {@link OppgaveType#kreverPeriode()} og {@link GyldigEndreOppgaveStatus}.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@GyldigEndreOppgaveStatus
 public record EndreOppgaveStatusDto(
 
     @JsonProperty(value = "aktørId", required = true)
@@ -26,13 +30,11 @@ public record EndreOppgaveStatusDto(
     @NotNull
     OppgaveType oppgavetype,
 
-    @JsonProperty(value = "fomDato", required = true)
-    @NotNull
+    @JsonProperty(value = "fomDato")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate fomDato,
 
-    @JsonProperty(value = "tomDato", required = true)
-    @NotNull
+    @JsonProperty(value = "tomDato")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate tomDato
 ) {
