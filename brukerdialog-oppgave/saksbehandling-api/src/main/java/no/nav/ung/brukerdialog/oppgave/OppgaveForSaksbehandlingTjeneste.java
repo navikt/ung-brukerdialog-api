@@ -46,6 +46,7 @@ public interface OppgaveForSaksbehandlingTjeneste {
      */
     void løsSøkYtelseOppgave(AktørId aktørId);
 
+
     /**
      * Endrer frist for en oppgave.
      *

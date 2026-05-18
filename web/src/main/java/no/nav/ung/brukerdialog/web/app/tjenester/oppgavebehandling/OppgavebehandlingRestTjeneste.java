@@ -123,6 +123,7 @@ public class OppgavebehandlingRestTjeneste {
         return Response.ok().build();
     }
 
+
     @POST
     @Path("/endre-frist")
     @Operation(summary = "Endrer frist for en oppgave", tags = "oppgavebehandling")

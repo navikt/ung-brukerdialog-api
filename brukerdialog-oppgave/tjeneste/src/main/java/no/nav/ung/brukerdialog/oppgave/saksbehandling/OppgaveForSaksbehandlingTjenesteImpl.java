@@ -71,7 +71,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         repository.hentAlleOppgaverForAktør(aktørId).stream()
             .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
-            .filter(o -> gjelderSammePeriodeForInntektsrapportering(o, dto))
+            .filter(o -> matcherPeriodeEllerHarIkkePeriode(o, dto))
             .findFirst()
             .ifPresentOrElse(
                 oppgave -> {
@@ -90,7 +90,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         repository.hentAlleOppgaverForAktør(aktørId).stream()
             .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
-            .filter(o -> gjelderSammePeriodeForInntektsrapportering(o, dto))
+            .filter(o -> matcherPeriodeEllerHarIkkePeriode(o, dto))
             .findFirst()
             .ifPresentOrElse(
                 oppgave -> {
@@ -112,15 +112,37 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         søkYtelseOppgaver.forEach(o -> oppgaveLivssyklusTjeneste.løsOppgave(o, Optional.empty()));
     }
 
+
     @Override
     public void endreFrist(AktørId aktørId, UUID eksternReferanse, LocalDateTime frist) {
         repository.endreFrist(eksternReferanse, aktørId, frist);
     }
 
 
-    // Vurder om denne logikken skal ligge i denne tjenesten eller håndteres av konsument
-    private boolean gjelderSammePeriodeForInntektsrapportering(BrukerdialogOppgaveEntitet oppgave,
-                                                               EndreOppgaveStatusDto dto) {
+    /**
+     * Sjekker om en oppgave matcher periodekravet i DTO-en, eller om oppgavetype ikke krever periode.
+     *
+     * <p>Oppgavetyper er klassifisert som enten periodebaserte (f.eks. RAPPORTER_INNTEKT som krever
+     * fomDato/tomDato) eller ikke-periodebaserte (f.eks. SØK_YTELSE som ikke har periode).
+     *
+     * <p>Logikken er som følger:
+     * <ul>
+     *   <li>Hvis oppgavetype ikke krever periode ({@link OppgaveType#kreverPeriode()} == false),
+     *       returneres alltid {@code true} uavhengig av oppgavens innhold.</li>
+     *   <li>Hvis oppgavetype krever periode, må oppgavens lagrede periode (fomDato/tomDato) eksakt
+     *       matche DTO-ens fomDato og tomDato.</li>
+     *   <li>Hvis oppgavetype krever periode, men oppgavedata er av uventet type, returneres {@code false}.</li>
+     * </ul>
+     *
+     * @param oppgave oppgaveentiteten som skal sjekkes
+     * @param dto DTO-en som inneholder oppgavetype og eventuelle periodedata
+     * @return {@code true} hvis oppgaven matcher periodekravet; {@code false} ellers
+     */
+    private boolean matcherPeriodeEllerHarIkkePeriode(BrukerdialogOppgaveEntitet oppgave,
+                                        EndreOppgaveStatusDto dto) {
+        if (!dto.oppgavetype().kreverPeriode()) {
+            return true;
+        }
         if (oppgave.getOppgaveData() instanceof InntektsrapporteringOppgaveDataEntitet data) {
             return data.getFraOgMed().equals(dto.fomDato()) && data.getTilOgMed().equals(dto.tomDato());
         }
