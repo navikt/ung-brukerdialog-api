@@ -112,15 +112,6 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         søkYtelseOppgaver.forEach(o -> oppgaveLivssyklusTjeneste.løsOppgave(o, Optional.empty()));
     }
 
-    @Override
-    public void avbrytSøkYtelseOppgaver(AktørId aktørId) {
-        List<BrukerdialogOppgaveEntitet> søkYtelseOppgaver = repository.hentOppgaveForType(
-            OppgaveType.SØK_YTELSE, OppgaveStatus.ULØST, aktørId);
-        if (søkYtelseOppgaver.size() > 1) {
-            logger.warn("Fant flere enn én uløst søk-ytelse-oppgave ved avbryt. Antall: {}", søkYtelseOppgaver.size());
-        }
-        søkYtelseOppgaver.forEach(oppgaveLivssyklusTjeneste::avbrytOppgave);
-    }
 
     @Override
     public void endreFrist(AktørId aktørId, UUID eksternReferanse, LocalDateTime frist) {

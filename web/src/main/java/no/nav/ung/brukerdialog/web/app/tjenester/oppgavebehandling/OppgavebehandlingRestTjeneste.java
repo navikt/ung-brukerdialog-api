@@ -123,19 +123,6 @@ public class OppgavebehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/avbryt-sok-ytelse")
-    @Operation(summary = "Avbryter alle uløste søk-ytelse-oppgaver for en deltaker", tags = "oppgavebehandling")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.OPPGAVE, auditlogg = false)
-    public Response avbrytSøkYtelseOppgaver(
-        @Valid
-        @NotNull
-        @Parameter(description = "AktørId for deltakeren")
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class)
-        AktørIdDto aktørId) {
-        oppgaveForSaksbehandlingTjeneste.avbrytSøkYtelseOppgaver(aktørId.getAktørId());
-        return Response.ok().build();
-    }
 
     @POST
     @Path("/endre-frist")
