@@ -152,6 +152,12 @@
             <artifactId>migreringer</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.ung.brukerdialog</groupId>
+            <artifactId>migreringer</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- REST + -->
         <dependency>
