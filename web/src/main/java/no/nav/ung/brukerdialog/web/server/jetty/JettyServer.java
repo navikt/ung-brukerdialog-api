@@ -130,9 +130,10 @@ public class JettyServer {
         System.setProperty("task.manager.polling.tasks.size", "10");
         System.setProperty("task.manager.polling.scrolling.select.size", "10");
 
-        if (ENV.isDev()) {
-            System.setProperty("task.manager.auto.traceparent", "true");
-        }
+        // Dette feiler fordi vi får en ukjent trace-flag 03 som er eit ukjent format. Kommenterer ut til vi godtar det ukjente flagget
+        //        if (ENV.isDev()) {
+        //            System.setProperty("task.manager.auto.traceparent", "true");
+        //        }
     }
 
     private void konfigurerJndi() throws Exception {
