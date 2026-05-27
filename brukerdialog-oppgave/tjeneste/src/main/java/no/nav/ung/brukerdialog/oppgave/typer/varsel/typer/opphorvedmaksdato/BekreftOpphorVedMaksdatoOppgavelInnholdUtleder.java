@@ -26,7 +26,7 @@ public class BekreftOpphorVedMaksdatoOppgavelInnholdUtleder implements OppgavelI
 
     @Override
     public String utledVarselTekst(BrukerdialogOppgaveEntitet oppgave) {
-        return "Din ungdomsprogramytelse opph\u00f8rer automatisk. Du kan gi oss en kommentar innen 14 dager.";
+        return "Din ungdomsprogramytelse opph\u00f8rer. Du kan gi oss en kommentar innen 14 dager.";
     }
 
     @Override

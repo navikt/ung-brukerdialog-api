@@ -10,7 +10,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import java.time.LocalDate;
 
 /**
- * Data for oppgave om automatisk opphør av ungdomsprogramytelsen.
+ * Data for oppgave om opphør ved maksdato av ungdomsprogramytelsen.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record BekreftOpphorVedMaksdatoOppgavetypeDataDto(
