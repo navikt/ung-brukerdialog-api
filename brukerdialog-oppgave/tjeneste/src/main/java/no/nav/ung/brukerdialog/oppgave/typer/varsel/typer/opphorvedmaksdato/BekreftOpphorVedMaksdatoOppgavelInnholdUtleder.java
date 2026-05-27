@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.automatiskopphor;
+package no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -8,25 +8,25 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 import no.nav.ung.brukerdialog.oppgave.OppgavelInnholdUtleder;
 
-@OppgaveTypeRef(OppgaveType.BEKREFT_AUTOMATISK_OPPHOR)
+@OppgaveTypeRef(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO)
 @ApplicationScoped
-public class BekreftAutomatiskOpphorOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
+public class BekreftOpphorVedMaksdatoOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
 
     private String ungdomsprogramytelsenDeltakerBaseUrl;
 
     @Inject
-    public BekreftAutomatiskOpphorOppgavelInnholdUtleder(
+    public BekreftOpphorVedMaksdatoOppgavelInnholdUtleder(
         @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
     ) {
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
     }
 
-    public BekreftAutomatiskOpphorOppgavelInnholdUtleder() {
+    public BekreftOpphorVedMaksdatoOppgavelInnholdUtleder() {
     }
 
     @Override
     public String utledVarselTekst(BrukerdialogOppgaveEntitet oppgave) {
-        return "Din ungdomsprogramytelse opph\u00f8rer automatisk. Du kan gi oss en kommentar innen 14 dager.";
+        return "Din ungdomsprogramytelse opph\u00f8rer. Du kan gi oss en kommentar innen 14 dager.";
     }
 
     @Override
