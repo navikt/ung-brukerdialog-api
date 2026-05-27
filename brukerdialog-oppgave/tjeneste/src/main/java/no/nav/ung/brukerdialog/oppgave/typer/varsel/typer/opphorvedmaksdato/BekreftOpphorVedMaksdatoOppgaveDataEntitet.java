@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 /**
  * Databasestruktur for oppgavedata av type BEKREFT_OPPHOR_VED_MAKSDATO.
- * Lagrer sluttdato og max-dato for det automatiske opphøret.
+ * Lagrer sluttdato og max-dato for opphøret.
  */
 @Entity(name = "BekreftOpphorVedMaksdatoOppgaveData")
 @Table(name = "BD_OPPGAVE_DATA_BEKREFT_OPPHOR_VED_MAKSDATO")
