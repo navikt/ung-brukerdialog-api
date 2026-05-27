@@ -9,7 +9,7 @@ public enum OppgaveType {
     RAPPORTER_INNTEKT(true),
     SØK_YTELSE,
     BEKREFT_BOSTED,
-    BEKREFT_AUTOMATISK_OPPHOR;
+    BEKREFT_OPPHOR_VED_MAKSDATO;
 
     private final boolean kreverPeriode;
 

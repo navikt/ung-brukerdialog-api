@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.automatiskopphor.BekreftAutomatiskOpphorOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretsluttdato.EndretSluttdatoDataDto;
@@ -28,7 +28,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppg
     @JsonSubTypes.Type(value = KontrollerRegisterinntektOppgavetypeDataDto.class, name = "KONTROLLER_REGISTERINNTEKT"),
     @JsonSubTypes.Type(value = InntektsrapporteringOppgavetypeDataDto.class, name = "INNTEKTSRAPPORTERING"),
     @JsonSubTypes.Type(value = SøkYtelseOppgavetypeDataDto.class, name = "SØK_YTELSE"),
-    @JsonSubTypes.Type(value = BekreftAutomatiskOpphorOppgavetypeDataDto.class, name = "AUTOMATISK_OPPHOR")
+    @JsonSubTypes.Type(value = BekreftOpphorVedMaksdatoOppgavetypeDataDto.class, name = "OPPHOR_VED_MAKSDATO")
 })
 public interface OppgavetypeDataDto {
     /**
