@@ -19,7 +19,14 @@ public record BekreftBostedOppgavetypeDataDto(
     LocalDate tom,
 
     @NotNull
-    Boolean erBosattITrondheim
+    Boolean erBosattITrondheim,
+
+    @NotNull
+    String ikkeOppfyltÅrsakFritekstbekrivelse,
+
+    @NotNull
+    BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
+
 ) implements OppgavetypeDataDto {
     @Override
     public OppgaveType oppgavetype() {
