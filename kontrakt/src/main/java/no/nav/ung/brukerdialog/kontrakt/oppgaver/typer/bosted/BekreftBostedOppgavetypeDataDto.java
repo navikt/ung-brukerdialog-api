@@ -22,7 +22,7 @@ public record BekreftBostedOppgavetypeDataDto(
     Boolean erBosattITrondheim,
 
     @NotNull
-    String ikkeOppfyltÅrsakFritekstbekrivelse,
+    String ikkeOppfyltÅrsakFritekstbeskrivelse,
 
     @NotNull
     BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak

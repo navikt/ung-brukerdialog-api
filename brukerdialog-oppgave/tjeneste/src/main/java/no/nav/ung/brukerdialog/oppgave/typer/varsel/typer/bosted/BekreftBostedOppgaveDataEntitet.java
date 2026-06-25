@@ -23,8 +23,8 @@ public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
     @Column(name = "er_bosatt_i_trondheim", nullable = false, updatable = false)
     private boolean erBosattITrondheim;
 
-    @Column(name = "ikke_oppfylt_arsak_fritekstbeskrivelse", nullable = false, updatable = false)
-    private String ikkeOppfyltÅrsakFritekstbekrivelse;
+    @Column(name = "ikke_oppfylt_arsak_fritekstbeskrivelse", updatable = false)
+    private String ikkeOppfyltÅrsakFritekstbeskrivelse;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ikke_oppfylt_arsak", nullable = false, updatable = false)
@@ -34,11 +34,11 @@ public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
         // For JPA
     }
 
-    public BekreftBostedOppgaveDataEntitet(LocalDate fom, LocalDate tom, boolean erBosattITrondheim, String ikkeOppfyltÅrsakFritekstbekrivelse, BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak) {
+    public BekreftBostedOppgaveDataEntitet(LocalDate fom, LocalDate tom, boolean erBosattITrondheim, String ikkeOppfyltÅrsakFritekstbeskrivelse, BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak) {
         this.fom = fom;
         this.tom = tom;
         this.erBosattITrondheim = erBosattITrondheim;
-        this.ikkeOppfyltÅrsakFritekstbekrivelse = ikkeOppfyltÅrsakFritekstbekrivelse;
+        this.ikkeOppfyltÅrsakFritekstbeskrivelse = ikkeOppfyltÅrsakFritekstbeskrivelse;
         this.ikkeOppfyltÅrsak = ikkeOppfyltÅrsak;
     }
 
@@ -54,8 +54,8 @@ public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
         return erBosattITrondheim;
     }
 
-    public String getIkkeOppfyltÅrsakFritekstbekrivelse() {
-        return ikkeOppfyltÅrsakFritekstbekrivelse;
+    public String getIkkeOppfyltÅrsakFritekstbeskrivelse() {
+        return ikkeOppfyltÅrsakFritekstbeskrivelse;
     }
 
     public BostedsvilkårIkkeOppfyltÅrsak getIkkeOppfyltÅrsak() {
