@@ -23,6 +23,7 @@ public record BekreftBostedOppgavetypeDataDto(
 
     String ikkeOppfyltÅrsakFritekstbeskrivelse,
 
+    @NotNull
     BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
 
 ) implements OppgavetypeDataDto {
