@@ -21,10 +21,8 @@ public record BekreftBostedOppgavetypeDataDto(
     @NotNull
     Boolean erBosattITrondheim,
 
-    @NotNull
     String ikkeOppfyltÅrsakFritekstbeskrivelse,
 
-    @NotNull
     BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
 
 ) implements OppgavetypeDataDto {
