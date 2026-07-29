@@ -4,13 +4,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.DeaktiverMinSideVarselTask;
 import no.nav.ung.brukerdialog.PubliserMinSideVarselTask;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 
 import java.util.Optional;
@@ -46,9 +44,7 @@ public class OppgaveLivssyklusTjeneste {
      */
     public BrukerdialogOppgaveEntitet løsOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, Optional<OppgaveResponsDto> responsDto) {
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
-        oppgaveEntitet.setStatus(OppgaveStatus.LØST);
-        responsDto.ifPresent(oppgaveEntitet::setRespons);
-        oppgaveEntitet.setLøstDato(java.time.LocalDateTime.now());
+        oppgaveEntitet.løs(responsDto.orElse(null));
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
         return oppgaveEntitet;
     }
@@ -62,7 +58,7 @@ public class OppgaveLivssyklusTjeneste {
      */
     public void utløpOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
-        oppgaveEntitet.setStatus(OppgaveStatus.UTLØPT);
+        oppgaveEntitet.utløp();
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
     }
 
@@ -75,7 +71,7 @@ public class OppgaveLivssyklusTjeneste {
      */
     public void avbrytOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
-        oppgaveEntitet.setStatus(OppgaveStatus.AVBRUTT);
+        oppgaveEntitet.avbryt();
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
     }
 
@@ -89,7 +85,6 @@ public class OppgaveLivssyklusTjeneste {
         if (oppgaveEntitet.getId() != null) {
             throw new IllegalArgumentException("Oppgave er allerede persistert med id: " + oppgaveEntitet.getId());
         }
-        oppgaveEntitet.setStatus(OppgaveStatus.ULØST);
         var oppgaveData = OppgaveDataMapperFraDtoTilEntitet.finnTjeneste(oppgaveDataMapper, oppgaveEntitet.getOppgaveType()).map(oppgavetypeData);
         oppgaveEntitet.setOppgaveData(oppgaveData);
         brukerdialogOppgaveRepository.lagre(oppgaveEntitet);

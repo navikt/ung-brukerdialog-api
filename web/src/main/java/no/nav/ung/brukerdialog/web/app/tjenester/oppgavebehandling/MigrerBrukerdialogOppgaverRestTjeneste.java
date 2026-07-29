@@ -90,7 +90,7 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
             if (eksisterende.isPresent()) {
                 // Pga feil i migreringslogikk ved kjøring i test
                 if (eksisterende.get().getStatus() != oppgaveDto.status()) {
-                    eksisterende.get().setStatus(oppgaveDto.status());
+                    eksisterende.get().settStatusVedMigrering(oppgaveDto.status());
                     repository.oppdater(eksisterende.get());
                 }
 

@@ -69,7 +69,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         logger.info("Utløper oppgave av type: {} med periode [{} - {}]", dto.oppgavetype(), dto.fomDato(), dto.tomDato());
         var aktørId = dto.aktørId();
         repository.hentAlleOppgaverForAktør(aktørId).stream()
-            .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
+            .filter(BrukerdialogOppgaveEntitet::erUløst)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
             .filter(o -> matcherPeriodeEllerHarIkkePeriode(o, dto))
             .findFirst()
@@ -88,7 +88,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
         logger.info("Avbryter oppgave av type: {} med periode [{} - {}]", dto.oppgavetype(), dto.fomDato(), dto.tomDato());
         var aktørId = dto.aktørId();
         repository.hentAlleOppgaverForAktør(aktørId).stream()
-            .filter(o -> o.getStatus() == OppgaveStatus.ULØST)
+            .filter(BrukerdialogOppgaveEntitet::erUløst)
             .filter(o -> o.getOppgaveType() == dto.oppgavetype())
             .filter(o -> matcherPeriodeEllerHarIkkePeriode(o, dto))
             .findFirst()

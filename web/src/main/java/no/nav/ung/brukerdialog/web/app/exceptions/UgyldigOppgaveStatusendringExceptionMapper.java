@@ -3,24 +3,22 @@ package no.nav.ung.brukerdialog.web.app.exceptions;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
-
+import no.nav.k9.felles.log.util.LoggerUtils;
+import no.nav.ung.brukerdialog.kontrakt.FeilDto;
+import no.nav.ung.brukerdialog.kontrakt.FeilType;
+import no.nav.ung.brukerdialog.oppgave.UgyldigOppgaveStatusendringException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import no.nav.k9.felles.log.util.LoggerUtils;
-import no.nav.ung.brukerdialog.kontrakt.FeilDto;
-import no.nav.ung.brukerdialog.kontrakt.FeilType;
-import no.nav.ung.brukerdialog.oppgave.brukerdialog.OppgaveKanIkkeLøsesException;
-
-public class OppgaveKanIkkeLøsesExceptionMapper implements ExceptionMapper<OppgaveKanIkkeLøsesException> {
+public class UgyldigOppgaveStatusendringExceptionMapper implements ExceptionMapper<UgyldigOppgaveStatusendringException> {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
-    public Response toResponse(OppgaveKanIkkeLøsesException exception) {
+    public Response toResponse(UgyldigOppgaveStatusendringException exception) {
         String message = exception.getMessage() != null ? LoggerUtils.removeLineBreaks(exception.getMessage()) : "";
-        log.info("Oppgave kunne ikke løses fordi den ikke er uløst: {}", message); // NOSONAR
+        log.info("Ugyldig statusendring på oppgave: {}", message); // NOSONAR
 
         try {
             return Response

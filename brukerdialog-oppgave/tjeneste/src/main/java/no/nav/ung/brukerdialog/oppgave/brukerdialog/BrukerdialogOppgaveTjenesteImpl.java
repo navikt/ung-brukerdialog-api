@@ -2,15 +2,14 @@ package no.nav.ung.brukerdialog.oppgave.brukerdialog;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
-import no.nav.ung.brukerdialog.typer.AktørId;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveMapper;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveLivssyklusTjeneste;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.saksbehandling.OppgaveForSaksbehandlingTjenesteImpl;
+import no.nav.ung.brukerdialog.typer.AktørId;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +58,6 @@ public class BrukerdialogOppgaveTjenesteImpl implements BrukerdialogOppgaveTjene
     public BrukerdialogOppgaveDto løsOppgave(UUID oppgavereferanse, AktørId aktørId, Optional<OppgaveResponsDto> oppgaveResponsDto) {
         var oppgave = repository.hentOppgaveForOppgavereferanse(oppgavereferanse, aktørId)
             .orElseThrow(() -> new IllegalArgumentException("Fant ikke oppgave med oppgaveReferanse: " + oppgavereferanse));
-        if (oppgave.getStatus() != OppgaveStatus.ULØST) {
-            throw new OppgaveKanIkkeLøsesException(oppgavereferanse, oppgave.getStatus());
-        }
         var oppdatertOppgave = oppgaveLivssyklusTjeneste.løsOppgave(oppgave, oppgaveResponsDto);
         return mapper.tilDto(oppdatertOppgave);
     }
