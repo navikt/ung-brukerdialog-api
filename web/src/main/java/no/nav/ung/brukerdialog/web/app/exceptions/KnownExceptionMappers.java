@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import no.nav.k9.felles.exception.ManglerTilgangException;
 import no.nav.k9.felles.exception.VLException;
 import no.nav.k9.felles.jpa.TomtResultatException;
+import no.nav.ung.brukerdialog.oppgave.brukerdialog.OppgaveKanIkkeLøsesException;
 import no.nav.ung.brukerdialog.web.server.abac.UkjentAbacVerdiException;
 
 public class KnownExceptionMappers {
@@ -28,6 +29,7 @@ public class KnownExceptionMappers {
         register(JsonParseException.class, new JsonParseExceptionMapper());
         register(ManglerTilgangException.class, new ManglerTilgangExceptionMapper());
         register(TomtResultatException.class, new TomtResultatExceptionMapper());
+        register(OppgaveKanIkkeLøsesException.class, new OppgaveKanIkkeLøsesExceptionMapper());
         register(UnsupportedOperationException.class, new UnsupportedOperationExceptionMapper());
         register(VLException.class, new VLExceptionMapper());
         register(UkjentAbacVerdiException.class, new UkjentAbacVerdiExceptionMapper());

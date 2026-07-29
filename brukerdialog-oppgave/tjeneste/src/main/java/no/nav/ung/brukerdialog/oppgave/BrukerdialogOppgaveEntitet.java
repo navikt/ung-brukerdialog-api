@@ -21,6 +21,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_OPPGAVE")
     private Long id;
 
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
+
     @Embedded
     @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", nullable = false, updatable = false)))
     private AktørId aktørId;
