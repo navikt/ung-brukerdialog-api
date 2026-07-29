@@ -10,8 +10,8 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.YtelseType;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveDataEntitet;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveDataEntitet;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveDataEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,7 +104,7 @@ class BrukerdialogOppgaveRepositoryTest {
         BrukerdialogOppgaveEntitet oppgave3 = opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData());
 
         // Løs én av SØK_YTELSE oppgavene
-        oppgave3.setStatus(OppgaveStatus.LØST);
+        oppgave3.løs(null);
         repository.oppdater(oppgave3);
 
         entityManager.flush();
