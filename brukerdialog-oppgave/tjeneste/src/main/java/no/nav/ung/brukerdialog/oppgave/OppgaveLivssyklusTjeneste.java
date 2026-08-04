@@ -10,11 +10,16 @@ import no.nav.ung.brukerdialog.DeaktiverMinSideVarselTask;
 import no.nav.ung.brukerdialog.PubliserMinSideVarselTask;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @ApplicationScoped
 public class OppgaveLivssyklusTjeneste {
+
+    private static final Logger logger = LoggerFactory.getLogger(OppgaveLivssyklusTjeneste.class);
 
     private ProsessTaskTjeneste prosessTaskTjeneste;
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
@@ -43,6 +48,7 @@ public class OppgaveLivssyklusTjeneste {
      * @return
      */
     public BrukerdialogOppgaveEntitet løsOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, Optional<OppgaveResponsDto> responsDto) {
+        logger.info("Løser oppgave: oppgaveType={}, oppgaveReferanse={}", oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
         oppgaveEntitet.løs(responsDto.orElse(null));
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
@@ -57,6 +63,7 @@ public class OppgaveLivssyklusTjeneste {
      * @param oppgaveEntitet Oppgaven som skal markeres som utløpt
      */
     public void utløpOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet) {
+        logger.info("Utløper oppgave: oppgaveType={}, oppgaveReferanse={}", oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
         oppgaveEntitet.utløp();
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
@@ -70,6 +77,7 @@ public class OppgaveLivssyklusTjeneste {
      * @param oppgaveEntitet Oppgaven som skal avbryttes
      */
     public void avbrytOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet) {
+        logger.info("Avbryter oppgave: oppgaveType={}, oppgaveReferanse={}", oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
         opprettTaskForDeaktiveringAvVarsel(oppgaveEntitet);
         oppgaveEntitet.avbryt();
         brukerdialogOppgaveRepository.oppdater(oppgaveEntitet);
@@ -84,6 +92,16 @@ public class OppgaveLivssyklusTjeneste {
     public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData) {
         if (oppgaveEntitet.getId() != null) {
             throw new IllegalArgumentException("Oppgave er allerede persistert med id: " + oppgaveEntitet.getId());
+        }
+        if (oppgavetypeData instanceof EndretPeriodeDataDto endretPeriodeData) {
+            logger.info("Oppretter oppgave: oppgaveType={}, oppgaveReferanse={}, ytelsetype={}, frist={}, endringer={}",
+                oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse(),
+                oppgaveEntitet.getYtelsetype(), oppgaveEntitet.getFristTid(),
+                endretPeriodeData.endringer());
+        } else {
+            logger.info("Oppretter oppgave: oppgaveType={}, oppgaveReferanse={}, ytelsetype={}, frist={}",
+                oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse(),
+                oppgaveEntitet.getYtelsetype(), oppgaveEntitet.getFristTid());
         }
         var oppgaveData = OppgaveDataMapperFraDtoTilEntitet.finnTjeneste(oppgaveDataMapper, oppgaveEntitet.getOppgaveType()).map(oppgavetypeData);
         oppgaveEntitet.setOppgaveData(oppgaveData);
