@@ -21,6 +21,10 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_OPPGAVE")
     private Long id;
 
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
+
     @Embedded
     @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", nullable = false, updatable = false)))
     private AktørId aktørId;
@@ -124,12 +128,42 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.fristTid = fristTid;
     }
 
-    public void setStatus(OppgaveStatus status) {
-        this.status = status;
+    public boolean erUløst() {
+        return status == OppgaveStatus.ULØST;
     }
 
-    public void setLøstDato(LocalDateTime løstDato) {
-        this.løstDato = løstDato;
+    public void løs(OppgaveResponsDto respons) {
+        validerKanEndres(OppgaveStatus.LØST);
+        this.status = OppgaveStatus.LØST;
+        this.løstDato = LocalDateTime.now();
+        if (respons != null) {
+            this.respons = respons;
+        }
+    }
+
+    public void avbryt() {
+        validerKanEndres(OppgaveStatus.AVBRUTT);
+        this.status = OppgaveStatus.AVBRUTT;
+    }
+
+    public void utløp() {
+        validerKanEndres(OppgaveStatus.UTLØPT);
+        this.status = OppgaveStatus.UTLØPT;
+    }
+
+    // ULØST er eneste ikke-terminale status, så enhver overgang er kun lovlig derfra.
+    private void validerKanEndres(OppgaveStatus nyStatus) {
+        if (!erUløst()) {
+            throw new UgyldigOppgaveStatusendringException(oppgavereferanse, status, nyStatus);
+        }
+    }
+
+    /**
+     * Setter status uten validering. Skal kun brukes ved migrering av oppgaver fra andre systemer,
+     * der oppgaven allerede har en terminal status som må bevares.
+     */
+    public void settStatusVedMigrering(OppgaveStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getLøstDato() {
@@ -138,10 +172,6 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
 
     public OppgaveResponsDto getRespons() {
         return respons;
-    }
-
-    public void setRespons(OppgaveResponsDto respons) {
-        this.respons = respons;
     }
 
     Long getId() {
