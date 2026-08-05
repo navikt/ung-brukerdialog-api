@@ -8,15 +8,12 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import java.time.LocalDate;
 
 /**
- * Data for oppgave om bostedavklaring – bruker bekrefter om de er bosatt i Trondheim.
+ * Data for oppgave om bostedavklaring – bruker bekrefter om de ikke lenger er bosatt i Trondheim.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record BekreftBostedOppgavetypeDataDto(
+public record BekreftBostedOpphørOppgavetypeDataDto(
     @NotNull
     LocalDate fom,
-
-    @NotNull
-    LocalDate tom,
 
     @NotNull
     Boolean erBosattITrondheim,
