@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
@@ -22,6 +23,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppg
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = BekreftBostedOppgavetypeDataDto.class, name = "BOSTED"),
+    @JsonSubTypes.Type(value = BekreftBostedOpphørOppgavetypeDataDto.class, name = "BOSTED_OPPHØR"),
     @JsonSubTypes.Type(value = EndretStartdatoDataDto.class, name = "ENDRET_STARTDATO"),
     @JsonSubTypes.Type(value = EndretSluttdatoDataDto.class, name = "ENDRET_SLUTTDATO"),
     @JsonSubTypes.Type(value = EndretPeriodeDataDto.class, name = "ENDRET_PERIODE"),

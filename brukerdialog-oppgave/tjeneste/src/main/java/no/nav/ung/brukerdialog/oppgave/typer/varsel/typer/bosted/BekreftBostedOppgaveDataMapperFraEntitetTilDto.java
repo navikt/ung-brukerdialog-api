@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
@@ -19,6 +20,9 @@ public class BekreftBostedOppgaveDataMapperFraEntitetTilDto implements OppgaveDa
     @Override
     public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
         var e = (BekreftBostedOppgaveDataEntitet) entitet;
-        return new BekreftBostedOppgavetypeDataDto(e.getFom(), e.getTom(), e.isErBosattITrondheim(), null, null);
+        if (e.getTom() == null) {
+            return new BekreftBostedOpphørOppgavetypeDataDto(e.getFom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak());
+        }
+        return new BekreftBostedOppgavetypeDataDto(e.getFom(), e.getTom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak());
     }
 }
