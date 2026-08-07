@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
+import org.hibernate.jpa.HibernateHints;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class OppgaveStatistikkRepository {
                 BrukerdialogOppgaveEntitet.class)
             .setParameter("avbrutt", OppgaveStatus.AVBRUTT)
             .setParameter("cutoff", LocalDateTime.now().minusDays(14))
+            .setHint(HibernateHints.HINT_READ_ONLY, true)
             .getResultList();
     }
 
@@ -51,6 +53,7 @@ public class OppgaveStatistikkRepository {
                 BrukerdialogOppgaveEntitet.class)
             .setParameter("type", oppgaveType)
             .setParameter("sisteKjøring", sisteKjøring)
+            .setHint(HibernateHints.HINT_READ_ONLY, true)
             .getResultList();
     }
 }

@@ -10,6 +10,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class RapportertInntektDto extends OppgaveResponsDto {
 
@@ -49,5 +50,19 @@ public class RapportertInntektDto extends OppgaveResponsDto {
 
     public BigDecimal getArbeidstakerOgFrilansInntekt() {
         return arbeidstakerOgFrilansInntekt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RapportertInntektDto that)) return false;
+        return Objects.equals(fraOgMed, that.fraOgMed)
+            && Objects.equals(tilOgMed, that.tilOgMed)
+            && Objects.equals(arbeidstakerOgFrilansInntekt, that.arbeidstakerOgFrilansInntekt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fraOgMed, tilOgMed, arbeidstakerOgFrilansInntekt);
     }
 }

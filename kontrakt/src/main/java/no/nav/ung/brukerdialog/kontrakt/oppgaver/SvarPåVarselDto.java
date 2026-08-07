@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import java.util.Objects;
+
 /**
  * DTO for uttalelse fra bruker på et varsel.
  */
@@ -32,6 +34,19 @@ public class SvarPåVarselDto extends OppgaveResponsDto {
 
     public String getUttalelseFraBruker() {
         return uttalelseFraBruker;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SvarPåVarselDto that)) return false;
+        return Objects.equals(harUttalelse, that.harUttalelse)
+            && Objects.equals(uttalelseFraBruker, that.uttalelseFraBruker);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(harUttalelse, uttalelseFraBruker);
     }
 }
 
