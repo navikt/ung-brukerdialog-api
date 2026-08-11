@@ -26,6 +26,6 @@ public record BekreftBostedOpphørOppgavetypeDataDto(
 ) implements OppgavetypeDataDto {
     @Override
     public OppgaveType oppgavetype() {
-        return OppgaveType.BEKREFT_BOSTED;
+        return OppgaveType.BEKREFT_BOSTED_OPPHØR;
     }
 }
