@@ -61,8 +61,8 @@ class SvarPåVarselDtoTest {
     }
 
     @Test
-    void uttalelseFraBruker_med_ugyldige_tegn_er_ugyldig() {
-        var dto = new SvarPåVarselDto(true, "Дякую за інформацію");
+    void uttalelseFraBruker_med_kontrolltegn_er_ugyldig() {
+        var dto = new SvarPåVarselDto(true, "Ugyldig tekst \u0007 med kontrolltegn");
         Set<ConstraintViolation<SvarPåVarselDto>> violations = validator.validate(dto);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
@@ -72,6 +72,13 @@ class SvarPåVarselDtoTest {
     @Test
     void uttalelseFraBruker_med_æøå_og_tegnsetting_er_gyldig() {
         var dto = new SvarPåVarselDto(true, "Jeg synes vedtaket er feil, se vedlagt dokumentasjon (2025).");
+        Set<ConstraintViolation<SvarPåVarselDto>> violations = validator.validate(dto);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void uttalelseFraBruker_med_andre_unicode_bokstaver_er_gyldig() {
+        var dto = new SvarPåVarselDto(true, "Дякую за інформацію 感谢您的信息");
         Set<ConstraintViolation<SvarPåVarselDto>> violations = validator.validate(dto);
         assertThat(violations).isEmpty();
     }

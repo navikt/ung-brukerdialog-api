@@ -17,7 +17,7 @@ public class SvarPåVarselDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "uttalelseFraBruker")
     @Size(max = 4000)
-    @Pattern(regexp = "^[[\\p{IsLatin}&&[\\p{Lu}\\p{Ll}]]\\p{Nd}\\p{No}\\p{M}\\p{P}\\p{S}\\p{Zs}]*$", message = "Uttalelse fra bruker inneholder ugyldige tegn")
+    @Pattern(regexp = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{S}\\p{Space}]*$", message = "Uttalelse fra bruker inneholder ugyldige tegn")
     private String uttalelseFraBruker;
 
     public SvarPåVarselDto() {
