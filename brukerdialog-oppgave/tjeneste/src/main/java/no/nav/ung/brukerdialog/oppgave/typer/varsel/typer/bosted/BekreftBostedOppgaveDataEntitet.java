@@ -17,7 +17,7 @@ public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
     @Column(name = "fom", nullable = false, updatable = false)
     private LocalDate fom;
 
-    @Column(name = "tom", nullable = false, updatable = false)
+    @Column(name = "tom", updatable = false)
     private LocalDate tom;
 
     @Column(name = "er_bosatt_i_trondheim", nullable = false, updatable = false)
