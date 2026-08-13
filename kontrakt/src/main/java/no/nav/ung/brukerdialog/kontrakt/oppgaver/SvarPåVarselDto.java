@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import no.nav.k9.felles.validering.InputValideringRegex;
 
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ public class SvarPåVarselDto extends OppgaveResponsDto {
 
     @JsonProperty(value = "uttalelseFraBruker")
     @Size(max = 4000)
-    @Pattern(regexp = "^[\\p{Graph}\\p{IsWhite_Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$", message = "Uttalelse fra bruker inneholder ugyldige tegn")
+    @Pattern(regexp = InputValideringRegex.FRITEKST, message = "Uttalelse fra bruker inneholder ugyldige tegn")
     private String uttalelseFraBruker;
 
     public SvarPåVarselDto() {
