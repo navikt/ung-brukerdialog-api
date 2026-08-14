@@ -46,9 +46,9 @@
         <ung-deltakelse-opplyser.version>2.11.3</ung-deltakelse-opplyser.version>
         <handlebars.version>4.5.4</handlebars.version>
         <validation-model-jakarta.version>1.30.2</validation-model-jakarta.version>
-        <openhtmltopdf.version>1.1.66</openhtmltopdf.version>
+        <openhtmltopdf.version>1.1.69</openhtmltopdf.version>
         <jsoup.version>1.23.1</jsoup.version>
-        <commonmark.version>0.29.0</commonmark.version>
+        <commonmark.version>0.30.0</commonmark.version>
         <tms-mikrofrontend-builder.version>3.0.0</tms-mikrofrontend-builder.version>
         <tms-java-builder.version>2.2.0</tms-java-builder.version>
     </properties>
