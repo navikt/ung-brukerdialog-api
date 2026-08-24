@@ -47,7 +47,7 @@ public class OppgaveForSaksbehandlingTjenesteImpl implements OppgaveForSaksbehan
             oppgave.aktørId(),
             oppgave.ytelsetype(),
             oppgave.frist());
-        oppgaveLivssyklusTjeneste.opprettOppgave(oppgaveEntitet, oppgave.oppgavetypeData());
+        oppgaveLivssyklusTjeneste.opprettOppgave(oppgaveEntitet, oppgave.oppgavetypeData(), oppgave.journalføring());
     }
 
     @Override

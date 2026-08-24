@@ -5,15 +5,36 @@ import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import no.nav.k9.felles.log.metrics.MetricsUtil;
+import no.nav.ung.brukerdialog.oppgave.journalforing.JournalføringMetrikker;
+import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveJournalføringRepository;
 
+/**
+ * Eksponerer Prometheus-metrikker. Klassen er {@code @Transactional} fordi
+ * {@code ung_brukerdialog_journalforing_etterslep}-gaugen leser fra databasen
+ * første gang Micrometer skraper verdien (dvs. inne i {@link #prometheus()}) - samme mønster
+ * som andre lesende REST-endepunkt i denne kodebasen, jf.
+ * {@code DiagnostikkBrukerdialogOppgaverRestTjeneste}.
+ */
 @Path("/metrics")
 @Produces(TEXT_PLAIN)
 @ApplicationScoped
+@Transactional
 public class PrometheusRestService {
+
+    public PrometheusRestService() {
+        // CDI proxy
+    }
+
+    @Inject
+    public PrometheusRestService(OppgaveJournalføringRepository journalføringRepository) {
+        JournalføringMetrikker.registrerEtterslepGauge(journalføringRepository);
+    }
 
     @GET
     @Operation(hidden = true)
@@ -22,3 +43,4 @@ public class PrometheusRestService {
         return MetricsUtil.REGISTRY.scrape();
     }
 }
+

@@ -88,6 +88,7 @@ spec:
         - application: sif-abac-pdp
       external:
         - host: "pdl-api.dev-fss-pub.nais.io"
+        - host: "dokarkiv-q2.dev-fss-pub.nais.io"
     inbound:
       rules:
         - application: k9-swagger
@@ -146,6 +147,14 @@ spec:
     # PDL
     - name: PDL_TEMA
       value: UNG
+
+    # Journalføring (Dokarkiv) - se brukerdialog-oppgave/docs
+    - name: DOKARKIV_URL
+      value: https://dokarkiv-q2.dev-fss-pub.nais.io/rest/journalpostapi/v1
+    - name: DOKARKIV_SCOPE
+      value: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
+    - name: JOURNALFORING_ENABLED
+      value: "true"
 
     # Restservice Generelle
     - name: PDL_BASE_URL

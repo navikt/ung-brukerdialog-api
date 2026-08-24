@@ -23,6 +23,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigrerOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsRequest;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsResultat;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraDtoTilEntitet;
@@ -115,6 +116,11 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.aktørId(),
                     oppgaveDto.respons(),
                     oppgaveDto.status(),
+                    // MigrerOppgaveDto har ikke noe ytelsetype-felt - migreringen gjelder kun
+                    // ungdomsytelse-oppgaver fra den gamle applikasjonen. Migrerte oppgaver
+                    // journalføres ikke, siden de opprettes direkte via repository og ikke
+                    // via OppgaveLivssyklusTjeneste.
+                    OppgaveYtelsetype.UNGDOMSYTELSE,
                     frist,
                     løstDato,
                     opprettetTidspunkt,

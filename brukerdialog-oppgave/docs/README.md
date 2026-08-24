@@ -18,6 +18,10 @@ Brukerdialog-oppgaver er oppgaver som sendes til brukerne via Min Side og Aktør
 Skjermbilder for oppgavene er tilgjengelig via storybook:
 https://navikt.github.io/sif-brukerdialog/ung-innsyn-storybook/
 
+## Journalføring
+
+Alle oppgaver journalføres i Dokarkiv ved opprettelse — se [JOURNALFORING.md](JOURNALFORING.md).
+
 ## Kategorier
 
 **Varsel** — oppgaver som varsler brukeren om en endring og ber om bekreftelse. Flyten styres via Min Side-varsel.

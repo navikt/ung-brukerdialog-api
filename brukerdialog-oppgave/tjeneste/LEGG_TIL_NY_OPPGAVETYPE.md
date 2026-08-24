@@ -16,6 +16,7 @@ Som eksempel brukes den eksisterende typen `BEKREFT_ENDRET_STARTDATO` i pakken
 5. [Implementer `OppgaveDataMapperFraDtoTilEntitet`](#5-implementer-oppgavedatamapperfradtotilentitet)
 6. [Implementer `OppgaveDataMapperFraEntitetTilDto`](#6-implementer-oppgavedatamapperfraentitettildto)
 7. [Implementer `OppgavelInnholdUtleder`](#7-implementer-oppgavelinnholdutleder)
+8. [Implementer `OppgaveDokumentUtleder` for journalføring](#8-implementer-oppgavedokumentutleder-for-journalføring)
 
 ---
 
@@ -213,6 +214,38 @@ public class MinNyeOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
 
 ---
 
+## 8. Implementer `OppgaveDokumentUtleder` for journalføring
+
+Alle oppgaver journalføres i Dokarkiv ved opprettelse — se
+[JOURNALFORING.md](../docs/JOURNALFORING.md). `JournalførOppgaveTask` slår opp riktig
+implementasjon via `@OppgaveTypeRef` på samme måte som `OppgavelInnholdUtleder` over, og **feiler
+hvis den mangler** — dette steget kan ikke hoppes over slik steg 7 kan.
+
+**Pakke:** `no.nav.ung.brukerdialog.oppgave.journalforing.typer`
+
+> Returner **aldri** navn eller fødselsnummer fra `utledInnholdsdata` — de legges til av
+> `JournalførOppgaveTask` selv, hentet fra PDL. Det holder implementasjonen testbar uten ekte
+> fødselsnumre.
+
+```java
+@OppgaveTypeRef(OppgaveType.MIN_NYE_OPPGAVETYPE)
+@ApplicationScoped
+public class MinNyeOppgaveDokumentUtleder implements OppgaveDokumentUtleder {
+
+    @Override
+    public String utledTittel(BrukerdialogOppgaveEntitet oppgave) {
+        return "Tittel på journalposten og dokumentet";
+    }
+
+    @Override
+    public Map<String, Object> utledInnholdsdata(BrukerdialogOppgaveEntitet oppgave) {
+        return Map.of("mittFelt", "verdi til PDF-malen");
+    }
+}
+```
+
+---
+
 ## Sammendrag — sjekkliste
 
 | Steg | Hva | Modul |
@@ -224,3 +257,4 @@ public class MinNyeOppgavelInnholdUtleder implements OppgavelInnholdUtleder {
 | 5 | Implementer `OppgaveDataMapperFraDtoTilEntitet` + `@OppgaveTypeRef` | `brukerdialog-oppgave/tjeneste` |
 | 6 | Implementer `OppgaveDataMapperFraEntitetTilDto` + `@OppgaveTypeRef` | `brukerdialog-oppgave/tjeneste` |
 | 7 | Implementer `OppgavelInnholdUtleder` + `@OppgaveTypeRef` | `brukerdialog-oppgave/tjeneste` |
+| 8 | Implementer `OppgaveDokumentUtleder` + `@OppgaveTypeRef` (journalføring) | `brukerdialog-oppgave/tjeneste` |

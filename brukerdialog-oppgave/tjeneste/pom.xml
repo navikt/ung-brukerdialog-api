@@ -26,6 +26,10 @@
             <groupId>no.nav.ung.brukerdialog</groupId>
             <artifactId>kontrakt</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.ung.brukerdialog</groupId>
+            <artifactId>brukerdialog-oppgave-journalforing</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>no.nav.ung.brukerdialog</groupId>

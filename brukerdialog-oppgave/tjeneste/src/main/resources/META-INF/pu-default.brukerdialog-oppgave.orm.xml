@@ -16,6 +16,9 @@
     <!-- Sequence generator for diagnostikk-->
     <sequence-generator name="SEQ_DIAGNOSTIKK_OPPGAVE_LOGG"        allocation-size="50" sequence-name="SEQ_DIAGNOSTIKK_OPPGAVE_LOGG" />
 
+    <!-- Sequence generator for journalføring -->
+    <sequence-generator name="SEQ_BD_OPPGAVE_JOURNALFORING"        allocation-size="50" sequence-name="SEQ_BD_OPPGAVE_JOURNALFORING" />
+
     <!-- Entity mappings -->
 	<entity class="no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet" />
 
@@ -36,5 +39,7 @@
     <!-- Diagnostikk -->
     <entity class="no.nav.ung.brukerdialog.oppgave.diagnostikk.DiagnostikkOppgaveLogg" />
 
+    <!-- Journalføring -->
+    <entity class="no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveJournalføringEntitet" />
 
 </entity-mappings>

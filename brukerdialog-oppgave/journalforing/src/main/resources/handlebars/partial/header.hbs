@@ -1,0 +1,17 @@
+{{!--
+    Samlet brevhode - navn/fødselsnummer venstre (partial/person), Nav-logo + opprettelsesdato
+    høyre, tittel som egen full-bredde-rad under (clear: both i style.hbs, siden tittelen ikke
+    trygt passer inni en floatet, auto-bredde kolonne). Tidligere gjentatt likt i alle 8 malene
+    under typer/ - samlet her for å unngå duplisering. Logo- og dato-blokken er inlinet direkte
+    her siden den kun ble brukt fra denne ene partial-en - egen fil ga ingen gjenbruksverdi.
+    alt="Nav" gir lenkens PDF/UA-alternativtekst (skjermleser), påkrevd siden
+    .usePdfUaAccessibility(true) er aktivert.
+--}}
+<div class="header">
+    {{> partial/person}}
+    <div class="dokumentinfo">
+        <img src="classpath:handlebars/images/NAV_logo_digital_Red.png" alt="Nav"/>
+        <div class="opprettet-dato">{{datoLang opprettetDato}}</div>
+    </div>
+    <h1 id="header">{{tittel}}</h1>
+</div>

@@ -80,6 +80,22 @@ class BrukerdialogOppgaveEntitetTest {
         assertThat(oppgave.getStatus()).isEqualTo(OppgaveStatus.AVBRUTT);
     }
 
+    @Test
+    void konstruktør_skal_kaste_npe_naar_ytelsetype_er_null() {
+        // Defaulten til UNGDOMSYTELSE er fjernet - en manglende ytelsetype skal
+        // gi en høylytt feil her, ikke stille arve en verdi som styrer arkivtema ved
+        // journalføring.
+        assertThatThrownBy(() -> new BrukerdialogOppgaveEntitet(
+            UUID.randomUUID(),
+            OppgaveType.SØK_YTELSE,
+            new AktørId("1234567890123"),
+            null,
+            null
+        ))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("ytelsetype");
+    }
+
     private BrukerdialogOppgaveEntitet lagUløstOppgave() {
         return new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(),

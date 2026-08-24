@@ -3,6 +3,8 @@
 target
 .project
 .classpath
+# Lesbare PDF-er generert av tester for visuell kontroll (se OppgaveDokumentUtlederRenderingTest)
+pdf-preview/
 outdated-dependencies.txt
 bin
 *.iml

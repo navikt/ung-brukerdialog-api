@@ -224,6 +224,11 @@
                 <artifactId>brukerdialog-oppgave-min-side-varsel</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.ung.brukerdialog</groupId>
+                <artifactId>brukerdialog-oppgave-journalforing</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
             <dependency>
@@ -523,6 +528,11 @@
             <dependency>
                 <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>
+                <version>${openhtmltopdf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openhtmltopdf</groupId>
+                <artifactId>openhtmltopdf-pdfbox</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>
             <dependency>
