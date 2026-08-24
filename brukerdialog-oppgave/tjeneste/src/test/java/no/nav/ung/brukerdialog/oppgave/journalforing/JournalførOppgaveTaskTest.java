@@ -8,7 +8,7 @@ import no.nav.k9.felles.integrasjon.pdl.Person;
 import no.nav.k9.felles.log.metrics.MetricsUtil;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.felles.exception.HttpStatuskodeException;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.DokArkivKlient;
+import no.nav.k9.felles.integrasjon.dokarkiv.DokarkivKlient;
 import no.nav.ung.brukerdialog.journalforing.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
@@ -62,7 +62,7 @@ class JournalførOppgaveTaskTest {
     @Mock
     private PdfGenerator pdfGenerator;
     @Mock
-    private DokArkivKlient dokArkivKlient;
+    private DokarkivKlient dokArkivKlient;
 
     private JournalførOppgaveTask task;
     private UUID oppgavereferanse;
@@ -235,7 +235,7 @@ class JournalførOppgaveTaskTest {
         assertThat(journalføring.getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
         verify(journalføringRepository).oppdater(journalføring);
         assertThat(dokArkivKlientFake.getSisteRequest().tema()).isEqualTo(Tema.UNG.name());
-        assertThat(dokArkivKlientFake.getSisteRequest().sak()).isEqualTo(no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostRequest.Sak.GENERELL_SAK);
+        assertThat(dokArkivKlientFake.getSisteRequest().sak()).isEqualTo(no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest.Sak.GENERELL_FAGSAK);
     }
 
     @Test

@@ -5,17 +5,19 @@ import java.util.List;
 import java.util.function.Function;
 
 import no.nav.k9.felles.exception.HttpStatuskodeException;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.DokArkivKlient;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostRequest;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostResponse;
+import no.nav.k9.felles.integrasjon.dokarkiv.DokarkivKlient;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.AvsluttSakRequest;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.GjenaapneSakRequest;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostResponse;
 
 /**
- * In-memory fake for {@link DokArkivKlient}, til bruk i tester av {@code JournalførOppgaveTask}.
+ * In-memory fake for {@link DokarkivKlient}, til bruk i tester av {@code JournalførOppgaveTask}.
  * Registrerer alle mottatte requester slik at en test kan verifisere
  * hva som faktisk ble sendt (tema, sak, dokumentvarianter osv.) uten en ekte HTTP-server, og lar
  * testen styre om svaret skal være suksess, 409 eller et transient 5xx.
  */
-public class DokArkivKlientFake implements DokArkivKlient {
+public class DokArkivKlientFake implements DokarkivKlient {
 
     private final List<OpprettJournalpostRequest> mottatteRequester = new ArrayList<>();
     private Function<OpprettJournalpostRequest, OpprettJournalpostResponse> svarfunksjon = req -> {
@@ -23,15 +25,19 @@ public class DokArkivKlientFake implements DokArkivKlient {
     };
 
     @Override
-    public OpprettJournalpostResponse opprettJournalpostOgFerdigstill(OpprettJournalpostRequest request) {
+    public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request) {
         mottatteRequester.add(request);
         return svarfunksjon.apply(request);
     }
 
     @Override
-    public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request) {
-        mottatteRequester.add(request);
-        return svarfunksjon.apply(request);
+    public void avsluttSak(AvsluttSakRequest request) {
+        throw new UnsupportedOperationException("DokArkivKlientFake støtter ikke avsluttSak - ikke brukt av JournalførOppgaveTask");
+    }
+
+    @Override
+    public void gjenaapneSak(GjenaapneSakRequest request) {
+        throw new UnsupportedOperationException("DokArkivKlientFake støtter ikke gjenaapneSak - ikke brukt av JournalførOppgaveTask");
     }
 
     /** OK-respons: journalpost opprettet og ferdigstilt med gitt journalpostId. */

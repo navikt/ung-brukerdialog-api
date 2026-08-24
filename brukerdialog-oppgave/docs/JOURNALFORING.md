@@ -173,5 +173,5 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 | `JournalføringKonfig` | `tjeneste` | Parametrisering (på/av, deny-liste) |
 | `JournalføringMetrikker` | `tjeneste` | Metrikker |
 | `OppgaveDokumentUtleder` (+ typer) | `tjeneste` | Tittel og PDF-innhold per oppgavetype |
-| `DokArkivKlient` / `DokArkivKlientImpl` | `journalforing` | HTTP-klient mot Dokarkiv |
+| `DokarkivKlient` (k9-felles) | ekstern avhengighet | HTTP-klient mot Dokarkiv - delt bibliotek fra `k9-dokarkiv-klient`, ikke egenbygd |
 | `PdfGenerator` | `journalforing` | Handlebars + openhtmltopdf |

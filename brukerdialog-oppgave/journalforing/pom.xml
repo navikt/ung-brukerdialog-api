@@ -14,12 +14,16 @@
     <name>UNGSAK :: Brukerdialog oppgave - Journalføring</name>
 
     <!--
-        Kjenner bevisst ikke til brukerdialog-oppgave-tjeneste - unngår en
-        modulsyklus siden tjeneste (JournalførOppgaveTask) er den som bruker denne modulen.
-        DokArkivKlient og dens DTO-er er derfor generiske mot Dokarkivs wire-format og kjenner
-        ikke til denne applikasjonens egne enums (Tema, Fagsaksystem, Sakstype).
+        Kjenner bevisst ikke til brukerdialog-oppgave-tjeneste - unngår en modulsyklus
+        siden tjeneste (JournalførOppgaveTask) er den som bruker denne modulen.
     -->
     <dependencies>
+        <!--
+            PdfGenerator er en @ApplicationScoped CDI-bean - denne gir jakarta.enterprise.cdi-api
+            transitivt (repoet pinner ikke CDI-API direkte noe sted). Ikke lenger brukt for
+            OidcRestClient/ScopedRestIntegration her - den bruken flyttet til tjeneste sammen
+            med k9-felles sin egen DokarkivKlient.
+        -->
         <dependency>
             <groupId>no.nav.k9.felles.integrasjon</groupId>
             <artifactId>k9-felles-integrasjon-rest-klient</artifactId>

@@ -19,6 +19,11 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import no.nav.k9.felles.exception.HttpStatuskodeException;
+import no.nav.k9.felles.integrasjon.dokarkiv.DokarkivKlient;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.Bruker;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequestBuilder;
+import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostResponse;
 import no.nav.k9.felles.integrasjon.pdl.Behandlingsnummer;
 import no.nav.k9.felles.integrasjon.pdl.HentPersonQueryRequest;
 import no.nav.k9.felles.integrasjon.pdl.Navn;
@@ -30,12 +35,6 @@ import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.DokArkivKlient;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.IdType;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.JournalpostType;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostRequest;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostRequestBuilder;
-import no.nav.ung.brukerdialog.journalforing.dokarkiv.dto.OpprettJournalpostResponse;
 import no.nav.ung.brukerdialog.journalforing.pdf.PdfDokument;
 import no.nav.ung.brukerdialog.journalforing.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -80,7 +79,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private Instance<OppgaveDokumentUtleder> dokumentUtledere;
     private Pdl pdl;
     private PdfGenerator pdfGenerator;
-    private DokArkivKlient dokArkivKlient;
+    private DokarkivKlient dokarkivKlient;
 
     JournalførOppgaveTask() {
         // for CDI proxy
@@ -93,14 +92,14 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                                   @Any Instance<OppgaveDokumentUtleder> dokumentUtledere,
                                   Pdl pdl,
                                   PdfGenerator pdfGenerator,
-                                  DokArkivKlient dokArkivKlient) {
+                                  DokarkivKlient dokarkivKlient) {
         this.journalføringRepository = journalføringRepository;
         this.oppgaveRepository = oppgaveRepository;
         this.journalføringKonfig = journalføringKonfig;
         this.dokumentUtledere = dokumentUtledere;
         this.pdl = pdl;
         this.pdfGenerator = pdfGenerator;
-        this.dokArkivKlient = dokArkivKlient;
+        this.dokarkivKlient = dokarkivKlient;
     }
 
     @Override
@@ -147,7 +146,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
             OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, journalføring, person, tittel, pdf, json);
 
-            OpprettJournalpostResponse response = dokArkivKlient.opprettJournalpostOgFerdigstill(request);
+            OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
             journalføring.markerJournalført(new JournalpostId(response.journalpostId()));
             journalføringRepository.oppdater(journalføring);
             JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.OK);
@@ -296,35 +295,41 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                                                                String tittel,
                                                                byte[] pdf,
                                                                byte[] json) {
-        var bruker = new OpprettJournalpostRequest.Bruker(person.fødselsnummer(), IdType.FNR);
-        // avsenderMottaker.navn utelates bevisst - Dokarkiv slår selv opp navn i PDL.
-        var avsenderMottaker = new OpprettJournalpostRequest.AvsenderMottaker(person.fødselsnummer(), IdType.FNR);
+        var bruker = new Bruker(person.fødselsnummer(), Bruker.BrukerIdType.FNR);
+        // navn utelates bevisst - Dokarkiv slår selv opp navn i PDL.
+        var avsenderMottaker = new OpprettJournalpostRequest.AvsenderMottaker(
+            person.fødselsnummer(), null, null, OpprettJournalpostRequest.AvsenderMottaker.IdType.FNR);
 
         var sak = journalføring.getSakstype() == Sakstype.FAGSAK
-            ? OpprettJournalpostRequest.Sak.forFagsak(journalføring.getFagsakId().getVerdi(), journalføring.getFagsaksystem().name())
-            : OpprettJournalpostRequest.Sak.GENERELL_SAK;
+            ? OpprettJournalpostRequest.Sak.forSaksnummer(journalføring.getFagsakId().getVerdi(), journalføring.getFagsaksystem().name())
+            : OpprettJournalpostRequest.Sak.GENERELL_FAGSAK;
 
         var dokument = new OpprettJournalpostRequest.Dokument(
             tittel,
             BREVKODE,
+            null,
             List.of(
-                OpprettJournalpostRequest.DokumentVariant.arkivPdf(pdf),
-                OpprettJournalpostRequest.DokumentVariant.originalJson(json)
+                new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
+                // "ArkivertPDFA" er k9-felles sitt navn på denne recorden, men feltene
+                // (filtype/variantformat/fysiskDokument) er generiske - brukes her til
+                // ORIGINAL/JSON-varianten også, ikke bare PDF/A-arkivvarianten.
+                new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(
+                    OpprettJournalpostRequest.Filtype.JSON, OpprettJournalpostRequest.Variantformat.ORIGINAL, json)
             )
         );
 
         String oppgavereferanse = oppgave.getOppgavereferanse().toString();
         return new OpprettJournalpostRequestBuilder()
-            .journalpostType(JournalpostType.UTGAAENDE)
-            .avsenderMottaker(avsenderMottaker)
-            .bruker(bruker)
-            .tema(journalføring.getTema().name())
-            .tittel(tittel)
-            .journalfoerendeEnhet(JOURNALFOERENDE_ENHET)
-            .eksternReferanseId(oppgavereferanse)
-            .tilleggsopplysninger(List.of(new OpprettJournalpostRequest.Tilleggsopplysning(TILLEGGSOPPLYSNING_NOKKEL, oppgavereferanse)))
-            .sak(sak)
-            .dokumenter(List.of(dokument))
+            .medJournalpostType("UTGAAENDE")
+            .medAvsenderMottaker(avsenderMottaker)
+            .medBruker(bruker)
+            .medTema(journalføring.getTema().name())
+            .medTittel(tittel)
+            .medJournalfoerendeEnhet(JOURNALFOERENDE_ENHET)
+            .medEksternReferanseId(oppgavereferanse)
+            .medTilleggsopplysninger(List.of(new OpprettJournalpostRequest.Tilleggsopplysning(TILLEGGSOPPLYSNING_NOKKEL, oppgavereferanse)))
+            .medSak(sak)
+            .medDokumenter(List.of(dokument))
             .build();
     }
 
