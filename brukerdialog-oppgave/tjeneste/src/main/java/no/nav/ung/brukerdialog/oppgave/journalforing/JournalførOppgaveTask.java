@@ -262,13 +262,20 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
      * {@code tema}/{@code fagsaksystem}/{@code sakstype}/{@code fagsakId} leses fra den lagrede
      * journalføringsraden (utledet én gang ved opprettelse) - raden er det etterrettelige sporet
      * av hva som faktisk ble sendt til arkivet.
+     * <p>
+     * Journalpostens tittel ({@link JournalføringParametre#journalposttittel}) er bevisst
+     * forskjellig fra {@code dokumentTittel} - journalposten får en generisk per-ytelse-tittel,
+     * mens dokumentet beholder sin oppgavetype-spesifikke tittel (samme skille som
+     * {@code k9-brukerdialog-prosessering} gjør).
      */
     private OpprettJournalpostRequest byggJournalpostRequest(BrukerdialogOppgaveEntitet oppgave,
                                                                OppgaveJournalføringEntitet journalføring,
                                                                PersonInfo person,
-                                                               String tittel,
+                                                               String dokumentTittel,
                                                                byte[] pdf,
                                                                byte[] json) {
+        JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
+
         var bruker = new Bruker(person.fødselsnummer(), Bruker.BrukerIdType.FNR);
         // navn utelates bevisst - Dokarkiv slår selv opp navn i PDL.
         var avsenderMottaker = new OpprettJournalpostRequest.AvsenderMottaker(
@@ -279,8 +286,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             : OpprettJournalpostRequest.Sak.GENERELL_FAGSAK;
 
         var dokument = new OpprettJournalpostRequest.Dokument(
-            tittel,
-            JournalføringParametre.utled(oppgave.getYtelsetype()).brevkode(),
+            dokumentTittel,
+            parametre.brevkode(),
             null,
             List.of(
                 new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
@@ -298,7 +305,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .medAvsenderMottaker(avsenderMottaker)
             .medBruker(bruker)
             .medTema(journalføring.getTema().name())
-            .medTittel(tittel)
+            .medTittel(parametre.journalposttittel())
             .medJournalfoerendeEnhet(JOURNALFOERENDE_ENHET)
             .medEksternReferanseId(oppgavereferanse)
             .medTilleggsopplysninger(List.of(new OpprettJournalpostRequest.Tilleggsopplysning(TILLEGGSOPPLYSNING_NOKKEL, oppgavereferanse)))
