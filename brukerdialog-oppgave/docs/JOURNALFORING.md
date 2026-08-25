@@ -1,9 +1,24 @@
 # Journalføring av brukerdialogoppgaver
 
 Alle varsler/oppgaver som opprettes av `ung-brukerdialog-api` skal journalføres i Dokarkiv
-(Joark) — det er et lovkrav. Denne siden beskriver hvordan det er løst. For bakgrunn og
-vurderinger, se det opprinnelige planleggingsdokumentet i teamets interne arkiv; denne siden
-dekker den ferdige løsningen.
+(Joark) — det er et lovkrav, se «Rettslig grunnlag» under. Denne siden beskriver hvordan det er
+løst. For bakgrunn og vurderinger, se det opprinnelige planleggingsdokumentet i teamets interne
+arkiv; denne siden dekker den ferdige løsningen.
+
+## Rettslig grunnlag
+
+- **Journalføringsplikten** følger av
+  [§ 14 i forskrift om dokumentasjon og arkiv (arkivforskrifta)](https://lovdata.no/dokument/SF/forskrift/2025-12-17-2647):
+  alle inngående og utgående dokumenter som er saksdokumenter etter offentleglova § 4, og som er
+  eller blir saksbehandlet, skal registreres i journalen. §§ 14-15 angir også hvilke metadata som
+  skal registreres (avsender/mottaker, dato, tittel o.l.) — se «Datamodell» under for hvordan det
+  er løst her.
+- **Dokumentet er et forhåndsvarsel** etter
+  [§ 16 i forvaltningsloven](https://lovdata.no/lov/1967-02-10/§16): parten skal varsles før
+  vedtak treffes og få høve til å uttale seg innen en frist. Loven krever også at varselet «gjøre
+  greie for hva saken gjelder» (§ 16 tredje ledd) — det er derfor ytelsen alltid skal framgå
+  tydelig av tittel og brevtekst, se «Dokumentet som journalføres» under. Brevkoden
+  `FVL 04-16.0` (se «Kjente begrensninger») er valgt ut fra denne bestemmelsen.
 
 ## Når journalføres en oppgave?
 
@@ -151,8 +166,9 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 
 ## Kjente begrensninger / åpne punkter
 
-- **Brevkode** `FVL 04-16.0` er foreløpig og skal bekreftes med Team Dokumentløsninger — se
-  `TODO` i [`JournalførOppgaveTask`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalførOppgaveTask.java).
+- **Brevkode** `FVL 04-16.0` (jf. [§ 16 i forvaltningsloven](https://lovdata.no/lov/1967-02-10/§16),
+  se «Rettslig grunnlag») er foreløpig og skal bekreftes med Team Dokumentløsninger — se `TODO` i
+  [`JournalførOppgaveTask`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalførOppgaveTask.java).
 - **Behandlingsnummer** (`UNGDOMSYTELSEN`/B950) bør bekreftes med personvernansvarlig for bruk
   til journalføring av utgående varsel, ikke bare søknadsbehandling.
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.

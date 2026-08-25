@@ -63,9 +63,16 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private static final String JOURNALFOERENDE_ENHET = "9999";
 
     /**
-     * TODO: foreløpig brevkode - skal bekreftes med Team Dokumentløsninger. Forvaltningsloven
-     * § 16 (forhåndsvarsling) treffer et utgående varsel bedre enn NAV 76-13.94, som gjelder
-     * brukerens uttalelse og journalføres av k9-brukerdialog-prosessering.
+     * TODO: foreløpig brevkode - skal bekreftes med Team Dokumentløsninger.
+     * <p>
+     * Dokumentet som journalføres her er nettopp et forhåndsvarsel: parten skal varsles før
+     * vedtak treffes og få høve til å uttale seg innen en frist, jf. fvl. § 16 første ledd.
+     * Varselet skal gjøre greie for hva saken gjelder, jf. § 16 tredje ledd - derfor skal
+     * ytelsen alltid framgå tydelig av tittel og brevtekst (se {@link OppgaveDokumentTekster}).
+     * Koden treffer derfor formålet vesentlig bedre enn NAV 76-13.94, som gjelder brukerens
+     * uttalelse (inngående) og journalføres av k9-brukerdialog-prosessering.
+     *
+     * @see <a href="https://lovdata.no/lov/1967-02-10/§16">forvaltningsloven § 16 (forhåndsvarsling)</a>
      */
     private static final String BREVKODE = "FVL 04-16.0";
 
