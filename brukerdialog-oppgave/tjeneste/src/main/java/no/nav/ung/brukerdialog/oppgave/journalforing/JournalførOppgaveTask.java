@@ -59,14 +59,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     /** Helautomatisk journalføring - ingen saksbehandler er involvert. */
     private static final String JOURNALFOERENDE_ENHET = "9999";
 
-    /**
-     * TODO: foreløpig brevkode - skal bekreftes med Team Dokumentløsninger. Valgt fordi
-     * dokumentet er et forhåndsvarsel, jf. fvl. § 16.
-     *
-     * @see <a href="https://lovdata.no/lov/1967-02-10/§16">forvaltningsloven § 16 (forhåndsvarsling)</a>
-     */
-    private static final String BREVKODE = "FVL 04-16.0";
-
     private static final String TILLEGGSOPPLYSNING_NOKKEL = "ung.oppgave.eRef";
 
     private static final Logger log = LoggerFactory.getLogger(JournalførOppgaveTask.class);
@@ -288,7 +280,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         var dokument = new OpprettJournalpostRequest.Dokument(
             tittel,
-            BREVKODE,
+            JournalføringParametre.utled(oppgave.getYtelsetype()).brevkode(),
             null,
             List.of(
                 new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
