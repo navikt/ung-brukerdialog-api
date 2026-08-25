@@ -66,9 +66,11 @@ Kode: [`JournalføringParametre`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 | mangler | `{ sakstype: GENERELL_SAK }` |
 
 `SØK_YTELSE` er den eneste oppgavetypen som har lov til å mangle `fagsakId` (den har ingen
-fagsak ved opprettelse). For alle andre typer er `fagsakId` påkrevd — håndheves av
-`@GyldigJournalføring` på `OpprettOppgaveDto` med en feilmelding som navngir både oppgavetypen
-og hvilke typer som er unntatt.
+fagsak ved opprettelse). For alle andre typer er `fagsakId` egentlig ment å være påkrevd, med
+`@GyldigJournalføring` på `OpprettOppgaveDto` som håndhevende mekanisme — men denne annotasjonen
+er **midlertidig fjernet fra DTO-en** (se "Kjente begrensninger" under), så håndhevelsen er i
+praksis avslått inntil videre. `GyldigJournalføringValidator` finnes fortsatt i kode og er
+testdekket direkte, klar til å kobles på igjen.
 
 ## Datamodell
 
@@ -168,9 +170,11 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 
 - **Brevkode** `FVL 04-16.0` (jf. [§ 16 i forvaltningsloven](https://lovdata.no/lov/1967-02-10/§16),
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.
-- **`fagsakId` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak — manglende
-  verdi gir kun `WARN`-logg. Dette strammes inn til en 400-feil når `ung-sak` er i prod med
-  feltet.
+- **`fagsakId` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak —
+  `@GyldigJournalføring` (som ville håndhevet dette som en 400-feil) er bevisst fjernet fra
+  `OpprettOppgaveDto` inntil `ung-sak`/nedstrøms konsumenter er bekreftet klare til å alltid
+  sende feltet i prod. Manglende verdi gir i mellomtiden kun en `WARN`-logg (se
+  `OppgaveLivssyklusTjeneste`). Annotasjonen gjeninnføres på DTO-en når feltet er i prod.
 - **Prod er ikke aktivert ennå** (`JOURNALFORING_ENABLED=false` i `prod-gcp.yml`) — aktiveres når
   flyten er verifisert i dev.
 
@@ -179,7 +183,7 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 | Klasse | Modul | Ansvar |
 |---|---|---|
 | `JournalføringParametre` | `tjeneste` | Utleder tema/fagsaksystem/behandlingsnummer fra ytelsetype |
-| `GyldigJournalføringValidator` | `kontrakt` | Validerer `fagsakId` mot oppgavetype |
+| `GyldigJournalføringValidator` | `kontrakt` | Validerer `fagsakId` mot oppgavetype — **ikke koblet på** (`@GyldigJournalføring` fjernet fra DTO, se «Kjente begrensninger») |
 | `OppgaveJournalføringEntitet` / `Repository` | `tjeneste` | Datamodell og persistens |
 | `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv |
 | `JournalføringKonfig` | `tjeneste` | Parametrisering (på/av, deny-liste) |

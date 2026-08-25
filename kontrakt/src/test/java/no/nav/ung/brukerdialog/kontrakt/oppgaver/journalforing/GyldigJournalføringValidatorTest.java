@@ -1,9 +1,6 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import jakarta.validation.ConstraintValidatorContext;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OpprettOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
@@ -11,68 +8,80 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkke
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
- * Se {@link GyldigJournalføringValidator} for spesifikasjonen som testes her.
+ * Tester {@link GyldigJournalføringValidator} direkte (ikke via bean-validation-refleksjon på
+ * {@code OpprettOppgaveDto}) - {@code @GyldigJournalføring} er midlertidig fjernet fra DTO-en
+ * (se klassens javadoc og "Kjente begrensninger" i JOURNALFORING.md), men selve validatoren
+ * beholdes og testes uendret for enkel gjeninnføring senere.
  */
+@ExtendWith(MockitoExtension.class)
 class GyldigJournalføringValidatorTest {
 
-    private static Validator validator;
+    private final GyldigJournalføringValidator validator = new GyldigJournalføringValidator();
     private static final AktørId AKTØR_ID = new AktørId("1234567890123");
 
-    @BeforeAll
-    static void setUp() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
-    }
+    @Mock
+    private ConstraintValidatorContext context;
+    @Mock
+    private ConstraintValidatorContext.ConstraintViolationBuilder violationBuilder;
+    @Mock
+    private ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilder;
 
     @Test
     void oppgavetype_som_krever_fagsak_uten_fagsakId_er_ugyldig() {
-        var dto = bekreftBostedDto(null);
+        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(violationBuilder);
+        when(violationBuilder.addPropertyNode("journalføring")).thenReturn(nodeBuilder);
+        when(nodeBuilder.addPropertyNode("fagsakId")).thenReturn(nodeBuilder);
 
-        Set<ConstraintViolation<OpprettOppgaveDto>> violations = validator.validate(dto);
+        boolean gyldig = validator.isValid(bekreftBostedDto(null), context);
 
-        assertThat(violations).hasSize(1);
-        ConstraintViolation<OpprettOppgaveDto> violation = violations.iterator().next();
-        assertThat(violation.getPropertyPath()).hasToString("journalføring.fagsakId");
-        assertThat(violation.getMessage())
-            .contains(OppgaveType.BEKREFT_BOSTED.name())
-            .contains(OppgaveType.SØK_YTELSE.name());
+        assertThat(gyldig).isFalse();
+        verify(context).disableDefaultConstraintViolation();
+        verify(nodeBuilder).addConstraintViolation();
     }
 
     @Test
     void søkYtelse_uten_fagsakId_er_gyldig() {
         // SØK_YTELSE har ingen fagsak ved opprettelse og skal derfor være gyldig uten
         // journalføring/fagsakId (journalføres på GENERELL_SAK).
-        var dto = søkYtelseDto(null);
-        Set<ConstraintViolation<OpprettOppgaveDto>> violations = validator.validate(dto);
-        assertThat(violations).isEmpty();
+        boolean gyldig = validator.isValid(søkYtelseDto(null), context);
+        assertThat(gyldig).isTrue();
+        verifyNoInteractions(context);
     }
 
     @Test
     void søkYtelse_med_fagsakId_er_ogsaa_gyldig() {
         // Fagsak er valgfri for SØK_YTELSE, ikke forbudt - en satt fagsakId gir fortsatt en
         // gyldig dto (journalføres da på FAGSAK i stedet for GENERELL_SAK).
-        var dto = søkYtelseDto(new JournalføringDto(new Saksnummer("ABC123")));
-        Set<ConstraintViolation<OpprettOppgaveDto>> violations = validator.validate(dto);
-        assertThat(violations).isEmpty();
+        boolean gyldig = validator.isValid(søkYtelseDto(new JournalføringDto(new Saksnummer("ABC123"))), context);
+        assertThat(gyldig).isTrue();
+        verifyNoInteractions(context);
     }
 
     @Test
     void feilmelding_navngir_baade_oppgavetype_og_unntatte_typer() {
-        var dto = bekreftBostedDto(null);
+        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(violationBuilder);
+        when(violationBuilder.addPropertyNode("journalføring")).thenReturn(nodeBuilder);
+        when(nodeBuilder.addPropertyNode("fagsakId")).thenReturn(nodeBuilder);
 
-        Set<ConstraintViolation<OpprettOppgaveDto>> violations = validator.validate(dto);
+        validator.isValid(bekreftBostedDto(null), context);
 
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage())
+        ArgumentCaptor<String> meldingCaptor = ArgumentCaptor.forClass(String.class);
+        verify(context).buildConstraintViolationWithTemplate(meldingCaptor.capture());
+        assertThat(meldingCaptor.getValue())
             .isEqualTo("fagsakId er påkrevd for oppgavetype BEKREFT_BOSTED. Kun SØK_YTELSE kan journalføres uten fagsak.");
     }
 
