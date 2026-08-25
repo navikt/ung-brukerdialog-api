@@ -167,10 +167,6 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 ## Kjente begrensninger / åpne punkter
 
 - **Brevkode** `FVL 04-16.0` (jf. [§ 16 i forvaltningsloven](https://lovdata.no/lov/1967-02-10/§16),
-  se «Rettslig grunnlag») er foreløpig og skal bekreftes med Team Dokumentløsninger — se `TODO` i
-  [`JournalførOppgaveTask`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalførOppgaveTask.java).
-- **Behandlingsnummer** (`UNGDOMSYTELSEN`/B950) bør bekreftes med personvernansvarlig for bruk
-  til journalføring av utgående varsel, ikke bare søknadsbehandling.
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.
 - **`fagsakId` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak — manglende
   verdi gir kun `WARN`-logg. Dette strammes inn til en 400-feil når `ung-sak` er i prod med
