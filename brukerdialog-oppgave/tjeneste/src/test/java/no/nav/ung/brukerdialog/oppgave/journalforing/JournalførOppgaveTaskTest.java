@@ -9,7 +9,7 @@ import no.nav.k9.felles.log.metrics.MetricsUtil;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.felles.exception.HttpStatuskodeException;
 import no.nav.k9.felles.integrasjon.dokarkiv.DokarkivKlient;
-import no.nav.ung.brukerdialog.journalforing.pdf.PdfGenerator;
+import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;

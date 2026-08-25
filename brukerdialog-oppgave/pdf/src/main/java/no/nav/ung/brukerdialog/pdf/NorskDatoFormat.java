@@ -1,4 +1,4 @@
-package no.nav.ung.brukerdialog.journalforing.pdf;
+package no.nav.ung.brukerdialog.pdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

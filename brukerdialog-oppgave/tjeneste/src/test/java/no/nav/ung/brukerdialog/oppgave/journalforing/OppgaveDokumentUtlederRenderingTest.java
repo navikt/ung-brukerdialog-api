@@ -1,8 +1,8 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 import jakarta.enterprise.inject.Instance;
-import no.nav.ung.brukerdialog.journalforing.pdf.PdfDokument;
-import no.nav.ung.brukerdialog.journalforing.pdf.PdfGenerator;
+import no.nav.ung.brukerdialog.pdf.PdfDokument;
+import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;

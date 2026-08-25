@@ -9,9 +9,9 @@
         <version>${revision}${sha1}${changelist}</version>
     </parent>
 
-    <artifactId>brukerdialog-oppgave-journalforing</artifactId>
+    <artifactId>brukerdialog-oppgave-pdf</artifactId>
     <packaging>jar</packaging>
-    <name>UNGSAK :: Brukerdialog oppgave - Journalføring</name>
+    <name>UNGSAK :: Brukerdialog oppgave - PDF</name>
 
     <!--
         Kjenner bevisst ikke til brukerdialog-oppgave-tjeneste - unngår en modulsyklus

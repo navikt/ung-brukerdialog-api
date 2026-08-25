@@ -115,7 +115,7 @@ personopplysningene legges til av `JournalførOppgaveTask` selv, hentet fra PDL,
 implementasjonene forblir testbare uten ekte fødselsnumre.
 
 Kode: [`OppgaveDokumentUtleder`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveDokumentUtleder.java),
-[`PdfGenerator`](../journalforing/src/main/java/no/nav/ung/brukerdialog/journalforing/pdf/PdfGenerator.java)
+[`PdfGenerator`](../pdf/src/main/java/no/nav/ung/brukerdialog/pdf/PdfGenerator.java)
 
 ## Bruker og mottaker
 
@@ -186,4 +186,4 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 | `JournalføringMetrikker` | `tjeneste` | Metrikker |
 | `OppgaveDokumentUtleder` (+ typer) | `tjeneste` | Tittel og PDF-innhold per oppgavetype |
 | `DokarkivKlient` (k9-felles) | ekstern avhengighet | HTTP-klient mot Dokarkiv - delt bibliotek fra `k9-dokarkiv-klient`, ikke egenbygd |
-| `PdfGenerator` | `journalforing` | Handlebars + openhtmltopdf |
+| `PdfGenerator` | `pdf` | Handlebars + openhtmltopdf |

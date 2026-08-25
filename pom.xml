@@ -226,7 +226,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.ung.brukerdialog</groupId>
-                <artifactId>brukerdialog-oppgave-journalforing</artifactId>
+                <artifactId>brukerdialog-oppgave-pdf</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
