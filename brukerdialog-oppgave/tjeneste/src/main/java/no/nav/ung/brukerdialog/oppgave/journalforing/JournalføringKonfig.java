@@ -28,7 +28,7 @@ public class JournalføringKonfig {
     public JournalføringKonfig(
         @KonfigVerdi(value = "JOURNALFORING_ENABLED", defaultVerdi = "false")
         boolean journalføringEnabled,
-        @KonfigVerdi(value = "JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER", defaultVerdi = "")
+        @KonfigVerdi(value = "JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER", required = false)
         String deaktiverteOppgavetyperRaw
     ) {
         this.journalføringEnabled = journalføringEnabled;
