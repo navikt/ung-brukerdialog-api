@@ -23,16 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/avvik-registerinntekt/i18n/nb.ts},
- * med forgreningslogikken gjenskapt fra {@code AvvikRegisterinntektOppgavetekst.tsx} og
- * {@code avvikRegisterinntektOppgaveUtils.ts}: «kun ytelse»-inntekt gir
- * annen intro-/oppsummeringstekst enn arbeidsinntekt, og «gjelder deler av måned» gir en egen
- * forklaringssetning uavhengig av inntektskilde.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/avvik-registerinntekt/i18n/nb.ts}, med
+ * forgreningen gjenskapt fra {@code AvvikRegisterinntektOppgavetekst.tsx} og
+ * {@code avvikRegisterinntektOppgaveUtils.ts}.
  * <p>
- * <b>Bevisst forenkling:</b> gjenskaper ikke frontendens {@code .ingenOpplysninger}-
- * variant, som sammenligner med et tidligere brukerselvrapportert tall vi ikke har tilgang til i
- * denne DTO-en. Forgrener kun på faktisk mottatt inntekt (harInntekt/harKunYtelseInntekt).
+ * <b>Bevisst forenkling:</b> gjenskaper ikke frontendens {@code .ingenOpplysninger}-variant, som
+ * sammenligner med et tidligere brukerselvrapportert tall vi ikke har tilgang til i denne DTO-en.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT)
 @ApplicationScoped

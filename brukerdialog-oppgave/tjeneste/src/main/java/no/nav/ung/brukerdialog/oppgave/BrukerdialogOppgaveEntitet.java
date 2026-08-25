@@ -79,9 +79,8 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
      * Konstruktør for migrering av oppgave fra annen applikasjon.
      * Brukes når alle felter inkludert status og datoer skal settes.
      * <p>
-     * {@code ytelsetype} tas inn som eksplisitt parameter (ikke defaultet her) slik at denne
-     * klassen har én regel for feltet: det er alltid påkrevd. Kallere som migrerer oppgaver fra
-     * en tid før {@code ytelsetype} fantes, må selv avgjøre og sende inn riktig verdi.
+     * {@code ytelsetype} er en eksplisitt parameter, ikke defaultet - kallere som migrerer eldre
+     * oppgaver uten dette feltet må selv avgjøre riktig verdi.
      */
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,

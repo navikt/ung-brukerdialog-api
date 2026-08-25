@@ -15,14 +15,11 @@ import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveDokumentUtleder;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/endret-startdato/i18n/nb.ts}
- * (samme tekst som vises på Min Side / ungdomsprogram-deltaker i dag). Ingen forgrening -
- * {@link EndretStartdatoDataDto} har verken nullable felt eller varianter.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/endret-startdato/i18n/nb.ts} (samme tekst
+ * som på Min Side / ungdomsprogram-deltaker).
  * <p>
- * Tittel og innholdsdata bygges av {@link OppgaveDokumentTekster}, delt med
- * {@link EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_STARTDATO}) slik at teksten
- * ikke kan drifte i to retninger.
+ * Delt med {@link EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_STARTDATO}) via
+ * {@link OppgaveDokumentTekster}, slik at teksten ikke kan drifte i to retninger.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_STARTDATO)
 @ApplicationScoped

@@ -1,11 +1,9 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 /**
- * Fagsaksystem i dokarkiv-forstand. Utledes fra oppgavens ytelsetype - kan ikke sendes inn av
- * kalleren (se {@link JournalføringParametre#utled}).
- * <p>
- * Inneholder kun faktiske fagsaksystemer. {@code GENERELL_SAK} er en dokarkiv-<b>sakstype</b>,
- * ikke et fagsaksystem, og er modellert som {@link Sakstype#GENERELL_SAK} i stedet.
+ * Fagsaksystem i dokarkiv-forstand, utledet fra ytelsetype (se
+ * {@link JournalføringParametre#utled}) - ikke sendt inn av kalleren. {@code GENERELL_SAK} er en
+ * dokarkiv-sakstype, ikke et fagsaksystem - se {@link Sakstype#GENERELL_SAK} i stedet.
  */
 public enum Fagsaksystem {
 

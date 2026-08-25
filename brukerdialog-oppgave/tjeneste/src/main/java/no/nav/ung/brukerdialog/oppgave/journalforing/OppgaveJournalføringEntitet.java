@@ -26,16 +26,12 @@ import java.util.Objects;
 /**
  * Journalføring av en brukerdialogoppgave mot Dokarkiv. Én rad per oppgave.
  * <p>
- * Raden opprettes <b>alltid</b> ved oppgaveopprettelse, uavhengig av om
- * {@code JournalføringKonfig} er aktivert for oppgavetypen - det er kun den tilhørende
- * {@code JournalførOppgaveTask} som er betinget av konfigurasjonen. Dermed blir
- * et eventuelt etterslep (flagget av, eller tasken har ikke kjørt ennå) komplett og spørrbart:
- * {@code status = 'PLANLAGT'}.
+ * Raden opprettes ALLTID ved oppgaveopprettelse, uavhengig av {@code JournalføringKonfig} - kun
+ * den tilhørende {@code JournalførOppgaveTask} er betinget, slik at etterslep blir spørrbart via
+ * {@code status = PLANLAGT}.
  * <p>
- * {@code tema}, {@code fagsaksystem} og {@code sakstype} utledes én gang ved opprettelse (se
- * {@code JournalføringParametre.utled(...)}) og lagres her - raden er dermed et etterrettelig
- * spor av hva som faktisk ble sendt til arkivet, uavhengig av senere endringer i
- * utledningsregelen.
+ * {@code tema}/{@code fagsaksystem}/{@code sakstype} utledes én gang ved opprettelse og lagres
+ * her - et etterrettelig spor, uavhengig av senere endringer i utledningsregelen.
  */
 @Entity(name = "OppgaveJournalføring")
 @Table(name = "BD_OPPGAVE_JOURNALFORING")
@@ -84,11 +80,7 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
         // For JPA
     }
 
-    /**
-     * @param fagsakId må være satt når {@code sakstype == FAGSAK}, og må være {@code null} når
-     *                 {@code sakstype == GENERELL_SAK} - håndheves både her og som DB-constraint
-     *                 (defence in depth).
-     */
+    /** @param fagsakId påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet her og som DB-constraint. */
     public OppgaveJournalføringEntitet(BrukerdialogOppgaveEntitet oppgave,
                                         Tema tema,
                                         Fagsaksystem fagsaksystem,
@@ -148,11 +140,9 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     }
 
     /**
-     * Eneste tillatte tilstandsovergang: fra {@code PLANLAGT} til {@code JOURNALFORT}. Setter
-     * {@code journalpostId} og {@code status} atomisk, slik at invarianten «journalpost_id satt
-     * ⟺ status = JOURNALFORT» (håndhevet som DB-constraint) aldri kan brytes fra
-     * applikasjonssiden. Vi lagrer aldri en journalført oppgave uten journalpostId - denne
-     * metoden er derfor den eneste veien til {@code JOURNALFORT}.
+     * Eneste vei til {@code JOURNALFORT}: setter {@code journalpostId} og {@code status} atomisk,
+     * slik at invarianten «journalpost_id satt ⟺ status = JOURNALFORT» (også en DB-constraint)
+     * aldri kan brytes fra applikasjonssiden.
      */
     public void markerJournalført(JournalpostId journalpostId) {
         Objects.requireNonNull(journalpostId, "journalpostId");

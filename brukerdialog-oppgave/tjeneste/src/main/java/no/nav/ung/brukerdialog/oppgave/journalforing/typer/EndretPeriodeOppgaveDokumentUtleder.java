@@ -20,23 +20,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link EndretPeriodeDataDto#endringer()} avgjør hvilket av fire narrativ som vises, gjenskapt
- * fra frontendens egen forgrening i {@code sif-api/src/api/parse-utils/parseOppgaverElement.ts}:
- * <ul>
- *   <li>{@code {ENDRET_STARTDATO}} - samme tekst som {@link EndretStartdatoOppgaveDokumentUtleder},
- *       hentet fra samme sted ({@link OppgaveDokumentTekster}) slik at teksten ikke kan drifte.</li>
- *   <li>{@code {ENDRET_SLUTTDATO}} - samme tekst som {@link EndretSluttdatoOppgaveDokumentUtleder}
- *       (inkl. «meldt ut»-varianten når forrige tomdato manglet).</li>
- *   <li>{@code {FJERNET_PERIODE}} - «stans»-narrativ, ny tekst kuratert fra
- *       {@code oppgavepaneler/fjernet-periode/i18n/nb.ts}.</li>
- *   <li>{@code {ENDRET_STARTDATO, ENDRET_SLUTTDATO}} - «ny periode»-narrativ, kuratert fra
- *       {@code oppgavepaneler/endret-start-og-sluttdato/i18n/nb.ts}.</li>
- * </ul>
- * <b>Fallback (bevisst avvik fra frontend):</b> enhver annen/uventet kombinasjon - blant annet
- * {@code ANDRE_ENDRINGER}, som frontend ikke har tekst for og som får
- * {@code parseOppgaverElement.ts} til å kaste et vanlig unntak. Det er greit for en
- * frontend-rendering (oppgaven vises da bare ikke), men journalføring MÅ likevel produsere et
- * gyldig, arkiverbart dokument - se {@link #bestemGren} og {@code typer/endret-periode.hbs}.
+ * {@link EndretPeriodeDataDto#endringer()} avgjør gren, gjenskapt fra frontendens forgrening i
+ * {@code sif-api/src/api/parse-utils/parseOppgaverElement.ts} - se {@link #bestemGren}.
+ * <p>
+ * <b>Bevisst avvik fra frontend:</b> uventede kombinasjoner (bl.a. {@code ANDRE_ENDRINGER}) får
+ * frontend til å kaste et unntak, siden oppgaven da bare ikke vises. Journalføring MÅ likevel
+ * produsere et gyldig, arkiverbart dokument - derfor finnes {@code GrenType.UKJENT} som fallback
+ * i stedet for en exception.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_PERIODE)
 @ApplicationScoped
@@ -101,10 +91,8 @@ public class EndretPeriodeOppgaveDokumentUtleder implements OppgaveDokumentUtled
     }
 
     /**
-     * Se klasse-javadoc. Krever ikke bare riktig {@code endringer}-kombinasjon, men også at de
-     * tilhørende datoene faktisk finnes - en gjenkjent kombinasjon med manglende datoer havner i
-     * fallback-grenen i stedet for å risikere en {@code NullPointerException} eller en
-     * misvisende, delvis utfylt setning.
+     * Krever både riktig {@code endringer}-kombinasjon og at datoene faktisk finnes - manglende
+     * datoer havner i fallback-grenen, ikke en {@code NullPointerException} eller en halvferdig setning.
      */
     private Gren bestemGren(EndretPeriodeDataDto dto) {
         Set<PeriodeEndringType> endringer = dto.endringer();

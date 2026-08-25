@@ -17,17 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/sok-ytelse/i18n/nb.ts} og
- * {@code SokYtelseOppgavetekst.tsx}. Kilden har - i motsetning til de andre
- * oppgavetypene - ingen egen brødtekst («oppgavetekst») for den uløste tilstanden, kun
- * {@code oppgavetittel} og en kort {@code info}-setning pluss en lenkeknapp til forsiden; denne
- * oppgaven er en invitasjon til å søke, ikke et spørsmål å besvare. Erstatter lenkeknappen med en
- * skriftlig henvisning til Min side, og legger til {@code fomDato} som et eget faktafelt med
- * samme etikett («Startdato») som frontendens {@code oppsummering.startdato} bruker for feltet
- * etter at søknaden er løst - vi viser det bare allerede her, siden PDF-en genereres ved
- * opprettelse. Grener fullt ut på {@code ytelsetype} (egne titler/tekster for begge), så
- * ytelseskvalifikatoren i {@link OppgaveDokumentTekster} trengs ikke her.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/sok-ytelse/i18n/nb.ts} og
+ * {@code SokYtelseOppgavetekst.tsx}. Kilden har ingen brødtekst for uløst tilstand her (kun
+ * tittel + kort info-setning + lenkeknapp til forsiden) - erstattet med skriftlig henvisning til
+ * Min side, siden et PDF-brev ikke kan ha en lenkeknapp.
+ * <p>
+ * {@code fomDato} vises med samme etikett («Startdato») som frontendens
+ * {@code oppsummering.startdato} bruker etter at søknaden er løst - vist allerede her siden
+ * PDF-en genereres ved opprettelse, før den tilstanden finnes.
  */
 @OppgaveTypeRef(OppgaveType.SØK_YTELSE)
 @ApplicationScoped

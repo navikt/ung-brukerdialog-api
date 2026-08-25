@@ -1,18 +1,12 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 /**
- * Kastes når journalføring av en brukerdialogoppgave mot Dokarkiv feiler på en måte som ikke
- * skal føre til automatisk retry via {@code ProsessTask}, eller når en forutsetning for
- * journalføring mangler. Brukes blant annet ved:
- * <ul>
- *   <li>HTTP 409 fra Dokarkiv - journalposten finnes allerede, men {@code journalpostId} kan
- *       ikke leses fra responsen med dagens klient. Tasken skal ende i
- *       {@code FEILET} og følges opp manuelt, ikke retrye i det uendelige.</li>
- *   <li>Personen mangler folkeregisterident i PDL.</li>
- * </ul>
+ * Kastes når journalføring feiler på en måte som ikke skal retryes automatisk (f.eks. HTTP 409
+ * fra Dokarkiv - journalposten finnes, men {@code journalpostId} kan ikke leses), eller når en
+ * forutsetning mangler (f.eks. person uten folkeregisterident i PDL).
  * <p>
- * Meldingen skal ALDRI inneholde fødselsnummer, aktørId eller annet PII - kun
- * oppgavereferanse og oppgavetype.
+ * Meldingen skal ALDRI inneholde fødselsnummer, aktørId eller annet PII - kun oppgavereferanse
+ * og oppgavetype.
  */
 public class JournalføringException extends RuntimeException {
 

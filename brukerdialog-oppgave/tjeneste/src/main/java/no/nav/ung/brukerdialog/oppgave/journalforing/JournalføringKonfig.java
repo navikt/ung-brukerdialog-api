@@ -11,11 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Styrer om {@code JournalførOppgaveTask} opprettes for en gitt oppgave.
- * <p>
- * Journalføringsraden ({@code OppgaveJournalføringEntitet}) lagres <b>alltid</b> ved
- * opprettelse, uavhengig av denne konfigurasjonen. Denne klassen styrer med
- * andre ord kun <i>når</i> journalposten faktisk sendes til dokarkiv, ikke om etterslepet spores.
+ * Styrer om {@code JournalførOppgaveTask} opprettes for en gitt oppgave - IKKE om
+ * {@code OppgaveJournalføringEntitet}-raden lagres, som skjer uavhengig av denne konfigen.
  */
 @ApplicationScoped
 public class JournalføringKonfig {
@@ -39,12 +36,9 @@ public class JournalføringKonfig {
     }
 
     /**
-     * @return {@code true} hvis journalføring er globalt aktivert (se
-     * {@code JOURNALFORING_ENABLED}) og oppgavetypen ikke er eksplisitt deaktivert (se
-     * {@code JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER}).
-     * <p>
-     * Defaulten er bevisst {@code false}: et manglende eller
-     * feilstavet {@code JOURNALFORING_ENABLED} skal aldri slå journalføring PÅ i produksjon.
+     * {@code true} hvis {@code JOURNALFORING_ENABLED} og oppgavetypen ikke er i
+     * {@code JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER}. Defaulten er bevisst {@code false} - et
+     * manglende/feilstavet {@code JOURNALFORING_ENABLED} skal aldri slå journalføring PÅ i produksjon.
      */
     public boolean erAktivertFor(OppgaveType oppgaveType) {
         return journalføringEnabled && !deaktiverteOppgavetyper.contains(oppgaveType);

@@ -46,9 +46,8 @@ public class OppgaveJournalføringRepository {
     }
 
     /**
-     * Rader som venter på journalføring, eldste først. Tilsvarer den partielle indeksen
-     * {@code idx_bd_oppgave_journalforing_etterslep} og brukes til etterslep-metrikk
-     * og en eventuell opphentingsjobb ved prod-aktivering.
+     * Rader som venter på journalføring, eldste først - tilsvarer indeksen
+     * {@code idx_bd_oppgave_journalforing_etterslep}.
      */
     public List<OppgaveJournalføringEntitet> hentEtterslep() {
         TypedQuery<OppgaveJournalføringEntitet> query = entityManager.createQuery(
@@ -60,11 +59,9 @@ public class OppgaveJournalføringRepository {
     }
 
     /**
-     * Antall rader som har ventet på journalføring lenger enn {@code eldreEnn}:
-     * grunnlaget for etterslep-gauge {@code ung_brukerdialog_journalforing_etterslep}, som
-     * fanger opp både «flagget er av» og «tasken kom aldri i mål». Egen, snevrere spørring enn
-     * {@link #hentEtterslep()} - den brukes til en eventuell opphentingsjobb og skal derfor
-     * fortsatt returnere ALLE planlagte rader, uavhengig av alder.
+     * Grunnlag for etterslep-gauge {@code ung_brukerdialog_journalforing_etterslep}. Egen,
+     * snevrere spørring enn {@link #hentEtterslep()}, som må returnere ALLE planlagte rader
+     * uavhengig av alder (brukes også til en eventuell opphentingsjobb).
      */
     public long tellEtterslepEldreEnn(Duration eldreEnn) {
         TypedQuery<Long> query = entityManager.createQuery(

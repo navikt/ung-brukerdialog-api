@@ -116,10 +116,8 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.aktørId(),
                     oppgaveDto.respons(),
                     oppgaveDto.status(),
-                    // MigrerOppgaveDto har ikke noe ytelsetype-felt - migreringen gjelder kun
-                    // ungdomsytelse-oppgaver fra den gamle applikasjonen. Migrerte oppgaver
-                    // journalføres ikke, siden de opprettes direkte via repository og ikke
-                    // via OppgaveLivssyklusTjeneste.
+                    // MigrerOppgaveDto mangler ytelsetype - migrering gjelder kun ungdomsytelse.
+                    // Journalføres ikke: oppgaver opprettes direkte via repository, ikke via OppgaveLivssyklusTjeneste.
                     OppgaveYtelsetype.UNGDOMSYTELSE,
                     frist,
                     løstDato,

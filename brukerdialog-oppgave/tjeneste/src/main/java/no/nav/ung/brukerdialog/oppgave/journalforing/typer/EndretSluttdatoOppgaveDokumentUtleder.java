@@ -15,15 +15,12 @@ import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveDokumentUtleder;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/endret-sluttdato/i18n/nb.ts} og
- * {@code .../meldt-ut/i18n/nb.ts}. {@link EndretSluttdatoDataDto#forrigeSluttdato()} er nullable:
- * {@code null} betyr at dette er første gang en sluttdato settes (bruker meldes
- * ut), ikke en endring av en eksisterende - {@link OppgaveDokumentTekster#erMeldtUt} skiller de to.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/endret-sluttdato/i18n/nb.ts} og
+ * {@code .../meldt-ut/i18n/nb.ts}. {@code forrigeSluttdato() == null} betyr «meldt ut» (første
+ * sluttdato, ikke en endring) - se {@link OppgaveDokumentTekster#erMeldtUt}.
  * <p>
- * Tittel og innholdsdata bygges av {@link OppgaveDokumentTekster}, delt med
- * {@link EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_SLUTTDATO}) slik at teksten
- * ikke kan drifte i to retninger.
+ * Delt med {@link EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_SLUTTDATO}) via
+ * {@link OppgaveDokumentTekster}, slik at teksten ikke kan drifte i to retninger.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_SLUTTDATO)
 @ApplicationScoped

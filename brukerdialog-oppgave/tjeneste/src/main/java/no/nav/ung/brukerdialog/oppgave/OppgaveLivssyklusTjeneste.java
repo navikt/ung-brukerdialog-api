@@ -33,11 +33,8 @@ public class OppgaveLivssyklusTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(OppgaveLivssyklusTjeneste.class);
 
     /**
-     * Oppgavetyper uten fagsak ved opprettelse - kan journalføres på generell sak.
-     * Speiler {@code GyldigJournalføringValidator.UTEN_FAGSAK} i kontrakt-modulen. De to kan
-     * ikke dele én konstant på tvers av modulgrensen (pakke-privat synlighet, og tjeneste skal
-     * ikke ta en kompileringsavhengighet til en validator kun for én konstant) - hold dem i sync
-     * hvis regelen endres.
+     * Speiler {@code GyldigJournalføringValidator.UTEN_FAGSAK} i kontrakt-modulen - kan ikke
+     * dele konstanten på tvers av modulgrensen. Hold i sync hvis regelen endres.
      */
     private static final Set<OppgaveType> UTEN_FAGSAK = EnumSet.of(OppgaveType.SØK_YTELSE);
 
@@ -110,19 +107,10 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Persisterer oppgave, oppretter journalføring og publiserer varsel til Min Side.
-     * <p>
-     * Alt i denne metoden skjer i samme transaksjon (transactional outbox): enten
-     * committes oppgaven sammen med journalføringsraden og begge prosesstaskene, eller ingen av
-     * dem. Ingen del av dette skal derfor kjøres i en egen transaksjon (f.eks. via
-     * {@code REQUIRES_NEW}) - det ville enten kunne gitt en committet oppgave uten
-     * journalføringsrad, eller en foreldreløs task som peker på en oppgave som ble rullet
-     * tilbake.
+     * Persisterer oppgave, oppretter journalføring og publiserer varsel til Min Side - alt i én
+     * transaksjon (transactional outbox): committes sammen, eller ingen av dem.
      *
-     * @param oppgaveEntitet  Oppgave som skal opprettes og publiseres.
-     * @param oppgavetypeData
-     * @param journalføring   Journalføringsrelaterte felter fra requestbody (kan være
-     *                        {@code null} - da behandles det som om {@code fagsakId} mangler).
+     * @param journalføring Kan være {@code null} - behandles da som om {@code fagsakId} mangler.
      */
     public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData, JournalføringDto journalføring) {
         if (oppgaveEntitet.getId() != null) {
@@ -162,18 +150,14 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Oppretter journalføringsrad og eventuelt {@code JournalførOppgaveTask} for en nyopprettet
-     * oppgave. Raden lagres ALLTID når oppgaven skal journalføres, uavhengig av
-     * {@link JournalføringKonfig} - det er kun tasken som er betinget av konfigurasjonen, slik at
-     * etterslepet (rader uten task) blir komplett og spørrbart.
+     * Raden lagres ALLTID når oppgaven skal journalføres, uavhengig av {@link JournalføringKonfig}
+     * - kun tasken er betinget, slik at etterslepet (rader uten task) blir komplett og spørrbart.
      */
     private void opprettJournalføring(BrukerdialogOppgaveEntitet oppgaveEntitet, JournalføringDto journalføring) {
         Saksnummer fagsakId = journalføring != null ? journalføring.fagsakId() : null;
         boolean skalJournalføres = fagsakId != null || UTEN_FAGSAK.contains(oppgaveEntitet.getOppgaveType());
         if (!skalJournalføres) {
-            // fagsakId er foreløpig valgfri for alle typer. Mangler den for en type som krever
-            // fagsak, opprettes ingen journalføringsrad ennå - dette blir en høylytt 400 når
-            // valideringen strammes inn, når ung-sak garantert sender feltet.
+            // fagsakId er foreløpig valgfri - blir en høylytt 400 når valideringen strammes inn.
             logger.warn("Oppretter ikke journalføring: fagsakId mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
                 oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
             return;

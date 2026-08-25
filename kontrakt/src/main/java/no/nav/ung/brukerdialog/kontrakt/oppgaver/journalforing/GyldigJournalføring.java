@@ -11,11 +11,8 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validerer at {@code journalføring.fagsakId} er satt når oppgavetypen
- * ({@code oppgavetypeData.oppgavetype()}) krever fagsak ved journalføring.
- * <p>
- * Se {@link GyldigJournalføringValidator} for hvilke oppgavetyper som er unntatt
- * (journalføres på generell sak i stedet).
+ * Krever {@code journalføring.fagsakId} når oppgavetypen ikke er unntatt - se
+ * {@link GyldigJournalføringValidator#UTEN_FAGSAK}.
  */
 @Documented
 @Constraint(validatedBy = GyldigJournalføringValidator.class)

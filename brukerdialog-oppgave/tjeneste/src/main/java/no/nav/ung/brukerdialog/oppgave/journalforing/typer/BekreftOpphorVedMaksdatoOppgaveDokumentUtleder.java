@@ -16,17 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/opphor-ved-maksdato/i18n/nb.ts} og
- * {@code OpphorVedMaksdatoOppgavetekst.tsx}. {@code maxDato} brukes ikke i
- * kildeteksten (kun {@code sluttdato}/«sisteDag») og utelates derfor her også - trofast mot
- * kilden, ikke en forglemmelse.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/opphor-ved-maksdato/i18n/nb.ts} og
+ * {@code OpphorVedMaksdatoOppgavetekst.tsx}. {@code maxDato} er bevisst utelatt - kilden bruker
+ * kun {@code sluttdato}/«sisteDag».
  * <p>
- * «med ungdomsprogramytelsen» generaliserer grammatisk fint til «med aktivitetspenger» (i
- * motsetning til {@code fjernet-periode}s «av»/eiendomsform-tilfeller), så
- * {@link OppgaveDokumentTekster#ytelseNavn} brukes direkte i brødteksten. Den siste setningen
- * («... som siste dag med ytelsen ...») bruker allerede en nøytral «ytelsen» i kildeteksten og
- * trenger ingen substitusjon.
+ * Malen bruker {@link OppgaveDokumentTekster#ytelseNavn} direkte («med ungdomsprogramytelsen»/
+ * «med aktivitetspenger» passer begge grammatisk) - ingen ytelseskvalifikator-metode trengs her.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO)
 @ApplicationScoped

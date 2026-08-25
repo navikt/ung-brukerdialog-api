@@ -17,14 +17,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/rapporter-inntekt/i18n/nb.ts} og
- * {@code RapporterInntektOppgavetekst.tsx}. «Les mer om inntekt»-innholdet
- * (eksempler på hva som regnes som inntekt) er i kilden en sammenleggbar {@code <ReadMore>}, men
- * skrives her ut som vanlig løpende tekst - et arkivert PDF-brev har ingen sammenleggbar
- * visning, og innholdet er en del av selve oppgavetekstens eget innhold (ikke en delt
- * regelverkshenvisning, i motsetning til {@code avvik-registerinntekt}s
- * {@code regelverkOgInnsyn}-blokk, som ikke hører til denne komponenten og derfor er utelatt der).
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/rapporter-inntekt/i18n/nb.ts} og
+ * {@code RapporterInntektOppgavetekst.tsx}. «Les mer om inntekt» er i kilden en sammenleggbar
+ * {@code <ReadMore>}, men skrives her ut som vanlig løpende tekst - et arkivert PDF-brev har
+ * ingen sammenleggbar visning.
  */
 @OppgaveTypeRef(OppgaveType.RAPPORTER_INNTEKT)
 @ApplicationScoped

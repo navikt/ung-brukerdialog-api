@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,13 +43,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Journalfører en brukerdialogoppgave mot Dokarkiv. Opprettes av
- * {@code OppgaveLivssyklusTjeneste} ved oppgaveopprettelse, men kjøres uavhengig av den, slik at
- * feil i journalføring aldri blokkerer selve oppgaveopprettelsen.
+ * Journalfører en brukerdialogoppgave mot Dokarkiv, uavhengig av
+ * {@code OppgaveLivssyklusTjeneste} som oppretter tasken - feil her blokkerer aldri
+ * oppgaveopprettelsen.
  * <p>
- * {@code maxFailedRuns/firstDelay/thenDelay} gir ~21 minutter med retry (5 forsøk) før tasken
- * ender i {@code FEILET} - robust mot forbigående 5xx, men rask nok til å varsle om en reell
- * feil.
+ * {@code maxFailedRuns/firstDelay/thenDelay}: ~21 minutter retry (5 forsøk) før {@code FEILET}.
  */
 @ApplicationScoped
 @ProsessTask(value = JournalførOppgaveTask.TASKTYPE, maxFailedRuns = 5, firstDelay = 60, thenDelay = 300)
@@ -63,12 +60,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private static final String JOURNALFOERENDE_ENHET = "9999";
 
     /**
-     * TODO: foreløpig brevkode - skal bekreftes med Team Dokumentløsninger.
-     * <p>
-     * Dokumentet som journalføres her er nettopp et forhåndsvarsel: parten skal varsles før
-     * vedtak treffes og få høve til å uttale seg innen en frist, jf. fvl. § 16 første ledd.
-     * Varselet skal gjøre greie for hva saken gjelder, jf. § 16 tredje ledd - derfor skal
-     * ytelsen alltid framgå tydelig av tittel og brevtekst (se {@link OppgaveDokumentTekster}).
+     * TODO: foreløpig brevkode - skal bekreftes med Team Dokumentløsninger. Valgt fordi
+     * dokumentet er et forhåndsvarsel, jf. fvl. § 16.
      *
      * @see <a href="https://lovdata.no/lov/1967-02-10/§16">forvaltningsloven § 16 (forhåndsvarsling)</a>
      */
@@ -192,56 +185,44 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     /**
      * Henter fødselsnummer og navn for PDF-en og journalpost-metadataen.
      * <p>
-     * To PDL-kall, hver med den API-en som er mest robust for sitt formål:
-     * <ol>
-     *   <li>{@code hentPersonIdentForAktørId} - kun gjeldende {@code FOLKEREGISTERIDENT}, uten
-     *       historikk. Tom {@link Optional} betyr at PDL ikke har et folkeregisterident for
-     *       personen (f.eks. kun NPID) - kaster {@link JournalføringException} med
-     *       kun oppgavereferanse og oppgavetype, ALDRI aktørId eller fnr.</li>
-     *   <li>{@code hentPerson} med {@code Behandlingsnummer} utledet fra oppgavens ytelsetype
-     *       (se {@link JournalføringParametre}), for navnet. Navnet formateres som
-     *       {@code fornavn mellomnavn etternavn} via {@link #formaterNavn} - IKKE
-     *       {@code ung-sak}s {@code PersonBasisTjeneste.mapNavn}-sorteringsformat
-     *       ({@code etternavn fornavn mellomnavn}).</li>
-     * </ol>
      * Fødselsnummeret og navnet lever kun i denne metodens kallstack og i {@link PersonInfo} -
      * de lagres aldri i databasen, og {@link PersonInfo#toString()} er PII-fri.
-     * <p>
-     * Et PDL-404 eller annen {@code PdlException} fanges bevisst ikke her - den skal propagere
-     * til {@link #doTask} og videre til prosesstask-rammeverkets retry.
      */
     private PersonInfo hentPersonInfo(BrukerdialogOppgaveEntitet oppgave) {
-        String aktørId = oppgave.getAktørId().getId();
+        return new PersonInfo(hentFødselsnummer(oppgave), hentNavn(oppgave));
+    }
 
-        // Optional.empty() betyr at PDL ikke har et FOLKEREGISTERIDENT for personen (f.eks. kun
-        // NPID) - ikke at PDL svarte 404. Et PDL-404 kastes av hentPersonIdentForAktørId selv
-        // (PdlException) og skal propagere til retry, ikke fanges her.
-        String fødselsnummer = pdl.hentPersonIdentForAktørId(aktørId)
+    /**
+     * Kun gjeldende {@code FOLKEREGISTERIDENT}, uten historikk - unngår å sende et opphørt
+     * fødselsnummer til arkivet. Et PDL-404 kastes som {@code PdlException} og propagerer til
+     * {@link #doTask} for retry - fanges bevisst ikke her.
+     */
+    private String hentFødselsnummer(BrukerdialogOppgaveEntitet oppgave) {
+        return pdl.hentPersonIdentForAktørId(oppgave.getAktørId().getId())
             .orElseThrow(() -> new JournalføringException(
                 "Fant ikke folkeregisterident for oppgave %s (oppgavetype %s)"
                     .formatted(oppgave.getOppgavereferanse(), oppgave.getOppgaveType())));
+    }
 
+    private String hentNavn(BrukerdialogOppgaveEntitet oppgave) {
         Behandlingsnummer behandlingsnummer = JournalføringParametre.utled(oppgave.getYtelsetype()).behandlingsnummer();
         var query = new HentPersonQueryRequest();
-        query.setIdent(aktørId); // PDL godtar aktørId.
+        query.setIdent(oppgave.getAktørId().getId()); // PDL godtar aktørId.
         var projection = new PersonResponseProjection()
             .navn(new NavnResponseProjection().fornavn().mellomnavn().etternavn());
 
         Person person = pdl.hentPerson(query, projection, List.of(behandlingsnummer));
-        String navn = person.getNavn().stream()
+        return person.getNavn().stream()
             .findFirst()
             .map(JournalførOppgaveTask::formaterNavn)
             .orElseThrow(() -> new JournalføringException(
                 "Fant ikke navn for oppgave %s (oppgavetype %s)"
                     .formatted(oppgave.getOppgavereferanse(), oppgave.getOppgaveType())));
-
-        return new PersonInfo(fødselsnummer, navn);
     }
 
     /**
-     * Naturlig navnerekkefølge til brevet - {@code fornavn mellomnavn etternavn}. IKKE kopier
-     * {@code ung-sak}s {@code PersonBasisTjeneste.mapNavn}, som gir sorteringsformatet
-     * {@code etternavn fornavn mellomnavn}.
+     * {@code fornavn mellomnavn etternavn} - IKKE {@code ung-sak}s
+     * {@code PersonBasisTjeneste.mapNavn}-sorteringsformat ({@code etternavn fornavn mellomnavn}).
      */
     private static String formaterNavn(Navn navn) {
         return Stream.of(navn.getFornavn(), navn.getMellomnavn(), navn.getEtternavn())
@@ -250,9 +231,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Oppgavetype-spesifikt innhold (se {@link OppgaveDokumentUtleder}), utvidet med
-     * {@code oppgaveReferanse} - satt sentralt her slik at ingen av de åtte implementasjonene
-     * trenger å duplisere det.
+     * Oppgavetype-spesifikt innhold, utvidet med {@code oppgaveReferanse} - satt sentralt her
+     * for å unngå duplisering i alle åtte {@link OppgaveDokumentUtleder}-implementasjonene.
      */
     private Map<String, Object> byggOppgaveData(OppgaveDokumentUtleder utleder, BrukerdialogOppgaveEntitet oppgave) {
         Map<String, Object> data = new LinkedHashMap<>(utleder.utledInnholdsdata(oppgave));
@@ -261,10 +241,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Fletter tittel, opprettelsesdato, navn/fødselsnummer (PII) og oppgavetype-spesifikt
-     * innhold til datamodellen malen ({@link OppgaveDokumentUtleder#malnavn()}) rendres mot.
-     * Flettingen skjer bevisst sentralt her og ikke i hver enkelt {@link OppgaveDokumentUtleder}
-     * - se klasse-javadoc der.
+     * Fletter tittel, dato, navn/fødselsnummer (PII) og oppgavetype-spesifikt innhold til
+     * datamodellen malen ({@link OppgaveDokumentUtleder#malnavn()}) rendres mot.
      */
     private Map<String, Object> byggPdfData(String tittel, String opprettetDato, Map<String, Object> oppgaveData, PersonInfo person) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -289,10 +267,9 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Bygger dokarkiv-requesten. {@code tema}/{@code fagsaksystem}/{@code sakstype}/
-     * {@code fagsakId} leses fra den lagrede journalføringsraden, ikke re-utledes - utledningen
-     * skjer én gang, ved opprettelse, og lagres i raden, slik at raden forblir det etterrettelige
-     * sporet av hva som faktisk ble sendt til arkivet.
+     * {@code tema}/{@code fagsaksystem}/{@code sakstype}/{@code fagsakId} leses fra den lagrede
+     * journalføringsraden (utledet én gang ved opprettelse) - raden er det etterrettelige sporet
+     * av hva som faktisk ble sendt til arkivet.
      */
     private OpprettJournalpostRequest byggJournalpostRequest(BrukerdialogOppgaveEntitet oppgave,
                                                                OppgaveJournalføringEntitet journalføring,

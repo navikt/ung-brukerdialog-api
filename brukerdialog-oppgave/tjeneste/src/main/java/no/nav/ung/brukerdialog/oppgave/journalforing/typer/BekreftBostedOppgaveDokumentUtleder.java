@@ -20,20 +20,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Brevteksten er tilpasset fra
- * {@code sif-brukerdialog/packages/ung-innsyn/.../oppgavepaneler/bostedsvilkar/i18n/nb.ts}.
- * {@code BEKREFT_BOSTED} gjelder alltid aktivitetspenger (jf. kildeteksten selv), så det brukes
- * ingen ytelseskvalifikator her - i motsetning til de andre oppgavetypene.
+ * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/bostedsvilkar/i18n/nb.ts}. Ingen
+ * ytelseskvalifikator - gjelder alltid aktivitetspenger.
  * <p>
- * Vår egen mapper ({@code BekreftBostedOppgaveDataMapperFraEntitetTilDto}) gir to DTO-varianter
- * for samme {@code OppgaveType}: {@link BekreftBostedOppgavetypeDataDto} (bundet periode, med
- * {@code tom}) og {@link BekreftBostedOpphørOppgavetypeDataDto} (åpen/opphørt periode, uten
- * {@code tom}). Frontend har ingen skrevet tekst for opphør-varianten ennå; den periode-nøytrale
- * «Dette gjelder fra og med ...»-formen og fullføringen av den avkuttede kildeteksten i
- * {@code tekst.6} er nytt formuleringsarbeid.
- * <p>
- * {@code ikkeOppfyltÅrsak}/{@code ikkeOppfyltÅrsakFritekstbeskrivelse} vises til bruker - se
- * {@link OppgaveDokumentTekster#bostedIkkeOppfyltForklaring}.
+ * To DTO-varianter fra vår mapper: bundet periode ({@link BekreftBostedOppgavetypeDataDto}) og
+ * åpen/opphørt periode ({@link BekreftBostedOpphørOppgavetypeDataDto}, uten {@code tom}).
+ * Frontend har ingen tekst for opphør-varianten - «Dette gjelder fra og med ...»-formen under er
+ * nytt formuleringsarbeid, ikke hentet fra kilden.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_BOSTED)
 @ApplicationScoped

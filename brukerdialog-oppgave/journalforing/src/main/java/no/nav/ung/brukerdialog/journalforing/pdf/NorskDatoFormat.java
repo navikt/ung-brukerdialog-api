@@ -6,13 +6,10 @@ import java.util.Locale;
 
 /**
  * Norsk datoformatering til brevtekst, delt mellom {@link PdfGenerator}s Handlebars-hjelpere og
- * Java-koden som utleder titler - slik at f.eks. tittelen «Tilbakemelding på
- * inntekt i januar 2025» og tilsvarende tekst i PDF-brødteksten alltid er formatert likt.
+ * titel-utledningen, slik at de alltid formaterer likt.
  * <p>
- * Formatene speiler {@code sif-brukerdialog/packages/sif-utils/src/dateFormatter.ts}
- * ({@code .full}/{@code .month}/{@code .monthFullYear}). {@link Locale#of(String)}
- * med språkkode {@code "no"} er verifisert å gi små forbokstaver på månedsnavn i JVM-en
- * («januar», ikke «Januar»).
+ * Speiler {@code sif-brukerdialog/packages/sif-utils/src/dateFormatter.ts}. {@link Locale#of(String)}
+ * med {@code "no"} er verifisert å gi små forbokstaver på månedsnavn («januar», ikke «Januar»).
  */
 public final class NorskDatoFormat {
 

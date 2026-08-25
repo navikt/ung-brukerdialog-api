@@ -9,22 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Delt brevtekst-logikk mellom {@code typer}-klassene.
- * <p>
- * To formål:
+ * Delt brevtekst-logikk mellom {@code typer}-klassene. To formål:
  * <ol>
  *   <li><b>Ytelseskvalifikator</b> ({@link #ytelsePreposisjonsfrase}/{@link #ytelseNavn}) - gjør
- *   ytelsen (ungdomsytelse/aktivitetspenger) eksplisitt i tittel og brødtekst for oppgavetyper
- *   som ellers ikke sier det. {@code OppgaveYtelsetype} er et fritt felt på entiteten, uavhengig
- *   av {@code OppgaveType} - selv om enkelte typer i praksis kun brukes for én ytelse i dag
- *   (se {@code sif-brukerdialog}s {@code lovverk.ts}), er det en frontend-antakelse, ikke en
- *   kontraktgaranti. Kvalifikatoren gjør dokumentet korrekt uansett.</li>
- *   <li><b>Delt «endret startdato»/«endret sluttdato»-tekst</b> - {@code BEKREFT_ENDRET_PERIODE}
- *   kan vise nøyaktig samme narrativ som de dedikerte {@code BEKREFT_ENDRET_STARTDATO}/
- *   {@code _SLUTTDATO}-typene (f.eks. når {@code endringer = {ENDRET_STARTDATO}} o.l.).
- *   Ved å hente både tittel og data fra samme sted her, og bruke samme Handlebars-partial
- *   ({@code partial/innhold/endret-startdato}, {@code .../endret-sluttdato}) i begge maler, kan
- *   ikke teksten drifte i to retninger over tid.</li>
+ *   ytelsen eksplisitt der oppgavetypen ellers ikke sier det. {@code OppgaveYtelsetype} er et
+ *   fritt felt, uavhengig av {@code OppgaveType} - ikke en kontraktgaranti, selv der kun én
+ *   ytelse brukes i praksis i dag.</li>
+ *   <li><b>Delt «endret startdato/sluttdato»-tekst</b> - {@code BEKREFT_ENDRET_PERIODE} kan vise
+ *   samme narrativ som de dedikerte typene. Samme metode + samme Handlebars-partial i begge
+ *   maler hindrer at teksten drifter i to retninger.</li>
  * </ol>
  */
 public final class OppgaveDokumentTekster {
@@ -57,12 +50,7 @@ public final class OppgaveDokumentTekster {
         return "Tilbakemelding på endret startdato " + ytelsePreposisjonsfrase(ytelsetype);
     }
 
-    /**
-     * Innholdsdata for «endret startdato»-narrativet, brukt både av
-     * {@code EndretStartdatoOppgaveDokumentUtleder} og {@code EndretPeriodeOppgaveDokumentUtleder}
-     * (gren {@code ENDRET_STARTDATO}) sammen med Handlebars-partialen
-     * {@code partial/innhold/endret-startdato}.
-     */
+    /** Delt av {@code EndretStartdatoOppgaveDokumentUtleder} og {@code EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_STARTDATO}). */
     public static Map<String, Object> endretStartdatoInnhold(LocalDate nyStartdato, LocalDate forrigeStartdato,
                                                               OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -78,12 +66,7 @@ public final class OppgaveDokumentTekster {
         return base + " " + ytelsePreposisjonsfrase(ytelsetype);
     }
 
-    /**
-     * Innholdsdata for «endret sluttdato»/«meldt ut»-narrativet (branches internt på
-     * {@code erMeldtUt}), brukt både av {@code EndretSluttdatoOppgaveDokumentUtleder} og
-     * {@code EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_SLUTTDATO}) sammen med
-     * Handlebars-partialen {@code partial/innhold/endret-sluttdato}.
-     */
+    /** Delt av {@code EndretSluttdatoOppgaveDokumentUtleder} og {@code EndretPeriodeOppgaveDokumentUtleder} (gren {@code ENDRET_SLUTTDATO}). */
     public static Map<String, Object> endretSluttdatoInnhold(LocalDate nySluttdato, LocalDate forrigeSluttdato,
                                                               OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -102,20 +85,11 @@ public final class OppgaveDokumentTekster {
     }
 
     /**
-     * Innholdsdata for «fjernet periode»-narrativet ({@code BEKREFT_ENDRET_PERIODE} med
-     * {@code endringer = {FJERNET_PERIODE}}), kuratert fra
-     * {@code oppgavepaneler/fjernet-periode/i18n/nb.ts}.
+     * Kilde: {@code oppgavepaneler/fjernet-periode/i18n/nb.ts}.
      * <p>
-     * <b>Bevisst forenkling:</b> kildeteksten («meldt deg ut <i>av ungdomsprogrammet</i>»,
-     * «stoppe ungdomsprogramytelsen <i>din</i>») bruker et fast «programmet»-begrep og
-     * possessiv-bøying som ikke generaliserer grammatisk til aktivitetspenger (et pluralisert
-     * substantiv - «aktivitetspenger din» er ugrammatisk). Derfor to fullstendige,
-     * ytelsetype-spesifikke setninger her, framfor ordrett gjenbruk av en frase/substantiv-
-     * parameter slik de øvrige narrativene gjør. {@code SØK_YTELSE}/{@code BEKREFT_ENDRET_PERIODE}
-     * med aktivitetspenger er i dag ikke en reell kombinasjon
-     * ({@code sif-brukerdialog}s {@code lovverk.ts} markerer denne oppgavetypen som
-     * ungdomsytelse-only i praksis), men journalføringen skal likevel gi et korrekt og
-     * arkivverdig dokument om det skulle skje.
+     * <b>Bevisst forenkling:</b> «aktivitetspenger din» er ugrammatisk (possessiv-bøying passer
+     * ikke et pluralisert substantiv), så hver ytelsetype får en fullstendig, hardkodet setning
+     * her i stedet for frase/substantiv-parametrisering som de andre narrativene bruker.
      */
     public static Map<String, Object> fjernetPeriodeInnhold(OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -136,12 +110,9 @@ public final class OppgaveDokumentTekster {
     }
 
     /**
-     * Innholdsdata for «endret start- og sluttdato»-narrativet ({@code BEKREFT_ENDRET_PERIODE}
-     * med {@code endringer = {ENDRET_STARTDATO, ENDRET_SLUTTDATO}}), kuratert fra
-     * {@code oppgavepaneler/endret-start-og-sluttdato/i18n/nb.ts}. I motsetning til
-     * {@link #fjernetPeriodeInnhold}, generaliserer denne kildeteksten grammatisk fint til
-     * aktivitetspenger (ingen possessiv-bøying av ytelsesnavnet), så her brukes samme
-     * frase/substantiv-parametrisering som i de andre narrativene.
+     * Kilde: {@code oppgavepaneler/endret-start-og-sluttdato/i18n/nb.ts}. I motsetning til
+     * {@link #fjernetPeriodeInnhold} generaliserer denne teksten grammatisk fint til
+     * aktivitetspenger, så vanlig frase/substantiv-parametrisering brukes her.
      */
     public static Map<String, Object> endretStartOgSluttdatoInnhold(LocalDate nyFom, LocalDate nyTom,
                                                                      OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
@@ -159,12 +130,9 @@ public final class OppgaveDokumentTekster {
     }
 
     /**
-     * Fallback-narrativ for enhver {@code endringer}-kombinasjon ingen dedikert tekst er
-     * skrevet for ennå (bl.a. {@code ANDRE_ENDRINGER}), eller en ellers gjenkjent kombinasjon
-     * der forventede datoer mangler. Frontend kaster i dette tilfellet
-     * (ser {@code parseOppgaverElement.ts}) - journalføring MÅ likevel produsere et gyldig,
-     * arkiverbart dokument. {@code nyPeriodeFom}/{@code nyPeriodeTom} er begge valgfrie her,
-     * i motsetning til de andre narrativene.
+     * Fallback for kombinasjoner uten dedikert tekst (bl.a. {@code ANDRE_ENDRINGER}) eller
+     * manglende datoer. Frontend kaster her ({@code parseOppgaverElement.ts}) - journalføring MÅ
+     * likevel produsere et gyldig, arkiverbart dokument.
      */
     public static Map<String, Object> ukjentPeriodeendringInnhold(LocalDate nyFom, LocalDate nyTom,
                                                                    OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
@@ -191,10 +159,9 @@ public final class OppgaveDokumentTekster {
     }
 
     /**
-     * Visningstekst for {@code BostedsvilkårIkkeOppfyltÅrsak} - fem nye
-     * visningstekster uten frontend-forelegg, siden {@code BostedVilkarOppgavePanelOppgavetekst.tsx}
-     * ikke viser årsaken i dag. {@code null} når vilkåret er oppfylt ({@code UDEFINERT}) - skal da
-     * ikke vises i det hele tatt.
+     * Nye visningstekster uten frontend-forelegg ({@code BostedVilkarOppgavePanelOppgavetekst.tsx}
+     * viser ikke årsaken i dag). {@code null} for {@code UDEFINERT} (vilkåret er oppfylt) - skal
+     * da ikke vises.
      */
     public static String bostedIkkeOppfyltForklaring(BostedsvilkårIkkeOppfyltÅrsak årsak, String fritekstbeskrivelse) {
         return switch (årsak) {

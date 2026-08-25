@@ -9,17 +9,12 @@ import no.nav.k9.felles.log.metrics.MetricsUtil;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 
 /**
- * Metrikker for journalføring, samlet ett sted for konsistente navn og tagger.
- * Registrerer mot {@link MetricsUtil#REGISTRY}, som allerede eksponeres på
- * {@code /internal/metrics/prometheus}.
+ * Metrikker for journalføring, samlet ett sted for konsistente navn/tagger. Registrerer mot
+ * {@link MetricsUtil#REGISTRY} ({@code /internal/metrics/prometheus}).
  * <p>
- * {@code Counter}/{@code Timer}/{@code Gauge}-registrering er trygt å gjenta - Micrometer
- * dedupliserer på navn+tagger, så gjentatte {@code .register(...)}-kall returnerer samme
- * instans i stedet for å opprette en ny.
- * <p>
- * Klassen er {@code public} fordi {@code registrerEtterslepGauge} kalles fra {@code web}-modulen
- * ({@code PrometheusRestService}) - selve metrikk-definisjonen skal likevel holdes samlet her,
- * ikke spres til web-laget.
+ * Trygt å kalle {@code .register(...)} gjentatte ganger - Micrometer dedupliserer på
+ * navn+tagger. {@code public} fordi {@code registrerEtterslepGauge} kalles fra
+ * {@code web}-modulen ({@code PrometheusRestService}).
  */
 public final class JournalføringMetrikker {
 
@@ -76,17 +71,12 @@ public final class JournalføringMetrikker {
     }
 
     /**
-     * Registrerer etterslep-gaugen mot repositoryet. Selve databasekallet skjer
-     * først når Micrometer skraper verdien - altså fra {@code PrometheusRestService} i
-     * web-modulen, som derfor må være {@code @Transactional} på samme måte som andre lesende
-     * REST-endepunkt i denne kodebasen (jf. {@code DiagnostikkBrukerdialogOppgaverRestTjeneste}
-     * og {@code no.nav.k9.felles.jpa.TransactionInterceptor}, som er globalt aktivert via
-     * {@code @Priority}). {@code register(...)} her krever ingen transaksjon - det kobler bare
-     * til en verdi-leverandør som kalles senere.
+     * Databasekallet skjer først når Micrometer skraper gaugen - dvs. fra
+     * {@code PrometheusRestService} i web-modulen, som derfor MÅ være {@code @Transactional}.
+     * {@code register(...)} her krever selv ingen transaksjon.
      * <p>
      * {@code Gauge.builder(name, repository, ...)} holder kun en {@code WeakReference} til
-     * repositoryet, men det er trygt her: repositoryet er en {@code @ApplicationScoped}
-     * CDI-bean som beholdes av containeren så lenge applikasjonen kjører.
+     * repositoryet - trygt siden det er en {@code @ApplicationScoped} CDI-bean.
      */
     public static void registrerEtterslepGauge(OppgaveJournalføringRepository repository) {
         Gauge.builder(NAVN_ETTERSLEP, repository, repo -> repo.tellEtterslepEldreEnn(ETTERSLEP_GRENSE))

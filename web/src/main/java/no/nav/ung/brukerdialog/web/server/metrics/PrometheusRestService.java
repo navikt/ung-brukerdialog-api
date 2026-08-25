@@ -15,11 +15,9 @@ import no.nav.ung.brukerdialog.oppgave.journalforing.JournalføringMetrikker;
 import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveJournalføringRepository;
 
 /**
- * Eksponerer Prometheus-metrikker. Klassen er {@code @Transactional} fordi
- * {@code ung_brukerdialog_journalforing_etterslep}-gaugen leser fra databasen
- * første gang Micrometer skraper verdien (dvs. inne i {@link #prometheus()}) - samme mønster
- * som andre lesende REST-endepunkt i denne kodebasen, jf.
- * {@code DiagnostikkBrukerdialogOppgaverRestTjeneste}.
+ * Eksponerer Prometheus-metrikker. {@code @Transactional} fordi
+ * {@code ung_brukerdialog_journalforing_etterslep}-gaugen leser fra databasen første gang
+ * Micrometer skraper verdien, dvs. inne i {@link #prometheus()}.
  */
 @Path("/metrics")
 @Produces(TEXT_PLAIN)

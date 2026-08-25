@@ -24,11 +24,9 @@ import com.openhtmltopdf.util.XRLog;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
- * Genererer PDF-er fra Handlebars-maler under {@code src/main/resources/handlebars}, i samme
- * stil som {@code k9-brukerdialog-prosessering}s {@code PDFGenerator}.
- *
- * <p>Denne klassen er generisk rendrings-infrastruktur - den kjenner ikke til hva som faktisk
- * står i malene eller i datamodellen (se {@link PdfDokument}).
+ * Genererer PDF-er fra Handlebars-maler, i samme stil som {@code k9-brukerdialog-prosessering}s
+ * {@code PDFGenerator}. Generisk rendrings-infrastruktur - kjenner ikke innholdet i malene eller
+ * datamodellen (se {@link PdfDokument}).
  */
 @ApplicationScoped
 public class PdfGenerator {
@@ -56,12 +54,10 @@ public class PdfGenerator {
     }
 
     /**
-     * Offentlig slik at tester (i denne modulen og i {@code tjeneste}, se
-     * {@code OppgaveDokumentUtlederRenderingTest}) kan verifisere rendret HTML-innhold direkte,
-     * uten å gå via PDF-rasterisering. Dagens PDF/UA-oppsett inkluderer ikke en
-     * {@code ToUnicode}-CMap, så tekst kan ikke pålitelig hentes ut igjen fra PDF-byte - kun fra
-     * dette HTML-mellomsteget. Ufarlig å eksponere: inneholder ingen ny funksjonalitet utover det
-     * {@link #genererPdf(PdfDokument)} allerede gjør internt, kun uten selve rasteriseringen.
+     * Offentlig slik at tester (bl.a. {@code OppgaveDokumentUtlederRenderingTest}) kan verifisere
+     * rendret HTML direkte - PDF/UA-oppsettet mangler {@code ToUnicode}-CMap, så tekst kan ikke
+     * pålitelig hentes ut igjen fra PDF-byte. Legger ikke til funksjonalitet utover
+     * {@link #genererPdf(PdfDokument)}, bare uten rasteriseringen.
      */
     public String tilHtml(PdfDokument dokument) {
         Objects.requireNonNull(dokument, "dokument");
