@@ -287,7 +287,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         var dokument = new OpprettJournalpostRequest.Dokument(
             dokumentTittel,
-            parametre.brevkode(),
+            parametre.brevkode().getKode(),
             null,
             List.of(
                 new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
@@ -305,7 +305,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .medAvsenderMottaker(avsenderMottaker)
             .medBruker(bruker)
             .medTema(journalføring.getTema().name())
-            .medTittel(parametre.journalposttittel())
+            .medTittel(parametre.journalposttittel().getTittel())
             .medJournalfoerendeEnhet(JOURNALFOERENDE_ENHET)
             .medEksternReferanseId(oppgavereferanse)
             .medTilleggsopplysninger(List.of(new OpprettJournalpostRequest.Tilleggsopplysning(TILLEGGSOPPLYSNING_NOKKEL, oppgavereferanse)))

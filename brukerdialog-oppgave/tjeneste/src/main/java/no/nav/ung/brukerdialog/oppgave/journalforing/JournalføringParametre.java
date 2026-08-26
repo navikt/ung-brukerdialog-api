@@ -6,28 +6,13 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 /**
  * Journalføringsparametre utledet fra oppgavens ytelsetype. {@code behandlingsnummer} brukes
  * kun til PDL-oppslag av navn - ikke til selve dokarkiv-kallet.
- * <p>
- * {@code brevkode} følger formatet {@code FVL – forhåndsvarsel – <ytelse>} - ett dokument er et
- * forhåndsvarsel, jf. fvl. § 16, og brevkoden gjøres dermed selvforklarende per ytelse i stedet
- * for én delt kode på tvers av ytelser.
- * <p>
- * {@code journalposttittel} er en generisk per-ytelse-tittel for selve journalposten - bevisst
- * forskjellig fra dokumentets tittel (som er oppgavetype-spesifikk, jf.
- * {@code OppgaveDokumentUtleder#utledTittel}). Samme skille som
- * {@code k9-brukerdialog-prosessering} gjør mellom {@code YtelseType.tittel} (journalpost) og
- * {@code ytelse().tittel + dokumentTittelSuffix()} (dokument).
- *
- * @see <a href="https://lovdata.no/lov/1967-02-10/§16">forvaltningsloven § 16 (forhåndsvarsling)</a>
  */
 public record JournalføringParametre(
     Fagsaksystem fagsaksystem,
     Tema tema,
     Behandlingsnummer behandlingsnummer,
-    String brevkode,
-    String journalposttittel) {
-
-    /** Felles prefiks - selve forhåndsvarsel-klassifiseringen er lik på tvers av ytelser. */
-    private static final String BREVKODE_PREFIX = "FVL – forhåndsvarsel – ";
+    Brevkode brevkode,
+    Journalposttittel journalposttittel) {
 
     public static JournalføringParametre utled(OppgaveYtelsetype ytelsetype) {
         return switch (ytelsetype) {
@@ -35,15 +20,15 @@ public record JournalføringParametre(
                 Fagsaksystem.UNG_SAK,
                 Tema.UNG,
                 Behandlingsnummer.UNGDOMSYTELSEN,
-                BREVKODE_PREFIX + "ungdomsytelsen",
-                "Forhåndsvarsel om ungdomsytelsen");
+                Brevkode.UNGDOMSYTELSE,
+                Journalposttittel.UNGDOMSYTELSE);
 
             case AKTIVITETSPENGER -> new JournalføringParametre(
                 Fagsaksystem.UNG_SAK,
                 Tema.UNG, // TODO: Bytt til riktig tema når det er opprettet.
                 Behandlingsnummer.AKTIVITETSPENGER,
-                BREVKODE_PREFIX + "aktivitetspenger",
-                "Forhåndsvarsel om aktivitetspenger");
+                Brevkode.AKTIVITETSPENGER,
+                Journalposttittel.AKTIVITETSPENGER);
         };
     }
 }
