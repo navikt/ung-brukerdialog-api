@@ -22,11 +22,12 @@ arkiv; denne siden dekker den ferdige løsningen.
 
 ## Når journalføres en oppgave?
 
-**Ved opprettelse** — `OppgaveLivssyklusTjeneste.opprettOppgave(...)` oppretter alltid en
-journalføringsrad, og planlegger journalføringen som en egen `ProsessTask`
-(`JournalførOppgaveTask`) i **samme transaksjon** som oppgaven. Journalposten oppdateres
-**ikke** ved senere statusendring (f.eks. når oppgaven besvares eller utløper) — den beskriver
-alltid oppgaven slik den var ved opprettelse.
+**Ved opprettelse** — `OppgaveLivssyklusTjeneste.opprettOppgave(...)` planlegger journalføringen
+som en egen `ProsessTask` (`JournalførOppgaveTask`) i **samme transaksjon** som oppgaven.
+Journalføringsraden opprettes **ikke** her, men av tasken selv, først når journalføringen
+faktisk lykkes — enten journalfører vi og lagrer en komplett rad, eller det skjer ingenting.
+Journalposten oppdateres heller **ikke** ved senere statusendring (f.eks. når oppgaven besvares
+eller utløper) — den beskriver alltid oppgaven slik den var ved opprettelse.
 
 Journalføringen skjer i en egen task nettopp for at feil i journalføring (Dokarkiv nede, PDL
 nede, o.l.) aldri skal blokkere selve oppgaveopprettelsen eller Min Side-varselet.
@@ -77,16 +78,11 @@ testdekket direkte, klar til å kobles på igjen.
 Journalføring har sitt eget livsløp og ligger i en egen tabell, `BD_OPPGAVE_JOURNALFORING`, med
 FK til `BD_OPPGAVE`. `BD_OPPGAVE` er urørt av journalføring.
 
-```
-PLANLAGT  →  JOURNALFORT
-```
+Raden finnes **hvis og bare hvis** oppgaven faktisk er journalført — det finnes ingen
+mellomtilstand. `journalpost_id` og `journalfort_tid` er derfor påkrevde felter, satt idet raden
+opprettes; de kan aldri stå tomme på en eksisterende rad.
 
-- Raden opprettes **alltid**, uavhengig av om `JournalførOppgaveTask` faktisk kjøres. Det gjør
-  at «hva mangler journalføring?» blir ett spørsmål (`status = 'PLANLAGT'`), uansett om årsaken
-  er at flagget er av, oppgavetypen er deaktivert, eller tasken ikke har kjørt ennå.
-- `journalpost_id` settes kun ved reell suksess fra Dokarkiv, og databasen håndhever
-  `journalpost_id satt ⟺ status = 'JOURNALFORT'` som en check-constraint (defence in depth).
-- `fagsak_id satt ⟺ sakstype = 'FAGSAK'` er også en check-constraint.
+- `fagsak_id satt ⟺ sakstype = 'FAGSAK'` er en check-constraint (defence in depth).
 
 Kode: [`OppgaveJournalføringEntitet`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringEntitet.java),
 [`OppgaveJournalføringRepository`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringRepository.java)
@@ -133,11 +129,11 @@ minne under kallet.
 
 | Situasjon | Oppførsel |
 |---|---|
-| Dokarkiv svarer 409 (journalposten finnes fra før) | Behandles som en gyldig, idempotent respons med eksisterende `journalpostId` (via `DokarkivKlient`), og raden markeres `JOURNALFORT`. |
-| Dokarkiv svarer 5xx | Propagerer, prosesstask retryer (`maxFailedRuns=5, firstDelay=60, thenDelay=300`) |
+| Dokarkiv svarer 409 (journalposten finnes fra før) | Behandles som en gyldig, idempotent respons med eksisterende `journalpostId` (via `DokarkivKlient`), og raden lagres som normalt. |
+| Dokarkiv svarer 5xx | Propagerer, prosesstask retryer (`maxFailedRuns=5, firstDelay=60, thenDelay=300`) - ingen rad lagres før forsøket lykkes |
 | PDL finner ingen folkeregisterident | Tasken feiler med en melding som navngir oppgavereferanse og oppgavetype — **aldri** aktørId eller fødselsnummer |
 | PDL-nedetid | Propagerer, prosesstask retryer |
-| Journalpost opprettet, men ikke ferdigstilt | Logges som `WARN` og telles i egen metrikk — raden markeres likevel `JOURNALFORT` siden journalposten finnes |
+| Journalpost opprettet, men ikke ferdigstilt | Logges som `WARN` — raden lagres likevel siden journalposten finnes |
 
 ## Parametrisering
 
@@ -146,25 +142,11 @@ minne under kallet.
 | `JOURNALFORING_ENABLED` | Boolean | `false` | Global av/på-bryter. `true` i dev-gcp, `false` i prod-gcp inntil flyten er verifisert. |
 | `JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER` | String (kommaseparert) | `""` | Slå av enkelt-oppgavetyper uten ny deploy. Ugyldig oppgavetype feiler ved oppstart. |
 
-Flagget styrer **kun** om `JournalførOppgaveTask` opprettes — journalføringsraden lagres alltid,
-slik at etterslepet forblir komplett og spørrbart uansett konfigurasjon.
+Flagget styrer **kun** om `JournalførOppgaveTask` faktisk journalfører — sjekket av tasken selv
+idet den kjører, ikke ved oppretting. Er flagget av, journalføres ikke oppgaven, og ingen rad
+opprettes.
 
 Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalføringKonfig.java)
-
-## Observabilitet
-
-| Metrikk | Tagger | Formål |
-|---|---|---|
-| `ung_brukerdialog_journalforing_total` | `oppgavetype`, `resultat` (`OK`/`FEILET`/`HOPPET_OVER`) | Volum og feilrate |
-| `ung_brukerdialog_journalforing_ikke_ferdigstilt_total` | `oppgavetype` | Journalpost opprettet, men ikke ferdigstilt |
-| `ung_brukerdialog_journalforing_varighet` | `oppgavetype` | Latens mot Dokarkiv |
-| `ung_brukerdialog_journalforing_etterslep` | – | Gauge: antall rader med `status = 'PLANLAGT'` eldre enn 1 time. Fanger opp både «flagget er av» og «tasken kom aldri i mål». |
-
-Alle metrikker eksponeres på `/internal/metrics/prometheus`. Loggmeldinger inneholder kun
-`oppgavereferanse`, `oppgavetype`, `journalpostId` og `fagsaksystem` — aldri fødselsnummer,
-aktørId eller oppgavedata.
-
-Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalføringMetrikker.java)
 
 ## Kjente begrensninger / åpne punkter
 
@@ -189,7 +171,6 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 | `OppgaveJournalføringEntitet` / `Repository` | `tjeneste` | Datamodell og persistens |
 | `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv |
 | `JournalføringKonfig` | `tjeneste` | Parametrisering (på/av, deny-liste) |
-| `JournalføringMetrikker` | `tjeneste` | Metrikker |
 | `OppgaveDokumentUtleder` (+ typer) | `tjeneste` | Tittel og PDF-innhold per oppgavetype |
 | `DokarkivKlient` (k9-felles) | ekstern avhengighet | HTTP-klient mot Dokarkiv - delt bibliotek fra `k9-dokarkiv-klient`, ikke egenbygd |
 | `PdfGenerator` | `pdf` | Handlebars + openhtmltopdf |

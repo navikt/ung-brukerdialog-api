@@ -14,11 +14,6 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
-import no.nav.ung.brukerdialog.oppgave.journalforing.JournalføringKonfig;
-import no.nav.ung.brukerdialog.oppgave.journalforing.JournalføringParametre;
-import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveJournalføringEntitet;
-import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveJournalføringRepository;
-import no.nav.ung.brukerdialog.oppgave.journalforing.Sakstype;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +35,6 @@ public class OppgaveLivssyklusTjeneste {
 
     private ProsessTaskTjeneste prosessTaskTjeneste;
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
-    private OppgaveJournalføringRepository oppgaveJournalføringRepository;
-    private JournalføringKonfig journalføringKonfig;
     private Instance<OppgavelInnholdUtleder> varselInnholdUtledere;
     private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper;
 
@@ -51,14 +44,10 @@ public class OppgaveLivssyklusTjeneste {
     @Inject
     public OppgaveLivssyklusTjeneste(ProsessTaskTjeneste prosessTaskTjeneste,
                                      BrukerdialogOppgaveRepository brukerdialogOppgaveRepository,
-                                     OppgaveJournalføringRepository oppgaveJournalføringRepository,
-                                     JournalføringKonfig journalføringKonfig,
                                      @Any Instance<OppgavelInnholdUtleder> varselInnholdUtledere,
                                      @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.brukerdialogOppgaveRepository = brukerdialogOppgaveRepository;
-        this.oppgaveJournalføringRepository = oppgaveJournalføringRepository;
-        this.journalføringKonfig = journalføringKonfig;
         this.varselInnholdUtledere = varselInnholdUtledere;
         this.oppgaveDataMapper = oppgaveDataMapper;
     }
@@ -107,8 +96,8 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Persisterer oppgave, oppretter journalføring og publiserer varsel til Min Side - alt i én
-     * transaksjon (transactional outbox): committes sammen, eller ingen av dem.
+     * Persisterer oppgave, oppretter journalføringstask og publiserer varsel til Min Side - alt
+     * i én transaksjon (transactional outbox): committes sammen, eller ingen av dem.
      *
      * @param journalføring Kan være {@code null} - behandles da som om {@code fagsakId} mangler.
      */
@@ -130,7 +119,7 @@ public class OppgaveLivssyklusTjeneste {
         oppgaveEntitet.setOppgaveData(oppgaveData);
         brukerdialogOppgaveRepository.lagre(oppgaveEntitet);
         opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
-        opprettJournalføring(oppgaveEntitet, journalføring);
+        opprettTaskForJournalføringHvisAktuelt(oppgaveEntitet, journalføring);
     }
 
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
@@ -150,36 +139,24 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Raden lagres ALLTID når oppgaven skal journalføres, uavhengig av {@link JournalføringKonfig}
-     * - kun tasken er betinget, slik at etterslepet (rader uten task) blir komplett og spørrbart.
+     * Oppretter {@link JournalførOppgaveTask} ubetinget når oppgaven skal journalføres.
+     * {@code fagsakId} sendes med som en task-property siden den ikke er utledbar fra oppgaven
+     * selv.
      */
-    private void opprettJournalføring(BrukerdialogOppgaveEntitet oppgaveEntitet, JournalføringDto journalføring) {
+    private void opprettTaskForJournalføringHvisAktuelt(BrukerdialogOppgaveEntitet oppgaveEntitet, JournalføringDto journalføring) {
         Saksnummer fagsakId = journalføring != null ? journalføring.fagsakId() : null;
         boolean skalJournalføres = fagsakId != null || UTEN_FAGSAK.contains(oppgaveEntitet.getOppgaveType());
         if (!skalJournalføres) {
-            // fagsakId er foreløpig valgfri - blir en høylytt 400 når valideringen strammes inn.
-            logger.warn("Oppretter ikke journalføring: fagsakId mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
+            logger.warn("Oppretter ikke journalføringstask: fagsakId mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
                 oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
             return;
         }
 
-        JournalføringParametre parametre = JournalføringParametre.utled(oppgaveEntitet.getYtelsetype());
-        Sakstype sakstype = fagsakId != null ? Sakstype.FAGSAK : Sakstype.GENERELL_SAK;
-        OppgaveJournalføringEntitet journalføringEntitet = new OppgaveJournalføringEntitet(
-            oppgaveEntitet, parametre.tema(), parametre.fagsaksystem(), sakstype, fagsakId);
-        oppgaveJournalføringRepository.lagre(journalføringEntitet);
-
-        if (journalføringKonfig.erAktivertFor(oppgaveEntitet.getOppgaveType())) {
-            opprettTaskForJournalføring(oppgaveEntitet);
-        } else {
-            logger.info("Journalføring er ikke aktivert for oppgavetype {} - oppretter ikke JournalførOppgaveTask. oppgaveReferanse={}",
-                oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
-        }
-    }
-
-    private void opprettTaskForJournalføring(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(JournalførOppgaveTask.class);
         prosessTaskData.setProperty(JournalførOppgaveTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
+        if (fagsakId != null) {
+            prosessTaskData.setProperty(JournalførOppgaveTask.FAGSAK_ID, fagsakId.getVerdi());
+        }
         prosessTaskTjeneste.lagre(prosessTaskData);
     }
 

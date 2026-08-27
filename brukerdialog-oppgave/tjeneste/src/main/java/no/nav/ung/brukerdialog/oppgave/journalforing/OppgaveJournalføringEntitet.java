@@ -26,12 +26,13 @@ import java.util.Objects;
 /**
  * Journalføring av en brukerdialogoppgave mot Dokarkiv. Én rad per oppgave.
  * <p>
- * Raden opprettes ALLTID ved oppgaveopprettelse, uavhengig av {@code JournalføringKonfig} - kun
- * den tilhørende {@code JournalførOppgaveTask} er betinget, slik at etterslep blir spørrbart via
- * {@code status = PLANLAGT}.
+ * Raden finnes hvis og bare hvis oppgaven faktisk er journalført - det finnes ingen
+ * mellomtilstand. Enten journalfører {@code JournalførOppgaveTask} og lagrer en komplett rad
+ * (med {@code journalpostId} satt), eller så skjer det ingenting (ingen rad).
  * <p>
- * {@code tema}/{@code fagsaksystem}/{@code sakstype} utledes én gang ved opprettelse og lagres
- * her - et etterrettelig spor, uavhengig av senere endringer i utledningsregelen.
+ * {@code tema}/{@code fagsaksystem}/{@code sakstype} utledes av tasken idet journalføringen
+ * lykkes, og lagres her som et etterrettelig spor - uavhengig av senere endringer i
+ * utledningsregelen.
  */
 @Entity(name = "OppgaveJournalføring")
 @Table(name = "BD_OPPGAVE_JOURNALFORING")
@@ -65,27 +66,29 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "fagsak_id", updatable = false)))
     private Saksnummer fagsakId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private JournalføringStatus status = JournalføringStatus.PLANLAGT;
-
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id")))
+    @AttributeOverrides(@AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id", nullable = false, updatable = false)))
     private JournalpostId journalpostId;
 
-    @Column(name = "journalfort_tid")
+    @Column(name = "journalfort_tid", nullable = false, updatable = false)
     private LocalDateTime journalførtTid;
 
     protected OppgaveJournalføringEntitet() {
         // For JPA
     }
 
-    /** @param fagsakId påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet her og som DB-constraint. */
+    /**
+     * @param fagsakId     påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet
+     *                     her og som DB-constraint.
+     * @param journalpostId journalpost-ID-en Dokarkiv returnerte ved vellykket journalføring -
+     *                      raden skal aldri opprettes før dette er kjent.
+     */
     public OppgaveJournalføringEntitet(BrukerdialogOppgaveEntitet oppgave,
                                         Tema tema,
                                         Fagsaksystem fagsaksystem,
                                         Sakstype sakstype,
-                                        Saksnummer fagsakId) {
+                                        Saksnummer fagsakId,
+                                        JournalpostId journalpostId) {
         this.oppgave = Objects.requireNonNull(oppgave, "oppgave");
         this.tema = Objects.requireNonNull(tema, "tema");
         this.fagsaksystem = Objects.requireNonNull(fagsaksystem, "fagsaksystem");
@@ -97,6 +100,8 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
             throw new IllegalArgumentException("fagsakId skal ikke være satt når sakstype er GENERELL_SAK");
         }
         this.fagsakId = fagsakId;
+        this.journalpostId = Objects.requireNonNull(journalpostId, "journalpostId");
+        this.journalførtTid = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -123,35 +128,11 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
         return fagsakId;
     }
 
-    public JournalføringStatus getStatus() {
-        return status;
-    }
-
     public JournalpostId getJournalpostId() {
         return journalpostId;
     }
 
     public LocalDateTime getJournalførtTid() {
         return journalførtTid;
-    }
-
-    public boolean erJournalført() {
-        return status == JournalføringStatus.JOURNALFORT;
-    }
-
-    /**
-     * Eneste vei til {@code JOURNALFORT}: setter {@code journalpostId} og {@code status} atomisk,
-     * slik at invarianten «journalpost_id satt ⟺ status = JOURNALFORT» (også en DB-constraint)
-     * aldri kan brytes fra applikasjonssiden.
-     */
-    public void markerJournalført(JournalpostId journalpostId) {
-        Objects.requireNonNull(journalpostId, "journalpostId");
-        if (erJournalført()) {
-            throw new IllegalStateException(
-                "Oppgave er allerede journalført med journalpostId " + this.journalpostId);
-        }
-        this.journalpostId = journalpostId;
-        this.status = JournalføringStatus.JOURNALFORT;
-        this.journalførtTid = LocalDateTime.now();
     }
 }

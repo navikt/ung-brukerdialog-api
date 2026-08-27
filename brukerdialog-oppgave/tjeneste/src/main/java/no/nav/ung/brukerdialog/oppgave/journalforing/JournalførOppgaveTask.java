@@ -38,6 +38,7 @@ import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.typer.JournalpostId;
+import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,8 @@ import org.slf4j.LoggerFactory;
  * {@code OppgaveLivssyklusTjeneste} som oppretter tasken - feil her blokkerer aldri
  * oppgaveopprettelsen.
  * <p>
- * {@code maxFailedRuns/firstDelay/thenDelay}: ~21 minutter retry (5 forsøk) før {@code FEILET}.
+ * Journalføringsraden ({@link OppgaveJournalføringEntitet}) finnes hvis og bare hvis
+ * journalføringen faktisk har lykkes.
  */
 @ApplicationScoped
 @ProsessTask(value = JournalførOppgaveTask.TASKTYPE, maxFailedRuns = 5, firstDelay = 60, thenDelay = 300)
@@ -54,6 +56,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "oppgave.journalfor";
     public static final String OPPGAVE_REFERANSE = "oppgaveReferanse";
+    /** Valgfri - satt kun når oppgavetypen krever fagsak og saksbehandlingssystemet har oppgitt den. */
+    public static final String FAGSAK_ID = "fagsakId";
 
     /** Helautomatisk journalføring - ingen saksbehandler er involvert. */
     private static final String JOURNALFOERENDE_ENHET = "9999";
@@ -95,15 +99,9 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         UUID oppgavereferanse = UUID.fromString(prosessTaskData.getPropertyValue(OPPGAVE_REFERANSE));
 
-        OppgaveJournalføringEntitet journalføring = journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)
-            .orElseThrow(() -> new IllegalStateException(
-                "Finner ingen journalføringsrad for oppgavereferanse " + oppgavereferanse));
-
-        // Idempotens: journalpost_id settes kun ved reell suksess, så denne sjekken er trygg
-        // selv om tasken skulle bli kjørt på nytt etter et vellykket forsøk.
-        if (journalføring.erJournalført()) {
+        // Idempotens: raden opprettes kun ved reell suksess, så eksistens alene er nok.
+        if (journalføringRepository.hentForOppgaveReferanse(oppgavereferanse).isPresent()) {
             log.info("Oppgave {} er allerede journalført, hopper over", oppgavereferanse);
-            JournalføringMetrikker.registrer(journalføring.getOppgave().getOppgaveType(), JournalføringMetrikker.Resultat.HOPPET_OVER);
             return;
         }
 
@@ -111,52 +109,50 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .orElseThrow(() -> new IllegalStateException(
                 "Finner ingen oppgave for oppgavereferanse " + oppgavereferanse));
 
-        // Flagget kan ha blitt slått av (globalt eller per oppgavetype) etter at raden ble
-        // opprettet. Raden blir da stående PLANLAGT - det er poenget med at den lagres
-        // uavhengig av flagget.
         if (!journalføringKonfig.erAktivertFor(oppgave.getOppgaveType())) {
-            log.info("Journalføring er deaktivert for oppgavetype {} (oppgaveReferanse={}) - raden forblir PLANLAGT",
+            log.info("Journalføring er deaktivert for oppgavetype {} (oppgaveReferanse={}) - journalfører ikke",
                 oppgave.getOppgaveType(), oppgavereferanse);
-            JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.HOPPET_OVER);
             return;
         }
 
-        var tidtaking = JournalføringMetrikker.startTidtaking();
-        try {
-            PersonInfo person = hentPersonInfo(oppgave);
+        PersonInfo person = hentPersonInfo(oppgave);
 
-            OppgaveDokumentUtleder dokumentUtleder = OppgaveDokumentUtleder.finnUtleder(dokumentUtledere, oppgave.getOppgaveType());
-            String tittel = dokumentUtleder.utledTittel(oppgave);
-            Map<String, Object> oppgaveData = byggOppgaveData(dokumentUtleder, oppgave);
+        OppgaveDokumentUtleder dokumentUtleder = OppgaveDokumentUtleder.finnUtleder(dokumentUtledere, oppgave.getOppgaveType());
+        String dokumentTittel = dokumentUtleder.utledTittel(oppgave);
+        Map<String, Object> oppgaveData = byggOppgaveData(dokumentUtleder, oppgave);
 
-            String opprettetDato = oppgave.getOpprettetTidspunkt().toLocalDate().toString();
-            byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(dokumentUtleder.malnavn(), byggPdfData(tittel, opprettetDato, oppgaveData, person)));
-            byte[] json = tilOriginalJson(oppgaveData);
+        String opprettetDato = oppgave.getOpprettetTidspunkt().toLocalDate().toString();
+        byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(dokumentUtleder.malnavn(), byggPdfData(dokumentTittel, opprettetDato, oppgaveData, person)));
+        byte[] json = tilOriginalJson(oppgaveData);
 
-            OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, journalføring, person, tittel, pdf, json);
+        JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
+        Saksnummer fagsakId = hentFagsakId(prosessTaskData);
+        Sakstype sakstype = fagsakId != null ? Sakstype.FAGSAK : Sakstype.GENERELL_SAK;
 
-            OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
-            journalføring.markerJournalført(new JournalpostId(response.journalpostId()));
-            journalføringRepository.oppdater(journalføring);
-            JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.OK);
-            if (response.journalpostferdigstilt()) {
-                log.info("Journalførte oppgave {} med journalpostId {}", oppgavereferanse, response.journalpostId());
-            } else {
-                JournalføringMetrikker.registrerIkkeFerdigstilt(oppgave.getOppgaveType());
-                log.warn("Journalpost {} for oppgave {} ble opprettet, men ikke ferdigstilt: {}",
-                    response.journalpostId(), oppgavereferanse, response.melding());
-            }
-        } catch (RuntimeException e) {
-            JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.FEILET);
-            throw e;
-        } finally {
-            JournalføringMetrikker.stoppTidtaking(tidtaking, oppgave.getOppgaveType());
+        OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, parametre, sakstype, fagsakId, person, dokumentTittel, pdf, json);
+
+        OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
+
+        OppgaveJournalføringEntitet journalføring = new OppgaveJournalføringEntitet(
+            oppgave, parametre.tema(), parametre.fagsaksystem(), sakstype, fagsakId, new JournalpostId(response.journalpostId()));
+        journalføringRepository.lagre(journalføring);
+
+        if (response.journalpostferdigstilt()) {
+            log.info("Journalførte oppgave {} med journalpostId {}", oppgavereferanse, response.journalpostId());
+        } else {
+            log.warn("Journalpost {} for oppgave {} ble opprettet, men ikke ferdigstilt: {}",
+                response.journalpostId(), oppgavereferanse, response.melding());
         }
     }
 
     @Override
     public Set<String> requiredProperties() {
         return Set.of(OPPGAVE_REFERANSE);
+    }
+
+    private static Saksnummer hentFagsakId(ProsessTaskData prosessTaskData) {
+        String fagsakId = prosessTaskData.getPropertyValue(FAGSAK_ID);
+        return fagsakId != null ? new Saksnummer(fagsakId) : null;
     }
 
     /**
@@ -171,8 +167,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     /**
      * Kun gjeldende {@code FOLKEREGISTERIDENT}, uten historikk - unngår å sende et opphørt
-     * fødselsnummer til arkivet. Et PDL-404 kastes som {@code PdlException} og propagerer til
-     * {@link #doTask} for retry - fanges bevisst ikke her.
+     * fødselsnummer til arkivet.
      */
     private String hentFødselsnummer(BrukerdialogOppgaveEntitet oppgave) {
         return pdl.hentPersonIdentForAktørId(oppgave.getAktørId().getId())
@@ -209,7 +204,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     /**
      * Oppgavetype-spesifikt innhold, utvidet med {@code oppgaveReferanse} - satt sentralt her
-     * for å unngå duplisering i alle åtte {@link OppgaveDokumentUtleder}-implementasjonene.
+     * for å unngå duplisering i alle {@link OppgaveDokumentUtleder}-implementasjonene.
      */
     private Map<String, Object> byggOppgaveData(OppgaveDokumentUtleder utleder, BrukerdialogOppgaveEntitet oppgave) {
         Map<String, Object> data = new LinkedHashMap<>(utleder.utledInnholdsdata(oppgave));
@@ -244,30 +239,26 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * {@code tema}/{@code fagsaksystem}/{@code sakstype}/{@code fagsakId} leses fra den lagrede
-     * journalføringsraden (utledet én gang ved opprettelse) - raden er det etterrettelige sporet
-     * av hva som faktisk ble sendt til arkivet.
-     * <p>
      * Journalpostens tittel ({@link JournalføringParametre#journalposttittel}) er bevisst
      * forskjellig fra {@code dokumentTittel} - journalposten får en generisk per-ytelse-tittel,
      * mens dokumentet beholder sin oppgavetype-spesifikke tittel (samme skille som
      * {@code k9-brukerdialog-prosessering} gjør).
      */
     private OpprettJournalpostRequest byggJournalpostRequest(BrukerdialogOppgaveEntitet oppgave,
-                                                               OppgaveJournalføringEntitet journalføring,
+                                                               JournalføringParametre parametre,
+                                                               Sakstype sakstype,
+                                                               Saksnummer fagsakId,
                                                                PersonInfo person,
                                                                String dokumentTittel,
                                                                byte[] pdf,
                                                                byte[] json) {
-        JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
-
         var bruker = new Bruker(person.fødselsnummer(), Bruker.BrukerIdType.FNR);
         // navn utelates bevisst - Dokarkiv slår selv opp navn i PDL.
         var avsenderMottaker = new OpprettJournalpostRequest.AvsenderMottaker(
             person.fødselsnummer(), null, null, OpprettJournalpostRequest.AvsenderMottaker.IdType.FNR);
 
-        var sak = journalføring.getSakstype() == Sakstype.FAGSAK
-            ? OpprettJournalpostRequest.Sak.forSaksnummer(journalføring.getFagsakId().getVerdi(), journalføring.getFagsaksystem().name())
+        var sak = sakstype == Sakstype.FAGSAK
+            ? OpprettJournalpostRequest.Sak.forSaksnummer(fagsakId.getVerdi(), parametre.fagsaksystem().name())
             : OpprettJournalpostRequest.Sak.GENERELL_FAGSAK;
 
         var dokument = new OpprettJournalpostRequest.Dokument(
@@ -289,7 +280,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .medJournalpostType("UTGAAENDE")
             .medAvsenderMottaker(avsenderMottaker)
             .medBruker(bruker)
-            .medTema(journalføring.getTema().name())
+            .medTema(parametre.tema().name())
             .medTittel(parametre.journalposttittel().getTittel())
             .medJournalfoerendeEnhet(JOURNALFOERENDE_ENHET)
             .medEksternReferanseId(oppgavereferanse)

@@ -29,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Verifiserer at migrerte oppgaver ikke journalføres: migreringen skriver
  * direkte til {@link BrukerdialogOppgaveRepository} og går utenom
- * {@code OppgaveLivssyklusTjeneste}, som er stedet journalføringsraden normalt opprettes fra.
+ * {@code OppgaveLivssyklusTjeneste}, som er stedet {@code JournalførOppgaveTask} normalt
+ * opprettes fra - ingen task betyr ingen journalføringsrad.
  * <p>
  * Tjenesten instansieres direkte (ikke via {@code @Inject}) for å hoppe over
  * {@code @BeskyttetRessurs}/{@code @Transactional}-interceptorene, som krever en full
@@ -81,6 +82,5 @@ class MigrerBrukerdialogOppgaverRestTjenesteTest {
         var lagretOppgave = oppgaveRepository.hentOppgaveForOppgavereferanse(oppgaveReferanse);
         assertThat(lagretOppgave).isPresent();
         assertThat(journalføringRepository.hentForOppgaveReferanse(oppgaveReferanse)).isEmpty();
-        assertThat(journalføringRepository.hentEtterslep()).isEmpty();
     }
 }
