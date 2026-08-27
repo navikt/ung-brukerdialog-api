@@ -114,7 +114,6 @@ public class PdfGenerator {
         return handlebars;
     }
 
-    /** HTML-escaper fritekst fra bruker og gjør om linjeskift til {@code <br/>}. */
     private static void registrerFritekstHelper(Handlebars handlebars) {
         handlebars.registerHelper("fritekst", (Helper<String>) (context, options) -> {
             if (context == null) {
@@ -136,19 +135,16 @@ public class PdfGenerator {
             context == null ? "" : TIDSPUNKT_FORMAT.format(ZonedDateTime.parse(context)));
     }
 
-    /** F.eks. «1. januar 2021» - brevtekst-format, se {@link NorskDatoFormat}. */
     private static void registrerDatoLangHelper(Handlebars handlebars) {
         handlebars.registerHelper("datoLang", (Helper<String>) (context, options) ->
             context == null ? "" : NorskDatoFormat.datoLang(LocalDate.parse(context)));
     }
 
-    /** F.eks. «januar» - se {@link NorskDatoFormat}. */
     private static void registrerMånedHelper(Handlebars handlebars) {
         handlebars.registerHelper("måned", (Helper<String>) (context, options) ->
             context == null ? "" : NorskDatoFormat.måned(LocalDate.parse(context)));
     }
 
-    /** F.eks. «januar 2021» - se {@link NorskDatoFormat}. */
     private static void registrerMånedÅrHelper(Handlebars handlebars) {
         handlebars.registerHelper("månedÅr", (Helper<String>) (context, options) ->
             context == null ? "" : NorskDatoFormat.månedÅr(LocalDate.parse(context)));

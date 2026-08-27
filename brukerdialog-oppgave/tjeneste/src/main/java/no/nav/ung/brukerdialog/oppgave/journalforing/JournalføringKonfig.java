@@ -36,18 +36,16 @@ public class JournalføringKonfig {
     }
 
     /**
-     * {@code true} hvis {@code JOURNALFORING_ENABLED} og oppgavetypen ikke er i
-     * {@code JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER}. Defaulten er bevisst {@code false} - et
-     * manglende/feilstavet {@code JOURNALFORING_ENABLED} skal aldri slå journalføring PÅ i produksjon.
+     * Defaulten er bevisst {@code false} - et manglende/feilstavet {@code JOURNALFORING_ENABLED}
+     * skal aldri slå journalføring PÅ i produksjon.
      */
     public boolean erAktivertFor(OppgaveType oppgaveType) {
         return journalføringEnabled && !deaktiverteOppgavetyper.contains(oppgaveType);
     }
 
     /**
-     * Parser en kommaseparert liste av {@link OppgaveType}-navn. En ukjent verdi feiler ved
-     * oppstart i stedet for å bli stille ignorert - en skrivefeil i deny-lista skal
-     * ikke kunne late som om en oppgavetype er deaktivert når den egentlig ikke er.
+     * En ukjent verdi feiler ved oppstart i stedet for å bli stille ignorert - en skrivefeil i
+     * deny-lista skal ikke kunne late som om en oppgavetype er deaktivert når den egentlig ikke er.
      */
     private static Set<OppgaveType> parseDeaktiverteOppgavetyper(String raw) {
         if (raw == null || raw.isBlank()) {

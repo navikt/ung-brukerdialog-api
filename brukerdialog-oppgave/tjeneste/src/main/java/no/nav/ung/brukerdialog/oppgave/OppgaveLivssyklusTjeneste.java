@@ -96,8 +96,7 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Persisterer oppgave, oppretter journalføringstask og publiserer varsel til Min Side - alt
-     * i én transaksjon (transactional outbox): committes sammen, eller ingen av dem.
+     * Alt skjer i én transaksjon (transactional outbox): committes sammen, eller ingen av dem.
      *
      * @param journalføring Kan være {@code null} - behandles da som om {@code saksnummer} mangler.
      */
@@ -139,7 +138,6 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Oppretter {@link JournalførOppgaveTask} ubetinget når oppgaven skal journalføres.
      * {@code saksnummer} sendes med som en task-property siden den ikke er utledbar fra oppgaven
      * selv.
      */

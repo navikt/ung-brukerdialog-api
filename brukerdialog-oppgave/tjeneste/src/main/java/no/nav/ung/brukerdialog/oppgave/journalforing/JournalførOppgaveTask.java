@@ -187,10 +187,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                     .formatted(oppgave.getOppgavereferanse(), oppgave.getOppgaveType())));
     }
 
-    /**
-     * {@code fornavn mellomnavn etternavn} - IKKE {@code ung-sak}s
-     * {@code PersonBasisTjeneste.mapNavn}-sorteringsformat ({@code etternavn fornavn mellomnavn}).
-     */
     private static String formaterNavn(Navn navn) {
         return Stream.of(navn.getFornavn(), navn.getMellomnavn(), navn.getEtternavn())
             .filter(Objects::nonNull)
@@ -198,8 +194,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Oppgavetype-spesifikt innhold, utvidet med {@code oppgaveReferanse} - satt sentralt her
-     * for å unngå duplisering i alle {@link OppgaveDokumentUtleder}-implementasjonene.
+     * Satt sentralt her for å unngå duplisering i alle {@link OppgaveDokumentUtleder}-implementasjonene.
      */
     private Map<String, Object> byggOppgaveData(OppgaveDokumentUtleder utleder, BrukerdialogOppgaveEntitet oppgave) {
         Map<String, Object> data = new LinkedHashMap<>(utleder.utledInnholdsdata(oppgave));
@@ -258,11 +253,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             null,
             List.of(
                 new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
-                // "ArkivertPDFA" er k9-felles sitt navn på denne recorden, men feltene
-                // (filtype/variantformat/fysiskDokument) er generiske - brukes her til
-                // ORIGINAL/JSON-varianten også, ikke bare PDF/A-arkivvarianten.
-                new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(
-                    OpprettJournalpostRequest.Filtype.JSON, OpprettJournalpostRequest.Variantformat.ORIGINAL, json)
+                dokumentVariantJson(json)
             )
         );
 
@@ -282,8 +273,17 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Fødselsnummer og navn hentet fra PDL for journalføring. Bevisst PII-fri
-     * {@code toString()} - fnr og navn skal aldri havne i logg.
+     * "ArkivertPDFA" er k9-felles sitt navn på denne recorden, men feltene
+     * (filtype/variantformat/fysiskDokument) er generiske - brukes her til ORIGINAL/JSON-
+     * varianten også, ikke bare PDF/A-arkivvarianten.
+     */
+    private static OpprettJournalpostRequest.DokumentVariantArkivertPDFA dokumentVariantJson(byte[] json) {
+        return new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(
+            OpprettJournalpostRequest.Filtype.JSON, OpprettJournalpostRequest.Variantformat.ORIGINAL, json);
+    }
+
+    /**
+     * Bevisst PII-fri {@code toString()} - fnr og navn skal aldri havne i logg.
      */
     private record PersonInfo(String fødselsnummer, String navn) {
         @Override

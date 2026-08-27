@@ -148,10 +148,6 @@ public final class OppgaveDokumentTekster {
         return data;
     }
 
-    /**
-     * Svarfrist vises unntaksløst når satt, uavhengig av oppgavetype - ingen særbehandling per
-     * type.
-     */
     public static void leggTilSvarfrist(Map<String, Object> data, LocalDateTime fristTid) {
         if (fristTid != null) {
             data.put("svarfrist", fristTid.toLocalDate().toString());
