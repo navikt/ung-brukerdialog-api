@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 public enum Journalposttittel {
 
-    UNGDOMSYTELSE("ungdomsytelsen"),
+    UNGDOMSYTELSE("ungdomsprogramytelsen"),
     AKTIVITETSPENGER("aktivitetspenger");
 
     /** Felles prefiks - journalposten er alltid et forhåndsvarsel, uansett ytelse. */
