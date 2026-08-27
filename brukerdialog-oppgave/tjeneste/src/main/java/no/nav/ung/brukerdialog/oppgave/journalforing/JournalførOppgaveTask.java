@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * journalføringen faktisk har lykkes.
  */
 @ApplicationScoped
-@ProsessTask(value = JournalførOppgaveTask.TASKTYPE, maxFailedRuns = 5, firstDelay = 60, thenDelay = 300)
+@ProsessTask(value = JournalførOppgaveTask.TASKTYPE)
 public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "oppgave.journalfor";

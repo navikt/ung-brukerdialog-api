@@ -129,7 +129,7 @@ minne under kallet.
 | Situasjon | Oppførsel |
 |---|---|
 | Dokarkiv svarer 409 (journalposten finnes fra før) | Behandles som en gyldig, idempotent respons med eksisterende `journalpostId` (via `DokarkivKlient`), og raden lagres som normalt. |
-| Dokarkiv svarer 5xx | Propagerer, prosesstask retryer (`maxFailedRuns=5, firstDelay=60, thenDelay=300`) - ingen rad lagres før forsøket lykkes |
+| Dokarkiv svarer 5xx | Propagerer, prosesstask retryer - ingen rad lagres før forsøket lykkes |
 | PDL finner ingen folkeregisterident | Tasken feiler med en melding som navngir oppgavereferanse og oppgavetype — **aldri** aktørId eller fødselsnummer |
 | PDL-nedetid | Propagerer, prosesstask retryer |
 | Journalpost opprettet, men ikke ferdigstilt (f.eks. inaktivt tema i Dokarkiv) | Tasken kaster, prosesstask retryer — raden lagres **ikke** (journalføring anses ikke fullført før den faktisk er ferdigstilt). En retry gjenbruker samme `eksternReferanseId`, så Dokarkiv oppretter ingen duplikat journalpost, kun et nytt forsøk på ferdigstilling |
