@@ -143,16 +143,23 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
 
+        // Journalposten er alltid opprettet i Dokarkiv på dette tidspunktet, men kan ha blitt
+        // stående som MIDLERTIDIG dersom automatisk ferdigstilling feilet (f.eks. inaktivt tema).
+        // Vi lagrer derfor kun raden - og anser oppgaven som journalført - når ferdigstillingen
+        // faktisk lyktes. Ved journalpostferdigstilt=false kaster vi i stedet, slik at tasken kan
+        // kjøres på nytt: en retry gjenbruker samme eksternReferanseId (ingen duplikat opprettes)
+        // og Dokarkiv forsøker ferdigstilling på nytt for den eksisterende journalposten.
+        if (!response.journalpostferdigstilt()) {
+            throw new IllegalStateException(
+                "Journalpost %s for oppgave %s ble opprettet, men ikke ferdigstilt: %s"
+                    .formatted(response.journalpostId(), oppgavereferanse, response.melding()));
+        }
+
         OppgaveJournalføringEntitet journalføring = new OppgaveJournalføringEntitet(
             oppgave, parametre.tema(), parametre.fagsaksystem(), sakstype, saksnummer, new JournalpostId(response.journalpostId()));
         journalføringRepository.lagre(journalføring);
 
-        if (response.journalpostferdigstilt()) {
-            log.info("Journalførte oppgave {} med journalpostId {}", oppgavereferanse, response.journalpostId());
-        } else {
-            log.warn("Journalpost {} for oppgave {} ble opprettet, men ikke ferdigstilt: {}",
-                response.journalpostId(), oppgavereferanse, response.melding());
-        }
+        log.info("Journalførte oppgave {} med journalpostId {}", oppgavereferanse, response.journalpostId());
     }
 
     @Override

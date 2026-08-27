@@ -260,6 +260,31 @@ class JournalførOppgaveTaskTest {
     }
 
     @Test
+    void doTask_ikke_ferdigstilt_skal_kaste_illegalStateException_uten_å_lagre_rad() {
+        // Journalposten ble opprettet i Dokarkiv, men automatisk ferdigstilling feilet (f.eks.
+        // inaktivt tema eller manglende avsenderMottaker.navn). Tasken skal IKKE lagre raden -
+        // den regnes ikke som journalført før den faktisk er ferdigstilt - og skal i stedet
+        // kaste, slik at prosesstask-rammeverket retryer (en retry gjenbruker samme
+        // eksternReferanseId, så Dokarkiv oppretter ikke noen duplikat journalpost, men forsøker
+        // ferdigstilling på nytt).
+        BrukerdialogOppgaveEntitet oppgave = arrangerOppgaveKlarForJournalføring(OppgaveType.SØK_YTELSE);
+        arrangerPersonOgDokumentutleder(oppgave, "Søk ytelse");
+
+        DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
+        dokArkivKlientFake.svarMedOpprettetIkkeFerdigstilt("123456789", "Tema=UNG er ikke gyldig for ferdigstilling");
+        JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
+            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+
+        // Act & assert
+        assertThatThrownBy(() -> taskMedFake.doTask(taskData()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("123456789")
+            .hasMessageContaining(oppgavereferanse.toString())
+            .hasMessageContaining("Tema=UNG er ikke gyldig for ferdigstilling");
+        verify(journalføringRepository, never()).lagre(any());
+    }
+
+    @Test
     void doTask_5xx_skal_propagere_for_at_prosesstask_skal_retrye() {
         // Et transient serverfeil skal IKKE håndteres av tasken selv - unntaket skal propagere
         // slik at prosesstask-rammeverket gjør sitt vanlige retry-forsøk (maxFailedRuns=5,
