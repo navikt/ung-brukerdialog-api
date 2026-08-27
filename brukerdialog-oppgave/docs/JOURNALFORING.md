@@ -133,7 +133,7 @@ minne under kallet.
 
 | Situasjon | Oppførsel |
 |---|---|
-| Dokarkiv svarer 409 (journalposten finnes fra før) | Tasken **feiler** (`JournalføringException`) i stedet for å lagre uten `journalpostId` — journalpostId kan ikke leses fra 409-responsen med dagens `OidcRestClient`. Følges opp manuelt. |
+| Dokarkiv svarer 409 (journalposten finnes fra før) | Behandles som en gyldig, idempotent respons med eksisterende `journalpostId` (via `DokarkivKlient`), og raden markeres `JOURNALFORT`. |
 | Dokarkiv svarer 5xx | Propagerer, prosesstask retryer (`maxFailedRuns=5, firstDelay=60, thenDelay=300`) |
 | PDL finner ingen folkeregisterident | Tasken feiler med en melding som navngir oppgavereferanse og oppgavetype — **aldri** aktørId eller fødselsnummer |
 | PDL-nedetid | Propagerer, prosesstask retryer |
