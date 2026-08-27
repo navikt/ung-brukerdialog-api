@@ -1,6 +1,7 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 import java.io.UncheckedIOException;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,12 @@ import no.nav.k9.felles.integrasjon.pdl.NavnResponseProjection;
 import no.nav.k9.felles.integrasjon.pdl.PdlKlient;
 import no.nav.k9.felles.integrasjon.pdl.Person;
 import no.nav.k9.felles.integrasjon.pdl.PersonResponseProjection;
+import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.JsonObjectMapper;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.pdf.PdfDokument;
 import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -64,11 +67,13 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     private static final String TILLEGGSOPPLYSNING_NOKKEL = "ung.oppgave.eRef";
 
+    private static final Set<OppgaveType> DEAKTIVERTE_OPPGAVETYPER = EnumSet.noneOf(OppgaveType.class);
+
     private static final Logger log = LoggerFactory.getLogger(JournalførOppgaveTask.class);
 
     private OppgaveJournalføringRepository journalføringRepository;
     private BrukerdialogOppgaveRepository oppgaveRepository;
-    private JournalføringKonfig journalføringKonfig;
+    private boolean journalføringEnabled;
     private Instance<OppgaveDokumentUtleder> dokumentUtledere;
     private PdlKlient pdl;
     private PdfGenerator pdfGenerator;
@@ -81,18 +86,23 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     @Inject
     public JournalførOppgaveTask(OppgaveJournalføringRepository journalføringRepository,
                                   BrukerdialogOppgaveRepository oppgaveRepository,
-                                  JournalføringKonfig journalføringKonfig,
+                                  @KonfigVerdi(value = "JOURNALFORING_ENABLED", defaultVerdi = "false")
+                                  boolean journalføringEnabled,
                                   @Any Instance<OppgaveDokumentUtleder> dokumentUtledere,
                                   PdlKlient pdl,
                                   PdfGenerator pdfGenerator,
                                   DokarkivKlient dokarkivKlient) {
         this.journalføringRepository = journalføringRepository;
         this.oppgaveRepository = oppgaveRepository;
-        this.journalføringKonfig = journalføringKonfig;
+        this.journalføringEnabled = journalføringEnabled;
         this.dokumentUtledere = dokumentUtledere;
         this.pdl = pdl;
         this.pdfGenerator = pdfGenerator;
         this.dokarkivKlient = dokarkivKlient;
+    }
+
+    private boolean erAktivertFor(OppgaveType oppgaveType) {
+        return journalføringEnabled && !DEAKTIVERTE_OPPGAVETYPER.contains(oppgaveType);
     }
 
     @Override
@@ -109,7 +119,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .orElseThrow(() -> new IllegalStateException(
                 "Finner ingen oppgave for oppgavereferanse " + oppgavereferanse));
 
-        if (!journalføringKonfig.erAktivertFor(oppgave.getOppgaveType())) {
+        if (!erAktivertFor(oppgave.getOppgaveType())) {
             log.info("Journalføring er deaktivert for oppgavetype {} (oppgaveReferanse={}) - journalfører ikke",
                 oppgave.getOppgaveType(), oppgavereferanse);
             return;

@@ -52,8 +52,6 @@ class JournalførOppgaveTaskTest {
     @Mock
     private BrukerdialogOppgaveRepository oppgaveRepository;
     @Mock
-    private JournalføringKonfig journalføringKonfig;
-    @Mock
     private Instance<OppgaveDokumentUtleder> dokumentUtledere;
     @Mock
     private Instance<OppgaveDokumentUtleder> dokumentUtlederValgt;
@@ -71,7 +69,7 @@ class JournalførOppgaveTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository, journalføringKonfig,
+        task = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository, true,
             dokumentUtledere, pdl, pdfGenerator, dokArkivKlient);
         oppgavereferanse = UUID.randomUUID();
     }
@@ -128,7 +126,6 @@ class JournalførOppgaveTaskTest {
         BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType);
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.empty());
         when(oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)).thenReturn(Optional.of(oppgave));
-        when(journalføringKonfig.erAktivertFor(oppgaveType)).thenReturn(true);
         when(pdl.hentPersonIdentForAktørId(oppgave.getAktørId().getId())).thenReturn(Optional.of("12345678901"));
         return oppgave;
     }
@@ -151,7 +148,7 @@ class JournalførOppgaveTaskTest {
         task.doTask(taskData());
 
         // Assert – ingen videre behandling
-        verifyNoInteractions(oppgaveRepository, journalføringKonfig, pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
+        verifyNoInteractions(oppgaveRepository, pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
         verify(journalføringRepository, never()).lagre(any());
     }
 
@@ -165,19 +162,20 @@ class JournalførOppgaveTaskTest {
         assertThatThrownBy(() -> task.doTask(taskData()))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining(oppgavereferanse.toString());
-        verifyNoInteractions(journalføringKonfig, pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
+        verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
     }
 
     @Test
-    void doTask_deaktivert_for_oppgavetype_skal_hoppe_over_uten_å_lagre_rad() {
-        // Arrange – journalføring er slått av for oppgavetypen
+    void doTask_journalføring_deaktivert_globalt_skal_hoppe_over_uten_å_lagre_rad() {
+        // Arrange – journalføring er slått av globalt (JOURNALFORING_ENABLED=false)
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE);
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.empty());
         when(oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)).thenReturn(Optional.of(oppgave));
-        when(journalføringKonfig.erAktivertFor(OppgaveType.SØK_YTELSE)).thenReturn(false);
+        JournalførOppgaveTask taskDeaktivert = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
+            false, dokumentUtledere, pdl, pdfGenerator, dokArkivKlient);
 
         // Act
-        task.doTask(taskData());
+        taskDeaktivert.doTask(taskData());
 
         // Assert – verken forsøk på journalføring eller lagring
         verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
@@ -197,7 +195,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedOk("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act
         taskMedFake.doTask(taskData());
@@ -222,7 +220,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedOk("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         ProsessTaskData data = taskData();
         data.setProperty(JournalførOppgaveTask.SAKSNUMMER, "ABC123");
@@ -250,7 +248,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedDuplikat("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act
         taskMedFake.doTask(taskData());
@@ -272,7 +270,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedFeil(503);
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act & assert
         assertThatThrownBy(() -> taskMedFake.doTask(taskData()))
@@ -288,7 +286,6 @@ class JournalførOppgaveTaskTest {
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE);
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.empty());
         when(oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)).thenReturn(Optional.of(oppgave));
-        when(journalføringKonfig.erAktivertFor(OppgaveType.SØK_YTELSE)).thenReturn(true);
         when(pdl.hentPersonIdentForAktørId(oppgave.getAktørId().getId())).thenReturn(Optional.empty());
 
         // Act & assert

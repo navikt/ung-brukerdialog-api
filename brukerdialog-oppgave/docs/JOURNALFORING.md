@@ -141,13 +141,13 @@ minne under kallet.
 | Miljøvariabel | Type | Default | Formål |
 |---|---|---|---|
 | `JOURNALFORING_ENABLED` | Boolean | `false` | Global av/på-bryter. `true` i dev-gcp, `false` i prod-gcp inntil flyten er verifisert. |
-| `JOURNALFORING_DEAKTIVERTE_OPPGAVETYPER` | String (kommaseparert) | `""` | Slå av enkelt-oppgavetyper uten ny deploy. Ugyldig oppgavetype feiler ved oppstart. |
 
 Flagget styrer **kun** om `JournalførOppgaveTask` faktisk journalfører — sjekket av tasken selv
 idet den kjører, ikke ved oppretting. Er flagget av, journalføres ikke oppgaven, og ingen rad
-opprettes.
+opprettes. Injisert direkte i `JournalførOppgaveTask` (ingen egen konfigklasse).
 
-Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/JournalføringKonfig.java)
+Enkelt-oppgavetyper kan deaktiveres uavhengig av det globale flagget via en hardkodet
+`Set<OppgaveType>`-konstant (`DEAKTIVERTE_OPPGAVETYPER`) i `JournalførOppgaveTask`.
 
 ## Kjente begrensninger / åpne punkter
 
@@ -170,8 +170,7 @@ Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog
 | `JournalføringParametre` | `tjeneste` | Utleder tema/fagsaksystem/behandlingsnummer fra ytelsetype |
 | `GyldigJournalføringValidator` | `kontrakt` | Validerer `saksnummer` mot oppgavetype — **ikke koblet på** (`@GyldigJournalføring` fjernet fra DTO, se «Kjente begrensninger») |
 | `OppgaveJournalføringEntitet` / `Repository` | `tjeneste` | Datamodell og persistens |
-| `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv |
-| `JournalføringKonfig` | `tjeneste` | Parametrisering (på/av, deny-liste) |
+| `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv, parametrisering (på/av, deny-liste) |
 | `OppgaveDokumentUtleder` (+ typer) | `tjeneste` | Tittel og PDF-innhold per oppgavetype |
 | `DokarkivKlient` (k9-felles) | ekstern avhengighet | HTTP-klient mot Dokarkiv - delt bibliotek fra `k9-dokarkiv-klient`, ikke egenbygd |
 | `PdfGenerator` | `pdf` | Handlebars + openhtmltopdf |
