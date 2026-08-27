@@ -28,8 +28,9 @@ public class OppgaveLivssyklusTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(OppgaveLivssyklusTjeneste.class);
 
     /**
-     * Speiler {@code GyldigJournalføringValidator.UTEN_FAGSAK} i kontrakt-modulen - kan ikke
-     * dele konstanten på tvers av modulgrensen. Hold i sync hvis regelen endres.
+     * Speiler den kommenterte {@code @AssertTrue}-valideringen i {@code OpprettOppgaveDto}
+     * (kontrakt-modulen) - kan ikke dele konstanten på tvers av modulgrensen. Hold i sync hvis
+     * regelen endres.
      */
     private static final Set<OppgaveType> UTEN_FAGSAK = EnumSet.of(OppgaveType.SØK_YTELSE);
 

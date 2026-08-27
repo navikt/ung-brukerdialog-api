@@ -18,10 +18,10 @@ import java.util.UUID;
  * Oppgavetypen bestemmes av {@link OppgavetypeDataDto}-subtypen i {@code oppgavetypeData}.
  * <p>
  * {@code journalføring.saksnummer} håndheves IKKE som påkrevd her ennå - se
- * {@code GyldigJournalføringValidator} og "Kjente begrensninger" i JOURNALFORING.md.
- * {@code @GyldigJournalføring} er midlertidig fjernet: en manglende {@code saksnummer} skal kun gi
- * en {@code WARN}-logg (håndtert i {@code OppgaveLivssyklusTjeneste}), ikke en hard 400, inntil
- * `ung-sak`/nedstrøms konsumenter bekreftet sender feltet i prod. Gjeninnføres da.
+ * "Kjente begrensninger" i JOURNALFORING.md. En manglende {@code saksnummer} gir i mellomtiden
+ * kun en {@code WARN}-logg (håndtert i {@code OppgaveLivssyklusTjeneste}), ikke en hard 400,
+ * inntil `ung-sak`/nedstrøms konsumenter bekreftet sender feltet i prod. Se kommentert
+ * {@code @AssertTrue}-metode under for hvordan dette reaktiveres.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record OpprettOppgaveDto(
@@ -59,5 +59,20 @@ public record OpprettOppgaveDto(
         return aktørId.getId();
     }
 
+    // TODO: Aktiver når `ung-sak`/nedstrøms konsumenter er bekreftet klare til å alltid sende
+    // `saksnummer` i prod (se "Kjente begrensninger" i JOURNALFORING.md). Fjern kommentartegnene
+    // under for å reaktivere håndhevingen som en hard 400-feil i stedet for dagens WARN-logg
+    // (OppgaveLivssyklusTjeneste).
+    //
+    // @AssertTrue(message = "saksnummer er påkrevd for denne oppgavetypen")
+    // private boolean isSaksnummerGyldigForOppgavetype() {
+    //     if (oppgavetypeData == null || oppgavetypeData.oppgavetype() == null) {
+    //         return true;
+    //     }
+    //     if (oppgavetypeData.oppgavetype() == OppgaveType.SØK_YTELSE) {
+    //         return true;
+    //     }
+    //     return journalføring != null && journalføring.saksnummer() != null;
+    // }
 }
 

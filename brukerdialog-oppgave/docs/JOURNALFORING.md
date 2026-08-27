@@ -154,10 +154,10 @@ Enkelt-oppgavetyper kan deaktiveres uavhengig av det globale flagget via en hard
   Dokumentløsninger.
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.
 - **`saksnummer` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak —
-  `@GyldigJournalføring` (som ville håndhevet dette som en 400-feil) er bevisst fjernet fra
-  `OpprettOppgaveDto` inntil `ung-sak`/nedstrøms konsumenter er bekreftet klare til å alltid
-  sende feltet i prod. Manglende verdi gir i mellomtiden kun en `WARN`-logg (se
-  `OppgaveLivssyklusTjeneste`). Annotasjonen gjeninnføres på DTO-en når feltet er i prod.
+  en `@AssertTrue`-validering (som ville håndhevet dette som en 400-feil) ligger kommentert ut i
+  `OpprettOppgaveDto`, klar til å aktiveres når `ung-sak`/nedstrøms konsumenter er bekreftet klare
+  til å alltid sende feltet i prod. Manglende verdi gir i mellomtiden kun en `WARN`-logg (se
+  `OppgaveLivssyklusTjeneste`).
 - **Prod er ikke aktivert ennå** (`JOURNALFORING_ENABLED=false` i `prod-gcp.yml`) — aktiveres når
   flyten er verifisert i dev.
 
@@ -166,7 +166,6 @@ Enkelt-oppgavetyper kan deaktiveres uavhengig av det globale flagget via en hard
 | Klasse | Modul | Ansvar |
 |---|---|---|
 | `JournalføringParametre` | `tjeneste` | Utleder tema/fagsaksystem/behandlingsnummer fra ytelsetype |
-| `GyldigJournalføringValidator` | `kontrakt` | Validerer `saksnummer` mot oppgavetype — **ikke koblet på** (`@GyldigJournalføring` fjernet fra DTO, se «Kjente begrensninger») |
 | `OppgaveJournalføringEntitet` / `Repository` | `tjeneste` | Datamodell og persistens |
 | `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv, parametrisering (på/av, deny-liste) |
 | `OppgaveDokumentUtleder` (+ typer) | `tjeneste` | Tittel og PDF-innhold per oppgavetype |
