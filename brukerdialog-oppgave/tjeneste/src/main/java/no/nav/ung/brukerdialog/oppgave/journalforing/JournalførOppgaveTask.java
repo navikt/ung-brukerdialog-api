@@ -155,12 +155,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         return saksnummer != null ? new Saksnummer(saksnummer) : null;
     }
 
-    /**
-     * Henter fødselsnummer og navn for PDF-en og journalpost-metadataen.
-     * <p>
-     * Fødselsnummeret og navnet lever kun i denne metodens kallstack og i {@link PersonInfo} -
-     * de lagres aldri i databasen, og {@link PersonInfo#toString()} er PII-fri.
-     */
+
     private PersonInfo hentPersonInfo(BrukerdialogOppgaveEntitet oppgave) {
         return new PersonInfo(hentFødselsnummer(oppgave), hentNavn(oppgave));
     }
@@ -212,10 +207,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         return data;
     }
 
-    /**
-     * Fletter tittel, dato, navn/fødselsnummer (PII) og oppgavetype-spesifikt innhold til
-     * datamodellen malen ({@link OppgaveDokumentUtleder#malnavn()}) rendres mot.
-     */
     private Map<String, Object> byggPdfData(String tittel, String opprettetDato, Map<String, Object> oppgaveData, PersonInfo person) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("tittel", tittel);

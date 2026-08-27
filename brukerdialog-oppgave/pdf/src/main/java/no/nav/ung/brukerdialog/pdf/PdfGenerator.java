@@ -68,8 +68,6 @@ public class PdfGenerator {
         try {
             return template.apply(context);
         } catch (IOException e) {
-            // Verken malnavn eller stacktrace inneholder PII - datamodellen (kan inneholde
-            // navn/fnr, se PdfDokument) tas bevisst ikke med i meldingen.
             throw new UncheckedIOException(
                 "Klarte ikke å rendre Handlebars-mal '%s'".formatted(dokument.malnavn()), e);
         }
@@ -97,7 +95,6 @@ public class PdfGenerator {
                 .createPDF();
             return output.toByteArray();
         } catch (IOException e) {
-            // PDF-bytes og HTML-innhold skal aldri med i en exception-melding (kan inneholde PII).
             throw new UncheckedIOException("Klarte ikke å generere PDF", e);
         }
     }

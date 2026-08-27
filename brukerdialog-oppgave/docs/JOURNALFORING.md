@@ -105,8 +105,8 @@ To dokumentvarianter følger med journalposten:
 
 | Variant | Format | Innhold |
 |---|---|---|
-| `ARKIV` | PDF | Brukerrettet dokument, inkluderer brukerens navn og fødselsnummer |
-| `ORIGINAL` | JSON | Maskinlesbar oppgavedata — **ikke** navn/fødselsnummer |
+| `ARKIV` | PDF | Brukerrettet dokument |
+| `ORIGINAL` | JSON | Maskinlesbar oppgavedata |
 
 `OppgaveDokumentUtleder`-implementasjonene skal **aldri** returnere navn eller fødselsnummer —
 personopplysningene legges til av `JournalførOppgaveTask` selv, hentet fra PDL, slik at
