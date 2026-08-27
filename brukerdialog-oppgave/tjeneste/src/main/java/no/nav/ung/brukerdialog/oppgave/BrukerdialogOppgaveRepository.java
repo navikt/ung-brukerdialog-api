@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import no.nav.k9.felles.jpa.HibernateVerktøy;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
@@ -57,7 +58,7 @@ public class BrukerdialogOppgaveRepository {
         );
         query.setParameter("oppgavereferanse", oppgavereferanse);
         query.setParameter("aktørId", aktørId);
-        return query.getResultList().stream().findFirst();
+        return HibernateVerktøy.hentUniktResultat(query);
     }
 
     public List<BrukerdialogOppgaveEntitet> hentOppgaveForType(OppgaveType type, OppgaveStatus status, AktørId aktørId) {
@@ -77,7 +78,7 @@ public class BrukerdialogOppgaveRepository {
             BrukerdialogOppgaveEntitet.class
         );
         query.setParameter("oppgavereferanse", oppgavereferanse);
-        return query.getResultList().stream().findFirst();
+        return HibernateVerktøy.hentUniktResultat(query);
     }
 
     public BrukerdialogOppgaveEntitet endreFrist(UUID oppgaveReferanse, AktørId aktørId, LocalDateTime nyFrist) {

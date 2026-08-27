@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import no.nav.k9.felles.jpa.HibernateVerktøy;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,6 @@ public class OppgaveJournalføringRepository {
             OppgaveJournalføringEntitet.class
         );
         query.setParameter("oppgavereferanse", oppgavereferanse);
-        return query.getResultList().stream().findFirst();
+        return HibernateVerktøy.hentUniktResultat(query);
     }
 }
