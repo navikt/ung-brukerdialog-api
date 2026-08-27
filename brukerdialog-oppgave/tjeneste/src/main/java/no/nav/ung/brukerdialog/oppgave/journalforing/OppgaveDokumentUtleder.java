@@ -13,7 +13,8 @@ import java.util.Map;
  * {@link OppgaveType} koblet via {@link OppgaveTypeRef}.
  * <p>
  * Skal ALDRI returnere navn eller fødselsnummer - kalleren ({@code JournalførOppgaveTask})
- * fletter inn personopplysningene selv, ikke implementasjonene her.
+ * henter og fletter disse inn selv, ikke implementasjonene her. Andre personopplysninger
+ * (datoer, beløp, brukerskrevet fritekst m.m.) kan forekomme og skal aldri logges.
  */
 public interface OppgaveDokumentUtleder {
 
@@ -36,7 +37,8 @@ public interface OppgaveDokumentUtleder {
 
     /**
      * Oppgavetype-spesifikke data til PDF-malen, under nøkkelen {@code "oppgave"}. Skal ALDRI
-     * inneholde navn eller fødselsnummer - se klasse-javadoc.
+     * inneholde navn eller fødselsnummer - se klasse-javadoc. Kan for øvrig inneholde
+     * personopplysninger og skal aldri logges.
      */
     Map<String, Object> utledInnholdsdata(BrukerdialogOppgaveEntitet oppgave);
 }

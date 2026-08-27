@@ -109,8 +109,9 @@ To dokumentvarianter følger med journalposten:
 | `ORIGINAL` | JSON | Maskinlesbar oppgavedata |
 
 `OppgaveDokumentUtleder`-implementasjonene skal **aldri** returnere navn eller fødselsnummer —
-personopplysningene legges til av `JournalførOppgaveTask` selv, hentet fra PDL, slik at
-implementasjonene forblir testbare uten ekte fødselsnumre.
+disse hentes fra PDL og flettes inn av `JournalførOppgaveTask` selv, slik at implementasjonene
+forblir testbare uten ekte fødselsnumre. Annet innhold (datoer, beløp, brukerskrevet fritekst
+m.m.) kan likevel være personopplysninger og skal aldri logges.
 
 Kode: [`OppgaveDokumentUtleder`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveDokumentUtleder.java),
 [`PdfGenerator`](../pdf/src/main/java/no/nav/ung/brukerdialog/pdf/PdfGenerator.java)

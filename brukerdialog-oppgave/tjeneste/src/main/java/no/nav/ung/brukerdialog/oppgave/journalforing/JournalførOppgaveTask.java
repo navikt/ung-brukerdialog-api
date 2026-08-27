@@ -213,7 +213,8 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * {@code ORIGINAL}-varianten skal inneholde oppgavedata, ikke navn/fnr.
+     * {@code oppgaveData} inneholder aldri navn/fødselsnummer, men kan inneholde andre
+     * personopplysninger (datoer, beløp, brukerskrevet fritekst m.m.) - skal aldri logges.
      */
     private byte[] tilOriginalJson(Map<String, Object> oppgaveData) {
         try {
