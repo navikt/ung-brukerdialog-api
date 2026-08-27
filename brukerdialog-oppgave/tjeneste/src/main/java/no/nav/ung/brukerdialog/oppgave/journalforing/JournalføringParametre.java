@@ -19,7 +19,7 @@ public record JournalføringParametre(
             case UNGDOMSYTELSE -> new JournalføringParametre(
                 Fagsaksystem.UNG_SAK,
                 Tema.UNG,
-                Behandlingsnummer.UNGDOMSYTELSEN,
+                Behandlingsnummer.UNGDOMSPROGRAMYTELSEN,
                 Brevkode.UNGDOMSYTELSE,
                 Journalposttittel.UNGDOMSYTELSE);
 

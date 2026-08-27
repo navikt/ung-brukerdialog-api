@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 import jakarta.enterprise.inject.Instance;
 import no.nav.k9.felles.integrasjon.pdl.Navn;
-import no.nav.k9.felles.integrasjon.pdl.Pdl;
+import no.nav.k9.felles.integrasjon.pdl.PdlKlient;
 import no.nav.k9.felles.integrasjon.pdl.PdlException;
 import no.nav.k9.felles.integrasjon.pdl.Person;
 import no.nav.k9.felles.log.metrics.MetricsUtil;
@@ -39,8 +39,8 @@ import static org.mockito.Mockito.*;
  * Dekker {@link JournalførOppgaveTask} fullt ut, inkludert veiene gjennom {@code hentPersonInfo}.
  * <p>
  * OK/409/5xx-testene bruker {@link DokArkivKlientFake} for å styre dokarkiv-svaret uten en ekte
- * HTTP-server (409 skal feile, ikke lagre uten journalpostId). PDL-hullene - person uten
- * folkeregisterident, og PdlException ved navneoppslag - er dekket separat.
+ * HTTP-server (409 markeres journalført med samme journalpostId, som en vanlig 201). PDL-hullene -
+ * person uten folkeregisterident, og PdlException ved navneoppslag - er dekket separat.
  */
 @ExtendWith(MockitoExtension.class)
 class JournalførOppgaveTaskTest {
@@ -58,7 +58,7 @@ class JournalførOppgaveTaskTest {
     @Mock
     private OppgaveDokumentUtleder dokumentUtleder;
     @Mock
-    private Pdl pdl;
+    private PdlKlient pdl;
     @Mock
     private PdfGenerator pdfGenerator;
     @Mock
@@ -239,10 +239,11 @@ class JournalførOppgaveTaskTest {
     }
 
     @Test
-    void doTask_409_skal_kaste_journalforingException_og_ikke_lagre_journalpostId() {
-        // Journalposten finnes allerede i arkivet, men journalpostId kan ikke leses fra
-        // 409-responsen med dagens OidcRestClient. Vi lagrer aldri en journalført rad uten
-        // journalpostId - tasken skal derfor feile, ikke hoppe stille over.
+    void doTask_409_skal_markere_journalfort_med_eksisterende_journalpostId() {
+        // Journalposten finnes allerede i arkivet fra et tidligere (delvis fullført) forsøk.
+        // Siden k9-felles 12.1.0 behandler DokarkivKlient et 409-svar som en gyldig respons med
+        // journalpostId - tasken skal derfor markere oppgaven som journalført, akkurat som ved
+        // en vanlig 201, ikke feile.
         OppgaveJournalføringEntitet journalføring = planlagtJournalføring(OppgaveType.SØK_YTELSE);
         BrukerdialogOppgaveEntitet oppgave = journalføring.getOppgave();
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.of(journalføring));
@@ -252,16 +253,17 @@ class JournalførOppgaveTaskTest {
         arrangerPersonOgDokumentutleder(oppgave, "Søk ytelse");
 
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
-        dokArkivKlientFake.svarMed409();
+        dokArkivKlientFake.svarMedDuplikat("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
             journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
-        // Act & assert
-        assertThatThrownBy(() -> taskMedFake.doTask(taskData()))
-            .isInstanceOf(JournalføringException.class)
-            .hasMessageContaining(oppgavereferanse.toString());
-        assertThat(journalføring.erJournalført()).isFalse();
-        verify(journalføringRepository, never()).oppdater(any());
+        // Act
+        taskMedFake.doTask(taskData());
+
+        // Assert
+        assertThat(journalføring.erJournalført()).isTrue();
+        assertThat(journalføring.getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
+        verify(journalføringRepository).oppdater(journalføring);
     }
 
     @Test

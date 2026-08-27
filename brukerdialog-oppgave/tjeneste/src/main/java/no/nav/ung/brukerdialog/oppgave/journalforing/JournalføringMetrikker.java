@@ -36,8 +36,6 @@ public final class JournalføringMetrikker {
     enum Resultat {
         /** Journalpost opprettet (og eventuelt ferdigstilt - se {@link #registrerIkkeFerdigstilt}). */
         OK,
-        /** 409 fra Dokarkiv - journalposten finnes, men journalpostId kunne ikke leses. */
-        DUPLIKAT_UTEN_ID,
         /** Uventet feil under forsøket (PDL, PDF-generering, dokarkiv-kallet e.l.). */
         FEILET,
         /** Tasken avsluttet uten forsøk på journalføring (idempotent eller deaktivert type). */

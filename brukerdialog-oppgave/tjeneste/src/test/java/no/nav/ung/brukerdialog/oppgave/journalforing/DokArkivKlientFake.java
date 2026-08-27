@@ -51,14 +51,11 @@ public class DokArkivKlientFake implements DokarkivKlient {
     }
 
     /**
-     * Simulerer 409 (duplikat på {@code eksternReferanseId}).
-     * Responsbody kan i praksis ikke leses av dagens {@code OidcRestClient} - faken kaster derfor
-     * samme eksakte unntakstype som produksjonskoden må håndtere, uten body.
+     * Simulerer 409 (duplikat på {@code eksternReferanseId}) - behandles som en gyldig respons av {@code DokarkivKlient} selv, med samme
+     * {@code journalpostId} som ved den opprinnelige (nå duplisert) opprettelsen.
      */
-    public void svarMed409() {
-        svarfunksjon = req -> {
-            throw new HttpStatuskodeException("409", "Conflict", 409);
-        };
+    public void svarMedDuplikat(String eksisterendeJournalpostId) {
+        svarfunksjon = req -> new OpprettJournalpostResponse(eksisterendeJournalpostId, List.of(), true, null);
     }
 
     /** Simulerer et transient serverfeil (5xx) - skal propagere slik at prosesstasken retryer. */

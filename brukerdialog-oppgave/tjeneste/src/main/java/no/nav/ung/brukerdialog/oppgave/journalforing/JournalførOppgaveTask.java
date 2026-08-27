@@ -17,7 +17,6 @@ import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
-import no.nav.k9.felles.exception.HttpStatuskodeException;
 import no.nav.k9.felles.integrasjon.dokarkiv.DokarkivKlient;
 import no.nav.k9.felles.integrasjon.dokarkiv.dto.Bruker;
 import no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
@@ -27,7 +26,7 @@ import no.nav.k9.felles.integrasjon.pdl.Behandlingsnummer;
 import no.nav.k9.felles.integrasjon.pdl.HentPersonQueryRequest;
 import no.nav.k9.felles.integrasjon.pdl.Navn;
 import no.nav.k9.felles.integrasjon.pdl.NavnResponseProjection;
-import no.nav.k9.felles.integrasjon.pdl.Pdl;
+import no.nav.k9.felles.integrasjon.pdl.PdlKlient;
 import no.nav.k9.felles.integrasjon.pdl.Person;
 import no.nav.k9.felles.integrasjon.pdl.PersonResponseProjection;
 import no.nav.k9.prosesstask.api.ProsessTask;
@@ -67,7 +66,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private BrukerdialogOppgaveRepository oppgaveRepository;
     private JournalføringKonfig journalføringKonfig;
     private Instance<OppgaveDokumentUtleder> dokumentUtledere;
-    private Pdl pdl;
+    private PdlKlient pdl;
     private PdfGenerator pdfGenerator;
     private DokarkivKlient dokarkivKlient;
 
@@ -80,7 +79,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                                   BrukerdialogOppgaveRepository oppgaveRepository,
                                   JournalføringKonfig journalføringKonfig,
                                   @Any Instance<OppgaveDokumentUtleder> dokumentUtledere,
-                                  Pdl pdl,
+                                  PdlKlient pdl,
                                   PdfGenerator pdfGenerator,
                                   DokarkivKlient dokarkivKlient) {
         this.journalføringRepository = journalføringRepository;
@@ -147,20 +146,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                 log.warn("Journalpost {} for oppgave {} ble opprettet, men ikke ferdigstilt: {}",
                     response.journalpostId(), oppgavereferanse, response.melding());
             }
-        } catch (HttpStatuskodeException e) {
-            if (e.getHttpStatuskode() == 409) {
-                // Journalposten finnes allerede for denne eksternReferanseId, men journalpostId
-                // kan ikke leses fra responsbody med dagens OidcRestClient (k9-felles 11.2.13).
-                // Vi lagrer aldri en journalført rad uten journalpostId - tasken feiler i stedet
-                // og følges opp manuelt.
-                // TODO: fjern denne grenen når k9-felles eksponerer responsbody ved feilstatus.
-                JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.DUPLIKAT_UTEN_ID);
-                throw new JournalføringException(
-                    "Journalpost finnes allerede for oppgavereferanse %s, men journalpostId kunne ikke leses (HTTP 409)"
-                        .formatted(oppgavereferanse), e);
-            }
-            JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.FEILET);
-            throw e;
         } catch (RuntimeException e) {
             JournalføringMetrikker.registrer(oppgave.getOppgaveType(), JournalføringMetrikker.Resultat.FEILET);
             throw e;

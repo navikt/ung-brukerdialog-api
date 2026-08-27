@@ -22,7 +22,7 @@ class JournalføringParametreTest {
         assertThat(parametre.fagsaksystem()).isEqualTo(Fagsaksystem.UNG_SAK);
         assertThat(parametre.tema()).isEqualTo(Tema.UNG);
         assertThat(parametre.behandlingsnummer()).isEqualTo(switch (ytelsetype) {
-            case UNGDOMSYTELSE -> Behandlingsnummer.UNGDOMSYTELSEN;
+            case UNGDOMSYTELSE -> Behandlingsnummer.UNGDOMSPROGRAMYTELSEN;
             case AKTIVITETSPENGER -> Behandlingsnummer.AKTIVITETSPENGER;
         });
     }
