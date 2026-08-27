@@ -17,6 +17,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
+import com.openhtmltopdf.pdfboxout.PdfBoxRenderer;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.util.XRLog;
@@ -79,17 +80,16 @@ public class PdfGenerator {
     }
 
     private byte[] tilPdf(String html) {
-        try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            new PdfRendererBuilder()
-                .useFastMode()
-                .usePdfUaAccessibility(true)
-                .withHtmlContent(html, "")
-                .useFont(() -> new ByteArrayInputStream(REGULAR_FONT), FONTNAVN, 400, BaseRendererBuilder.FontStyle.NORMAL, false)
-                .useFont(() -> new ByteArrayInputStream(BOLD_FONT), FONTNAVN, 700, BaseRendererBuilder.FontStyle.NORMAL, false)
-                .useFont(() -> new ByteArrayInputStream(ITALIC_FONT), FONTNAVN, 400, BaseRendererBuilder.FontStyle.ITALIC, false)
-                .toStream(output)
-                .buildPdfRenderer()
-                .createPDF();
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             PdfBoxRenderer renderer = new PdfRendererBuilder()
+                 .usePdfUaAccessibility(true)
+                 .withHtmlContent(html, "")
+                 .useFont(() -> new ByteArrayInputStream(REGULAR_FONT), FONTNAVN, 400, BaseRendererBuilder.FontStyle.NORMAL, false)
+                 .useFont(() -> new ByteArrayInputStream(BOLD_FONT), FONTNAVN, 700, BaseRendererBuilder.FontStyle.NORMAL, false)
+                 .useFont(() -> new ByteArrayInputStream(ITALIC_FONT), FONTNAVN, 400, BaseRendererBuilder.FontStyle.ITALIC, false)
+                 .toStream(output)
+                 .buildPdfRenderer()) {
+            renderer.createPDF();
             return output.toByteArray();
         } catch (IOException e) {
             throw new UncheckedIOException("Klarte ikke å generere PDF", e);
