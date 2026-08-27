@@ -155,7 +155,7 @@ Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog
 
 | Metrikk | Tagger | Formål |
 |---|---|---|
-| `ung_brukerdialog_journalforing_total` | `oppgavetype`, `resultat` (`OK`/`DUPLIKAT_UTEN_ID`/`FEILET`/`HOPPET_OVER`) | Volum og feilrate |
+| `ung_brukerdialog_journalforing_total` | `oppgavetype`, `resultat` (`OK`/`FEILET`/`HOPPET_OVER`) | Volum og feilrate |
 | `ung_brukerdialog_journalforing_ikke_ferdigstilt_total` | `oppgavetype` | Journalpost opprettet, men ikke ferdigstilt |
 | `ung_brukerdialog_journalforing_varighet` | `oppgavetype` | Latens mot Dokarkiv |
 | `ung_brukerdialog_journalforing_etterslep` | – | Gauge: antall rader med `status = 'PLANLAGT'` eldre enn 1 time. Fanger opp både «flagget er av» og «tasken kom aldri i mål». |
