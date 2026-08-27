@@ -151,7 +151,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         }
 
         OppgaveJournalføringEntitet journalføring = new OppgaveJournalføringEntitet(
-            oppgave, parametre.tema(), parametre.fagsaksystem(), saksnummer, new JournalpostId(response.journalpostId()));
+            oppgave, parametre.fagsaksystem(), saksnummer, new JournalpostId(response.journalpostId()));
         journalføringRepository.lagre(journalføring);
 
         log.info("Journalførte oppgave {} med journalpostId {}", oppgavereferanse, response.journalpostId());

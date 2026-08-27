@@ -30,7 +30,7 @@ import java.util.Objects;
  * mellomtilstand. Enten journalfører {@code JournalførOppgaveTask} og lagrer en komplett rad
  * (med {@code journalpostId} satt), eller så skjer det ingenting (ingen rad).
  * <p>
- * {@code tema}/{@code fagsaksystem} utledes av tasken idet journalføringen lykkes, og lagres her
+ * {@code fagsaksystem} utledes av tasken idet journalføringen lykkes, og lagres her
  * som et etterrettelig spor - uavhengig av senere endringer i utledningsregelen.
  */
 @Entity(name = "OppgaveJournalføring")
@@ -48,10 +48,6 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "bd_oppgave_id", nullable = false, updatable = false)
     private BrukerdialogOppgaveEntitet oppgave;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tema", nullable = false, updatable = false)
-    private Tema tema;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fagsaksystem", nullable = false, updatable = false)
@@ -78,12 +74,10 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
      *                      raden skal aldri opprettes før dette er kjent.
      */
     public OppgaveJournalføringEntitet(BrukerdialogOppgaveEntitet oppgave,
-                                        Tema tema,
                                         Fagsaksystem fagsaksystem,
                                         Saksnummer saksnummer,
                                         JournalpostId journalpostId) {
         this.oppgave = Objects.requireNonNull(oppgave, "oppgave");
-        this.tema = Objects.requireNonNull(tema, "tema");
         this.fagsaksystem = Objects.requireNonNull(fagsaksystem, "fagsaksystem");
         this.saksnummer = saksnummer;
         this.journalpostId = Objects.requireNonNull(journalpostId, "journalpostId");
@@ -96,10 +90,6 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
 
     public BrukerdialogOppgaveEntitet getOppgave() {
         return oppgave;
-    }
-
-    public Tema getTema() {
-        return tema;
     }
 
     public Fagsaksystem getFagsaksystem() {

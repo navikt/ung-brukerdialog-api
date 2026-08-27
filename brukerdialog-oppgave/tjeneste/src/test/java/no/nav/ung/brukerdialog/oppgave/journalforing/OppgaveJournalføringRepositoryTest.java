@@ -56,7 +56,7 @@ class OppgaveJournalføringRepositoryTest {
     void skal_persistere_og_hente_journalføring_for_oppgave() {
         // Arrange
         var journalføring = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, new Saksnummer("ABC123"),
+            oppgave, Fagsaksystem.UNG_SAK, new Saksnummer("ABC123"),
             new JournalpostId("123456789"));
 
         // Act
@@ -67,7 +67,6 @@ class OppgaveJournalføringRepositoryTest {
         // Assert
         var hentet = repository.hentForOppgaveReferanse(oppgave.getOppgavereferanse());
         assertThat(hentet).isPresent();
-        assertThat(hentet.get().getTema()).isEqualTo(Tema.UNG);
         assertThat(hentet.get().getFagsaksystem()).isEqualTo(Fagsaksystem.UNG_SAK);
         assertThat(hentet.get().getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
         assertThat(hentet.get().getJournalpostId()).isEqualTo(new JournalpostId("123456789"));

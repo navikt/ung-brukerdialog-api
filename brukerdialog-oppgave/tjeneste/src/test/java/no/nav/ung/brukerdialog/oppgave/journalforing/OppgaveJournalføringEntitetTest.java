@@ -26,7 +26,7 @@ class OppgaveJournalføringEntitetTest {
     @Test
     void skal_opprette_med_fagsak_når_saksnummer_er_satt() {
         var journalføring = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, new Saksnummer("ABC123"),
+            oppgave, Fagsaksystem.UNG_SAK, new Saksnummer("ABC123"),
             new JournalpostId("123456789"));
 
         assertThat(journalføring.getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
@@ -37,7 +37,7 @@ class OppgaveJournalføringEntitetTest {
     @Test
     void skal_opprette_uten_fagsak_når_saksnummer_er_null() {
         var journalføring = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null,
+            oppgave, Fagsaksystem.UNG_SAK, null,
             new JournalpostId("123456789"));
 
         assertThat(journalføring.getSaksnummer()).isNull();
@@ -46,7 +46,7 @@ class OppgaveJournalføringEntitetTest {
     @Test
     void skal_feile_når_journalpostId_mangler() {
         assertThatThrownBy(() -> new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null, null))
+            oppgave, Fagsaksystem.UNG_SAK, null, null))
             .isInstanceOf(NullPointerException.class)
             .hasMessageContaining("journalpostId");
     }

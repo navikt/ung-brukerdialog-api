@@ -140,7 +140,7 @@ class JournalførOppgaveTaskTest {
         // Arrange – raden finnes allerede fra et tidligere, vellykket forsøk.
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE);
         OppgaveJournalføringEntitet eksisterende = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null,
+            oppgave, Fagsaksystem.UNG_SAK, null,
             new JournalpostId("123456789"));
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.of(eksisterende));
 
