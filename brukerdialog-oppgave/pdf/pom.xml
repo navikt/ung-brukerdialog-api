@@ -13,10 +13,6 @@
     <packaging>jar</packaging>
     <name>UNGSAK :: Brukerdialog oppgave - PDF</name>
 
-    <!--
-        Kjenner bevisst ikke til brukerdialog-oppgave-tjeneste - unngår en modulsyklus
-        siden tjeneste (JournalførOppgaveTask) er den som bruker denne modulen.
-    -->
     <dependencies>
         <!--
             PdfGenerator er en @ApplicationScoped CDI-bean - denne gir jakarta.enterprise.cdi-api
