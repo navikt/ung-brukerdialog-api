@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Krever {@code journalføring.fagsakId} når oppgavetypen ikke er unntatt - se
+ * Krever {@code journalføring.saksnummer} når oppgavetypen ikke er unntatt - se
  * {@link GyldigJournalføringValidator#UTEN_FAGSAK}.
  */
 @Documented
@@ -20,7 +20,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface GyldigJournalføring {
 
-    String message() default "fagsakId er påkrevd for denne oppgavetypen";
+    String message() default "saksnummer er påkrevd for denne oppgavetypen";
 
     Class<?>[] groups() default {};
 

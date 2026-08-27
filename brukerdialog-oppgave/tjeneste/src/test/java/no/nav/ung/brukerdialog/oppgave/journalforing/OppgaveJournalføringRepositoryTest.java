@@ -74,7 +74,7 @@ class OppgaveJournalføringRepositoryTest {
         assertThat(hentet.get().getTema()).isEqualTo(Tema.UNG);
         assertThat(hentet.get().getFagsaksystem()).isEqualTo(Fagsaksystem.UNG_SAK);
         assertThat(hentet.get().getSakstype()).isEqualTo(Sakstype.FAGSAK);
-        assertThat(hentet.get().getFagsakId()).isEqualTo(new Saksnummer("ABC123"));
+        assertThat(hentet.get().getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
         assertThat(hentet.get().getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
     }
 
@@ -84,7 +84,7 @@ class OppgaveJournalføringRepositoryTest {
     }
 
     @Test
-    void db_constraint_avviser_fagsak_uten_fagsak_id() {
+    void db_constraint_avviser_fagsak_uten_saksnummer() {
         assertThatThrownBy(() -> settInnRadDirekte(
             "'UNG', 'UNG_SAK', 'FAGSAK', null, '123456789'"))
             .isInstanceOf(PersistenceException.class)
@@ -95,12 +95,12 @@ class OppgaveJournalføringRepositoryTest {
      * Setter inn en rad med rå SQL, forbi entitetens egne invarianter, for å verifisere at
      * DB-constrainten alene (defence in depth) avviser en ugyldig kombinasjon selv om
      * tjenestelaget skulle ha en bug. {@code kolonneverdier} er
-     * {@code tema, fagsaksystem, sakstype, fagsak_id, journalpost_id} i rekkefølge.
+     * {@code tema, fagsaksystem, sakstype, saksnummer, journalpost_id} i rekkefølge.
      */
     private void settInnRadDirekte(String kolonneverdier) {
         entityManager.createNativeQuery(
                 "insert into BD_OPPGAVE_JOURNALFORING " +
-                    "(id, bd_oppgave_id, tema, fagsaksystem, sakstype, fagsak_id, journalpost_id, journalfort_tid) " +
+                    "(id, bd_oppgave_id, tema, fagsaksystem, sakstype, saksnummer, journalpost_id, journalfort_tid) " +
                     "values (nextval('SEQ_BD_OPPGAVE_JOURNALFORING'), " +
                     "(select id from BD_OPPGAVE where oppgavereferanse = :oppgavereferanse), " +
                     kolonneverdier + ", current_timestamp)")

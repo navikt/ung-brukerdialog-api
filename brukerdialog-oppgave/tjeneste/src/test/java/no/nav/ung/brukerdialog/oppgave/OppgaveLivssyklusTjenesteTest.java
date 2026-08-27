@@ -84,10 +84,10 @@ class OppgaveLivssyklusTjenesteTest {
     }
 
     @Test
-    void opprettOppgave_uten_fagsakId_for_type_som_krever_fagsak_skal_ikke_opprette_journalførOppgaveTask() {
+    void opprettOppgave_uten_saksnummer_for_type_som_krever_fagsak_skal_ikke_opprette_journalførOppgaveTask() {
         // Arrange – BEKREFT_BOSTED krever fagsak (er ikke i UTEN_FAGSAK), og ingen
         // journalføring-blokk sendes inn. Speiler dagens virkelighet: ung-sak sender ennå ikke
-        // fagsakId.
+        // saksnummer.
         BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(), OppgaveType.BEKREFT_BOSTED, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
@@ -99,7 +99,7 @@ class OppgaveLivssyklusTjenesteTest {
 
         // Assert – oppgaven og Min Side-varselet opprettes som normalt …
         verify(brukerdialogOppgaveRepository).lagre(oppgave);
-        // … men KUN Min Side-tasken - ingen JournalførOppgaveTask, siden fagsakId mangler for
+        // … men KUN Min Side-tasken - ingen JournalførOppgaveTask, siden saksnummer mangler for
         // en type som krever fagsak. Dette logges som WARN, ikke 400.
         verify(prosessTaskTjeneste, times(1)).lagre(any(ProsessTaskData.class));
     }
@@ -110,8 +110,8 @@ class OppgaveLivssyklusTjenesteTest {
     // ------------------------------------------------------------------------------------------
 
     @Test
-    void opprettOppgave_søkYtelse_uten_fagsakId_skal_opprette_journalførOppgaveTask_uten_fagsakId() {
-        // Arrange – SØK_YTELSE er i UTEN_FAGSAK og skal derfor journalføres selv uten fagsakId.
+    void opprettOppgave_søkYtelse_uten_saksnummer_skal_opprette_journalførOppgaveTask_uten_saksnummer() {
+        // Arrange – SØK_YTELSE er i UTEN_FAGSAK og skal derfor journalføres selv uten saksnummer.
         BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(), OppgaveType.SØK_YTELSE, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
@@ -127,27 +127,27 @@ class OppgaveLivssyklusTjenesteTest {
         ProsessTaskData journalføringTask = journalføringTask(captor.getAllValues());
         assertThat(journalføringTask.getPropertyValue(JournalførOppgaveTask.OPPGAVE_REFERANSE))
             .isEqualTo(oppgave.getOppgavereferanse().toString());
-        assertThat(journalføringTask.getPropertyValue(JournalførOppgaveTask.FAGSAK_ID)).isNull();
+        assertThat(journalføringTask.getPropertyValue(JournalførOppgaveTask.SAKSNUMMER)).isNull();
     }
 
     @Test
-    void opprettOppgave_med_fagsakId_skal_opprette_journalførOppgaveTask_med_fagsakId() {
-        // Arrange – BEKREFT_BOSTED krever fagsak, og fagsakId er satt (som når ung-sak sender
-        // fagsakId for oppgavetyper som krever det).
+    void opprettOppgave_med_saksnummer_skal_opprette_journalførOppgaveTask_med_saksnummer() {
+        // Arrange – BEKREFT_BOSTED krever fagsak, og saksnummer er satt (som når ung-sak sender
+        // saksnummer for oppgavetyper som krever det).
         BrukerdialogOppgaveEntitet oppgave = new BrukerdialogOppgaveEntitet(
             UUID.randomUUID(), OppgaveType.BEKREFT_BOSTED, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
         var oppgavetypeData = new BekreftBostedOppgavetypeDataDto(
             LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null);
-        var fagsakId = new Saksnummer("ABC123");
+        var saksnummer = new Saksnummer("ABC123");
 
         // Act
-        tjeneste.opprettOppgave(oppgave, oppgavetypeData, new JournalføringDto(fagsakId));
+        tjeneste.opprettOppgave(oppgave, oppgavetypeData, new JournalføringDto(saksnummer));
 
         // Assert
         ArgumentCaptor<ProsessTaskData> captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(prosessTaskTjeneste, times(2)).lagre(captor.capture());
         ProsessTaskData journalføringTask = journalføringTask(captor.getAllValues());
-        assertThat(journalføringTask.getPropertyValue(JournalførOppgaveTask.FAGSAK_ID)).isEqualTo("ABC123");
+        assertThat(journalføringTask.getPropertyValue(JournalførOppgaveTask.SAKSNUMMER)).isEqualTo("ABC123");
     }
 }

@@ -57,7 +57,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "oppgave.journalfor";
     public static final String OPPGAVE_REFERANSE = "oppgaveReferanse";
     /** Valgfri - satt kun når oppgavetypen krever fagsak og saksbehandlingssystemet har oppgitt den. */
-    public static final String FAGSAK_ID = "fagsakId";
+    public static final String SAKSNUMMER = "saksnummer";
 
     /** Helautomatisk journalføring - ingen saksbehandler er involvert. */
     private static final String JOURNALFOERENDE_ENHET = "9999";
@@ -126,15 +126,15 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         byte[] json = tilOriginalJson(oppgaveData);
 
         JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
-        Saksnummer fagsakId = hentFagsakId(prosessTaskData);
-        Sakstype sakstype = fagsakId != null ? Sakstype.FAGSAK : Sakstype.GENERELL_SAK;
+        Saksnummer saksnummer = hentSaksnummer(prosessTaskData);
+        Sakstype sakstype = saksnummer != null ? Sakstype.FAGSAK : Sakstype.GENERELL_SAK;
 
-        OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, parametre, sakstype, fagsakId, person, dokumentTittel, pdf, json);
+        OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, parametre, sakstype, saksnummer, person, dokumentTittel, pdf, json);
 
         OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
 
         OppgaveJournalføringEntitet journalføring = new OppgaveJournalføringEntitet(
-            oppgave, parametre.tema(), parametre.fagsaksystem(), sakstype, fagsakId, new JournalpostId(response.journalpostId()));
+            oppgave, parametre.tema(), parametre.fagsaksystem(), sakstype, saksnummer, new JournalpostId(response.journalpostId()));
         journalføringRepository.lagre(journalføring);
 
         if (response.journalpostferdigstilt()) {
@@ -150,9 +150,9 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         return Set.of(OPPGAVE_REFERANSE);
     }
 
-    private static Saksnummer hentFagsakId(ProsessTaskData prosessTaskData) {
-        String fagsakId = prosessTaskData.getPropertyValue(FAGSAK_ID);
-        return fagsakId != null ? new Saksnummer(fagsakId) : null;
+    private static Saksnummer hentSaksnummer(ProsessTaskData prosessTaskData) {
+        String saksnummer = prosessTaskData.getPropertyValue(SAKSNUMMER);
+        return saksnummer != null ? new Saksnummer(saksnummer) : null;
     }
 
     /**
@@ -247,7 +247,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private OpprettJournalpostRequest byggJournalpostRequest(BrukerdialogOppgaveEntitet oppgave,
                                                                JournalføringParametre parametre,
                                                                Sakstype sakstype,
-                                                               Saksnummer fagsakId,
+                                                               Saksnummer saksnummer,
                                                                PersonInfo person,
                                                                String dokumentTittel,
                                                                byte[] pdf,
@@ -258,7 +258,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             person.fødselsnummer(), null, null, OpprettJournalpostRequest.AvsenderMottaker.IdType.FNR);
 
         var sak = sakstype == Sakstype.FAGSAK
-            ? OpprettJournalpostRequest.Sak.forSaksnummer(fagsakId.getVerdi(), parametre.fagsaksystem().name())
+            ? OpprettJournalpostRequest.Sak.forSaksnummer(saksnummer.getVerdi(), parametre.fagsaksystem().name())
             : OpprettJournalpostRequest.Sak.GENERELL_FAGSAK;
 
         var dokument = new OpprettJournalpostRequest.Dokument(

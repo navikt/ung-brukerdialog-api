@@ -99,7 +99,7 @@ public class OppgaveLivssyklusTjeneste {
      * Persisterer oppgave, oppretter journalføringstask og publiserer varsel til Min Side - alt
      * i én transaksjon (transactional outbox): committes sammen, eller ingen av dem.
      *
-     * @param journalføring Kan være {@code null} - behandles da som om {@code fagsakId} mangler.
+     * @param journalføring Kan være {@code null} - behandles da som om {@code saksnummer} mangler.
      */
     public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData, JournalføringDto journalføring) {
         if (oppgaveEntitet.getId() != null) {
@@ -140,22 +140,22 @@ public class OppgaveLivssyklusTjeneste {
 
     /**
      * Oppretter {@link JournalførOppgaveTask} ubetinget når oppgaven skal journalføres.
-     * {@code fagsakId} sendes med som en task-property siden den ikke er utledbar fra oppgaven
+     * {@code saksnummer} sendes med som en task-property siden den ikke er utledbar fra oppgaven
      * selv.
      */
     private void opprettTaskForJournalføringHvisAktuelt(BrukerdialogOppgaveEntitet oppgaveEntitet, JournalføringDto journalføring) {
-        Saksnummer fagsakId = journalføring != null ? journalføring.fagsakId() : null;
-        boolean skalJournalføres = fagsakId != null || UTEN_FAGSAK.contains(oppgaveEntitet.getOppgaveType());
+        Saksnummer saksnummer = journalføring != null ? journalføring.saksnummer() : null;
+        boolean skalJournalføres = saksnummer != null || UTEN_FAGSAK.contains(oppgaveEntitet.getOppgaveType());
         if (!skalJournalføres) {
-            logger.warn("Oppretter ikke journalføringstask: fagsakId mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
+            logger.warn("Oppretter ikke journalføringstask: saksnummer mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
                 oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
             return;
         }
 
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(JournalførOppgaveTask.class);
         prosessTaskData.setProperty(JournalførOppgaveTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
-        if (fagsakId != null) {
-            prosessTaskData.setProperty(JournalførOppgaveTask.FAGSAK_ID, fagsakId.getVerdi());
+        if (saksnummer != null) {
+            prosessTaskData.setProperty(JournalførOppgaveTask.SAKSNUMMER, saksnummer.getVerdi());
         }
         prosessTaskTjeneste.lagre(prosessTaskData);
     }

@@ -41,10 +41,10 @@ class GyldigJournalføringValidatorTest {
     private ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilder;
 
     @Test
-    void oppgavetype_som_krever_fagsak_uten_fagsakId_er_ugyldig() {
+    void oppgavetype_som_krever_fagsak_uten_saksnummer_er_ugyldig() {
         when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(violationBuilder);
         when(violationBuilder.addPropertyNode("journalføring")).thenReturn(nodeBuilder);
-        when(nodeBuilder.addPropertyNode("fagsakId")).thenReturn(nodeBuilder);
+        when(nodeBuilder.addPropertyNode("saksnummer")).thenReturn(nodeBuilder);
 
         boolean gyldig = validator.isValid(bekreftBostedDto(null), context);
 
@@ -54,17 +54,17 @@ class GyldigJournalføringValidatorTest {
     }
 
     @Test
-    void søkYtelse_uten_fagsakId_er_gyldig() {
+    void søkYtelse_uten_saksnummer_er_gyldig() {
         // SØK_YTELSE har ingen fagsak ved opprettelse og skal derfor være gyldig uten
-        // journalføring/fagsakId (journalføres på GENERELL_SAK).
+        // journalføring/saksnummer (journalføres på GENERELL_SAK).
         boolean gyldig = validator.isValid(søkYtelseDto(null), context);
         assertThat(gyldig).isTrue();
         verifyNoInteractions(context);
     }
 
     @Test
-    void søkYtelse_med_fagsakId_er_ogsaa_gyldig() {
-        // Fagsak er valgfri for SØK_YTELSE, ikke forbudt - en satt fagsakId gir fortsatt en
+    void søkYtelse_med_saksnummer_er_ogsaa_gyldig() {
+        // Fagsak er valgfri for SØK_YTELSE, ikke forbudt - et satt saksnummer gir fortsatt en
         // gyldig dto (journalføres da på FAGSAK i stedet for GENERELL_SAK).
         boolean gyldig = validator.isValid(søkYtelseDto(new JournalføringDto(new Saksnummer("ABC123"))), context);
         assertThat(gyldig).isTrue();
@@ -75,14 +75,14 @@ class GyldigJournalføringValidatorTest {
     void feilmelding_navngir_baade_oppgavetype_og_unntatte_typer() {
         when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(violationBuilder);
         when(violationBuilder.addPropertyNode("journalføring")).thenReturn(nodeBuilder);
-        when(nodeBuilder.addPropertyNode("fagsakId")).thenReturn(nodeBuilder);
+        when(nodeBuilder.addPropertyNode("saksnummer")).thenReturn(nodeBuilder);
 
         validator.isValid(bekreftBostedDto(null), context);
 
         ArgumentCaptor<String> meldingCaptor = ArgumentCaptor.forClass(String.class);
         verify(context).buildConstraintViolationWithTemplate(meldingCaptor.capture());
         assertThat(meldingCaptor.getValue())
-            .isEqualTo("fagsakId er påkrevd for oppgavetype BEKREFT_BOSTED. Kun SØK_YTELSE kan journalføres uten fagsak.");
+            .isEqualTo("saksnummer er påkrevd for oppgavetype BEKREFT_BOSTED. Kun SØK_YTELSE kan journalføres uten fagsak.");
     }
 
     private static OpprettOppgaveDto søkYtelseDto(JournalføringDto journalføring) {

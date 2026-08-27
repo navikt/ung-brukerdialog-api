@@ -63,8 +63,8 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     private Sakstype sakstype;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "fagsak_id", updatable = false)))
-    private Saksnummer fagsakId;
+    @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", updatable = false)))
+    private Saksnummer saksnummer;
 
     @Embedded
     @AttributeOverrides(@AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id", nullable = false, updatable = false)))
@@ -78,7 +78,7 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     }
 
     /**
-     * @param fagsakId     påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet
+     * @param saksnummer    påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet
      *                     her og som DB-constraint.
      * @param journalpostId journalpost-ID-en Dokarkiv returnerte ved vellykket journalføring -
      *                      raden skal aldri opprettes før dette er kjent.
@@ -87,19 +87,19 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
                                         Tema tema,
                                         Fagsaksystem fagsaksystem,
                                         Sakstype sakstype,
-                                        Saksnummer fagsakId,
+                                        Saksnummer saksnummer,
                                         JournalpostId journalpostId) {
         this.oppgave = Objects.requireNonNull(oppgave, "oppgave");
         this.tema = Objects.requireNonNull(tema, "tema");
         this.fagsaksystem = Objects.requireNonNull(fagsaksystem, "fagsaksystem");
         this.sakstype = Objects.requireNonNull(sakstype, "sakstype");
-        if (sakstype == Sakstype.FAGSAK && fagsakId == null) {
-            throw new IllegalArgumentException("fagsakId må være satt når sakstype er FAGSAK");
+        if (sakstype == Sakstype.FAGSAK && saksnummer == null) {
+            throw new IllegalArgumentException("saksnummer må være satt når sakstype er FAGSAK");
         }
-        if (sakstype == Sakstype.GENERELL_SAK && fagsakId != null) {
-            throw new IllegalArgumentException("fagsakId skal ikke være satt når sakstype er GENERELL_SAK");
+        if (sakstype == Sakstype.GENERELL_SAK && saksnummer != null) {
+            throw new IllegalArgumentException("saksnummer skal ikke være satt når sakstype er GENERELL_SAK");
         }
-        this.fagsakId = fagsakId;
+        this.saksnummer = saksnummer;
         this.journalpostId = Objects.requireNonNull(journalpostId, "journalpostId");
         this.journalførtTid = LocalDateTime.now();
     }
@@ -124,8 +124,8 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
         return sakstype;
     }
 
-    public Saksnummer getFagsakId() {
-        return fagsakId;
+    public Saksnummer getSaksnummer() {
+        return saksnummer;
     }
 
     public JournalpostId getJournalpostId() {

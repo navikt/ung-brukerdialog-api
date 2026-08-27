@@ -8,7 +8,7 @@ import no.nav.ung.brukerdialog.typer.Saksnummer;
 /**
  * Journalføringsrelaterte felter som kan oppgis ved opprettelse av en brukerdialogoppgave.
  * Tema og fagsaksystem sendes IKKE inn - de utledes fra {@code ytelsetype}. Kalleren oppgir kun
- * {@code fagsakId}, og kun når oppgavetypen krever det (se {@link GyldigJournalføring}).
+ * {@code saksnummer}, og kun når oppgavetypen krever det (se {@link GyldigJournalføring}).
  * <p>
  * Egen wrapper selv om den i dag kun har ett felt: K9 som fagsaksystem er utsatt, ikke avlyst,
  * og kan senere kreve flere felter her uten at {@code OpprettOppgaveDto} må endres.
@@ -16,8 +16,8 @@ import no.nav.ung.brukerdialog.typer.Saksnummer;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record JournalføringDto(
 
-    @JsonProperty(value = "fagsakId")
+    @JsonProperty(value = "saksnummer")
     @Valid
-    Saksnummer fagsakId
+    Saksnummer saksnummer
 ) {
 }

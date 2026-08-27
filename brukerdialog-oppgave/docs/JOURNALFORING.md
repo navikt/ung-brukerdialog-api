@@ -61,13 +61,13 @@ Kode: [`JournalføringParametre`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 
 ## Sakstype — FAGSAK eller GENERELL_SAK
 
-| `journalføring.fagsakId` på requestbody | Dokarkiv `sak` |
+| `journalføring.saksnummer` på requestbody | Dokarkiv `sak` |
 |---|---|
 | satt | `{ sakstype: FAGSAK, fagsakId, fagsaksystem }` |
 | mangler | `{ sakstype: GENERELL_SAK }` |
 
-`SØK_YTELSE` er den eneste oppgavetypen som har lov til å mangle `fagsakId` (den har ingen
-fagsak ved opprettelse). For alle andre typer er `fagsakId` egentlig ment å være påkrevd, med
+`SØK_YTELSE` er den eneste oppgavetypen som har lov til å mangle `saksnummer` (den har ingen
+fagsak ved opprettelse). For alle andre typer er `saksnummer` egentlig ment å være påkrevd, med
 `@GyldigJournalføring` på `OpprettOppgaveDto` som håndhevende mekanisme — men denne annotasjonen
 er **midlertidig fjernet fra DTO-en** (se "Kjente begrensninger" under), så håndhevelsen er i
 praksis avslått inntil videre. `GyldigJournalføringValidator` finnes fortsatt i kode og er
@@ -82,7 +82,7 @@ Raden finnes **hvis og bare hvis** oppgaven faktisk er journalført — det finn
 mellomtilstand. `journalpost_id` og `journalfort_tid` er derfor påkrevde felter, satt idet raden
 opprettes; de kan aldri stå tomme på en eksisterende rad.
 
-- `fagsak_id satt ⟺ sakstype = 'FAGSAK'` er en check-constraint (defence in depth).
+- `saksnummer satt ⟺ sakstype = 'FAGSAK'` er en check-constraint (defence in depth).
 
 Kode: [`OppgaveJournalføringEntitet`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringEntitet.java),
 [`OppgaveJournalføringRepository`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringRepository.java)
@@ -154,7 +154,7 @@ Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog
   `FVL – forhåndsvarsel – aktivitetspenger` — foreløpige verdier, ikke bekreftet med Team
   Dokumentløsninger.
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.
-- **`fagsakId` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak —
+- **`saksnummer` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak —
   `@GyldigJournalføring` (som ville håndhevet dette som en 400-feil) er bevisst fjernet fra
   `OpprettOppgaveDto` inntil `ung-sak`/nedstrøms konsumenter er bekreftet klare til å alltid
   sende feltet i prod. Manglende verdi gir i mellomtiden kun en `WARN`-logg (se
@@ -167,7 +167,7 @@ Kode: [`JournalføringKonfig`](../tjeneste/src/main/java/no/nav/ung/brukerdialog
 | Klasse | Modul | Ansvar |
 |---|---|---|
 | `JournalføringParametre` | `tjeneste` | Utleder tema/fagsaksystem/behandlingsnummer fra ytelsetype |
-| `GyldigJournalføringValidator` | `kontrakt` | Validerer `fagsakId` mot oppgavetype — **ikke koblet på** (`@GyldigJournalføring` fjernet fra DTO, se «Kjente begrensninger») |
+| `GyldigJournalføringValidator` | `kontrakt` | Validerer `saksnummer` mot oppgavetype — **ikke koblet på** (`@GyldigJournalføring` fjernet fra DTO, se «Kjente begrensninger») |
 | `OppgaveJournalføringEntitet` / `Repository` | `tjeneste` | Datamodell og persistens |
 | `JournalførOppgaveTask` | `tjeneste` | Selve journalføringen: PDL-oppslag, PDF, kall mot Dokarkiv |
 | `JournalføringKonfig` | `tjeneste` | Parametrisering (på/av, deny-liste) |

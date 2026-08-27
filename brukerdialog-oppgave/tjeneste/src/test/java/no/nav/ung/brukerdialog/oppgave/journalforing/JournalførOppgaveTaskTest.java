@@ -208,14 +208,14 @@ class JournalførOppgaveTaskTest {
         OppgaveJournalføringEntitet lagret = captor.getValue();
         assertThat(lagret.getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
         assertThat(lagret.getSakstype()).isEqualTo(Sakstype.GENERELL_SAK);
-        assertThat(lagret.getFagsakId()).isNull();
+        assertThat(lagret.getSaksnummer()).isNull();
         assertThat(dokArkivKlientFake.getSisteRequest().tema()).isEqualTo(Tema.UNG.name());
         assertThat(dokArkivKlientFake.getSisteRequest().sak()).isEqualTo(no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest.Sak.GENERELL_FAGSAK);
     }
 
     @Test
-    void doTask_ok_med_fagsakId_property_skal_lagre_rad_med_sakstype_fagsak() {
-        // Arrange – ProsessTaskData har fagsakId satt, som når oppgavetypen krever fagsak.
+    void doTask_ok_med_saksnummer_property_skal_lagre_rad_med_sakstype_fagsak() {
+        // Arrange – ProsessTaskData har saksnummer satt, som når oppgavetypen krever fagsak.
         BrukerdialogOppgaveEntitet oppgave = arrangerOppgaveKlarForJournalføring(OppgaveType.BEKREFT_BOSTED);
         arrangerPersonOgDokumentutleder(oppgave, "Bekreft bosted");
 
@@ -225,7 +225,7 @@ class JournalførOppgaveTaskTest {
             journalføringKonfig, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         ProsessTaskData data = taskData();
-        data.setProperty(JournalførOppgaveTask.FAGSAK_ID, "ABC123");
+        data.setProperty(JournalførOppgaveTask.SAKSNUMMER, "ABC123");
 
         // Act
         taskMedFake.doTask(data);
@@ -235,7 +235,7 @@ class JournalførOppgaveTaskTest {
         verify(journalføringRepository).lagre(captor.capture());
         OppgaveJournalføringEntitet lagret = captor.getValue();
         assertThat(lagret.getSakstype()).isEqualTo(Sakstype.FAGSAK);
-        assertThat(lagret.getFagsakId()).isEqualTo(new Saksnummer("ABC123"));
+        assertThat(lagret.getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
     }
 
     @Test

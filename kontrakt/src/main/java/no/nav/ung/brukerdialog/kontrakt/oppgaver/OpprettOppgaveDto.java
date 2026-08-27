@@ -17,9 +17,9 @@ import java.util.UUID;
  * Generell DTO for opprettelse av en brukerdialogoppgave.
  * Oppgavetypen bestemmes av {@link OppgavetypeDataDto}-subtypen i {@code oppgavetypeData}.
  * <p>
- * {@code journalføring.fagsakId} håndheves IKKE som påkrevd her ennå - se
+ * {@code journalføring.saksnummer} håndheves IKKE som påkrevd her ennå - se
  * {@code GyldigJournalføringValidator} og "Kjente begrensninger" i JOURNALFORING.md.
- * {@code @GyldigJournalføring} er midlertidig fjernet: en manglende {@code fagsakId} skal kun gi
+ * {@code @GyldigJournalføring} er midlertidig fjernet: en manglende {@code saksnummer} skal kun gi
  * en {@code WARN}-logg (håndtert i {@code OppgaveLivssyklusTjeneste}), ikke en hard 400, inntil
  * `ung-sak`/nedstrøms konsumenter bekreftet sender feltet i prod. Gjeninnføres da.
  */

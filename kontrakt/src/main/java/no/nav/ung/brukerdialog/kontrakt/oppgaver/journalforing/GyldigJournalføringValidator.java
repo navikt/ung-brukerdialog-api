@@ -8,7 +8,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OpprettOppgaveDto;
 import java.util.EnumSet;
 import java.util.Set;
 
-/** Krever {@code journalføring.fagsakId} for oppgavetyper som ikke er i {@link #UTEN_FAGSAK}. */
+/** Krever {@code journalføring.saksnummer} for oppgavetyper som ikke er i {@link #UTEN_FAGSAK}. */
 public class GyldigJournalføringValidator implements ConstraintValidator<GyldigJournalføring, OpprettOppgaveDto> {
 
     /**
@@ -17,14 +17,14 @@ public class GyldigJournalføringValidator implements ConstraintValidator<Gyldig
      */
     static final Set<OppgaveType> UTEN_FAGSAK = EnumSet.of(OppgaveType.SØK_YTELSE);
 
-    private static final String FEILMELDING = "fagsakId er påkrevd for oppgavetype %s. Kun SØK_YTELSE kan journalføres uten fagsak.";
+    private static final String FEILMELDING = "saksnummer er påkrevd for oppgavetype %s. Kun SØK_YTELSE kan journalføres uten fagsak.";
 
     @Override
     public boolean isValid(OpprettOppgaveDto dto, ConstraintValidatorContext context) {
-        if (manglerOppgavetype(dto) || erUnntattFraFagsakkrav(dto) || harFagsakId(dto)) {
+        if (manglerOppgavetype(dto) || erUnntattFraFagsakkrav(dto) || harSaksnummer(dto)) {
             return true;
         }
-        rapporterManglendeFagsakId(dto, context);
+        rapporterManglendeSaksnummer(dto, context);
         return false;
     }
 
@@ -32,19 +32,19 @@ public class GyldigJournalføringValidator implements ConstraintValidator<Gyldig
         return dto == null || dto.oppgavetypeData() == null || dto.oppgavetypeData().oppgavetype() == null;
     }
 
-    /** Fagsak er valgfri, ikke forbudt - {@code SØK_YTELSE} med fagsakId er fortsatt tillatt. */
+    /** Fagsak er valgfri, ikke forbudt - {@code SØK_YTELSE} med saksnummer er fortsatt tillatt. */
     private boolean erUnntattFraFagsakkrav(OpprettOppgaveDto dto) {
         return UTEN_FAGSAK.contains(dto.oppgavetypeData().oppgavetype());
     }
 
-    private boolean harFagsakId(OpprettOppgaveDto dto) {
-        return dto.journalføring() != null && dto.journalføring().fagsakId() != null;
+    private boolean harSaksnummer(OpprettOppgaveDto dto) {
+        return dto.journalføring() != null && dto.journalføring().saksnummer() != null;
     }
 
-    private void rapporterManglendeFagsakId(OpprettOppgaveDto dto, ConstraintValidatorContext context) {
+    private void rapporterManglendeSaksnummer(OpprettOppgaveDto dto, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(FEILMELDING.formatted(dto.oppgavetypeData().oppgavetype()))
-            .addPropertyNode("journalføring").addPropertyNode("fagsakId")
+            .addPropertyNode("journalføring").addPropertyNode("saksnummer")
             .addConstraintViolation();
     }
 }

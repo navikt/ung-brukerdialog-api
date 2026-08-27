@@ -9,7 +9,7 @@ create table BD_OPPGAVE_JOURNALFORING
     tema            varchar(10)  not null,
     fagsaksystem    varchar(20)  not null,
     sakstype        varchar(20)  not null,
-    fagsak_id       varchar(20),
+    saksnummer      varchar(20),
     journalpost_id  varchar(20)  not null,
     journalfort_tid timestamp(3) not null,
     versjon         bigint       not null default 0,
@@ -19,7 +19,7 @@ create table BD_OPPGAVE_JOURNALFORING
     endret_tid      timestamp(3),
 
     constraint chk_bd_oppgave_journalforing_sak
-        check ((sakstype = 'FAGSAK') = (fagsak_id is not null))
+        check ((sakstype = 'FAGSAK') = (saksnummer is not null))
 );
 
 comment on table  BD_OPPGAVE_JOURNALFORING                 is 'Journalføring av en brukerdialogoppgave mot Dokarkiv. Én rad per oppgave - opprettes kun når oppgaven faktisk er journalført.';
@@ -27,6 +27,6 @@ comment on column BD_OPPGAVE_JOURNALFORING.bd_oppgave_id   is 'FK til BD_OPPGAVE
 comment on column BD_OPPGAVE_JOURNALFORING.tema            is 'Dokarkiv-tema, utledet fra oppgavens ytelsetype.';
 comment on column BD_OPPGAVE_JOURNALFORING.fagsaksystem    is 'Fagsaksystem, utledet fra oppgavens ytelsetype.';
 comment on column BD_OPPGAVE_JOURNALFORING.sakstype        is 'Dokarkiv-sakstype: FAGSAK eller GENERELL_SAK.';
-comment on column BD_OPPGAVE_JOURNALFORING.fagsak_id       is 'Saksnummer i fagsaksystemet. Satt når og bare når sakstype er FAGSAK.';
+comment on column BD_OPPGAVE_JOURNALFORING.saksnummer      is 'Saksnummer i fagsaksystemet. Satt når og bare når sakstype er FAGSAK.';
 comment on column BD_OPPGAVE_JOURNALFORING.journalpost_id  is 'Journalpost-ID fra Dokarkiv.';
 comment on column BD_OPPGAVE_JOURNALFORING.journalfort_tid is 'Tidspunkt for vellykket journalføring.';
