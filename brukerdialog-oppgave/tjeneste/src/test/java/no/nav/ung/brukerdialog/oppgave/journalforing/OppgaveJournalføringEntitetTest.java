@@ -24,49 +24,29 @@ class OppgaveJournalføringEntitetTest {
     );
 
     @Test
-    void skal_opprette_med_fagsak_når_sakstype_er_fagsak() {
+    void skal_opprette_med_fagsak_når_saksnummer_er_satt() {
         var journalføring = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.FAGSAK, new Saksnummer("ABC123"),
+            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, new Saksnummer("ABC123"),
             new JournalpostId("123456789"));
 
-        assertThat(journalføring.getSakstype()).isEqualTo(Sakstype.FAGSAK);
         assertThat(journalføring.getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
         assertThat(journalføring.getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
         assertThat(journalføring.getJournalførtTid()).isNotNull();
     }
 
     @Test
-    void skal_opprette_uten_fagsak_når_sakstype_er_generell_sak() {
+    void skal_opprette_uten_fagsak_når_saksnummer_er_null() {
         var journalføring = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.GENERELL_SAK, null,
+            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null,
             new JournalpostId("123456789"));
 
         assertThat(journalføring.getSaksnummer()).isNull();
-        assertThat(journalføring.getSakstype()).isEqualTo(Sakstype.GENERELL_SAK);
-    }
-
-    @Test
-    void skal_feile_når_saksnummer_mangler_for_sakstype_fagsak() {
-        assertThatThrownBy(() -> new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.FAGSAK, null,
-            new JournalpostId("123456789")))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("saksnummer");
-    }
-
-    @Test
-    void skal_feile_når_saksnummer_er_satt_for_sakstype_generell_sak() {
-        assertThatThrownBy(() -> new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.GENERELL_SAK, new Saksnummer("ABC123"),
-            new JournalpostId("123456789")))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("saksnummer");
     }
 
     @Test
     void skal_feile_når_journalpostId_mangler() {
         assertThatThrownBy(() -> new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.GENERELL_SAK, null, null))
+            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null, null))
             .isInstanceOf(NullPointerException.class)
             .hasMessageContaining("journalpostId");
     }

@@ -82,8 +82,6 @@ Raden finnes **hvis og bare hvis** oppgaven faktisk er journalført — det finn
 mellomtilstand. `journalpost_id` og `journalfort_tid` er derfor påkrevde felter, satt idet raden
 opprettes; de kan aldri stå tomme på en eksisterende rad.
 
-- `saksnummer satt ⟺ sakstype = 'FAGSAK'` er en check-constraint (defence in depth).
-
 Kode: [`OppgaveJournalføringEntitet`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringEntitet.java),
 [`OppgaveJournalføringRepository`](../tjeneste/src/main/java/no/nav/ung/brukerdialog/oppgave/journalforing/OppgaveJournalføringRepository.java)
 

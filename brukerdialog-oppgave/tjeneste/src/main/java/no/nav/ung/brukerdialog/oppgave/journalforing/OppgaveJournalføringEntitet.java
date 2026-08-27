@@ -30,9 +30,8 @@ import java.util.Objects;
  * mellomtilstand. Enten journalfører {@code JournalførOppgaveTask} og lagrer en komplett rad
  * (med {@code journalpostId} satt), eller så skjer det ingenting (ingen rad).
  * <p>
- * {@code tema}/{@code fagsaksystem}/{@code sakstype} utledes av tasken idet journalføringen
- * lykkes, og lagres her som et etterrettelig spor - uavhengig av senere endringer i
- * utledningsregelen.
+ * {@code tema}/{@code fagsaksystem} utledes av tasken idet journalføringen lykkes, og lagres her
+ * som et etterrettelig spor - uavhengig av senere endringer i utledningsregelen.
  */
 @Entity(name = "OppgaveJournalføring")
 @Table(name = "BD_OPPGAVE_JOURNALFORING")
@@ -58,10 +57,6 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     @Column(name = "fagsaksystem", nullable = false, updatable = false)
     private Fagsaksystem fagsaksystem;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "sakstype", nullable = false, updatable = false)
-    private Sakstype sakstype;
-
     @Embedded
     @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", updatable = false)))
     private Saksnummer saksnummer;
@@ -78,27 +73,18 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
     }
 
     /**
-     * @param saksnummer    påkrevd for {@code FAGSAK}, forbudt for {@code GENERELL_SAK} - håndhevet
-     *                     her og som DB-constraint.
+     * @param saksnummer    satt for oppgavetyper med fagsak, {@code null} ellers.
      * @param journalpostId journalpost-ID-en Dokarkiv returnerte ved vellykket journalføring -
      *                      raden skal aldri opprettes før dette er kjent.
      */
     public OppgaveJournalføringEntitet(BrukerdialogOppgaveEntitet oppgave,
                                         Tema tema,
                                         Fagsaksystem fagsaksystem,
-                                        Sakstype sakstype,
                                         Saksnummer saksnummer,
                                         JournalpostId journalpostId) {
         this.oppgave = Objects.requireNonNull(oppgave, "oppgave");
         this.tema = Objects.requireNonNull(tema, "tema");
         this.fagsaksystem = Objects.requireNonNull(fagsaksystem, "fagsaksystem");
-        this.sakstype = Objects.requireNonNull(sakstype, "sakstype");
-        if (sakstype == Sakstype.FAGSAK && saksnummer == null) {
-            throw new IllegalArgumentException("saksnummer må være satt når sakstype er FAGSAK");
-        }
-        if (sakstype == Sakstype.GENERELL_SAK && saksnummer != null) {
-            throw new IllegalArgumentException("saksnummer skal ikke være satt når sakstype er GENERELL_SAK");
-        }
         this.saksnummer = saksnummer;
         this.journalpostId = Objects.requireNonNull(journalpostId, "journalpostId");
         this.journalførtTid = LocalDateTime.now();
@@ -118,10 +104,6 @@ public class OppgaveJournalføringEntitet extends BaseEntitet {
 
     public Fagsaksystem getFagsaksystem() {
         return fagsaksystem;
-    }
-
-    public Sakstype getSakstype() {
-        return sakstype;
     }
 
     public Saksnummer getSaksnummer() {

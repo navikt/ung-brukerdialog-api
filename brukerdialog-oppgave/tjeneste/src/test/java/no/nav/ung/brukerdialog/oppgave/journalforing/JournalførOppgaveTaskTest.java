@@ -140,7 +140,7 @@ class JournalførOppgaveTaskTest {
         // Arrange – raden finnes allerede fra et tidligere, vellykket forsøk.
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE);
         OppgaveJournalføringEntitet eksisterende = new OppgaveJournalføringEntitet(
-            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, Sakstype.GENERELL_SAK, null,
+            oppgave, Tema.UNG, Fagsaksystem.UNG_SAK, null,
             new JournalpostId("123456789"));
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.of(eksisterende));
 
@@ -205,7 +205,6 @@ class JournalførOppgaveTaskTest {
         verify(journalføringRepository).lagre(captor.capture());
         OppgaveJournalføringEntitet lagret = captor.getValue();
         assertThat(lagret.getJournalpostId()).isEqualTo(new JournalpostId("123456789"));
-        assertThat(lagret.getSakstype()).isEqualTo(Sakstype.GENERELL_SAK);
         assertThat(lagret.getSaksnummer()).isNull();
         assertThat(dokArkivKlientFake.getSisteRequest().tema()).isEqualTo(Tema.UNG.name());
         assertThat(dokArkivKlientFake.getSisteRequest().sak()).isEqualTo(no.nav.k9.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest.Sak.GENERELL_FAGSAK);
@@ -232,7 +231,6 @@ class JournalførOppgaveTaskTest {
         ArgumentCaptor<OppgaveJournalføringEntitet> captor = ArgumentCaptor.forClass(OppgaveJournalføringEntitet.class);
         verify(journalføringRepository).lagre(captor.capture());
         OppgaveJournalføringEntitet lagret = captor.getValue();
-        assertThat(lagret.getSakstype()).isEqualTo(Sakstype.FAGSAK);
         assertThat(lagret.getSaksnummer()).isEqualTo(new Saksnummer("ABC123"));
     }
 
