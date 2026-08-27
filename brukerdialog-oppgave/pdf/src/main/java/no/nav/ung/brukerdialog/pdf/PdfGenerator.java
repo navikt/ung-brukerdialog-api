@@ -54,10 +54,7 @@ public class PdfGenerator {
     }
 
     /**
-     * Offentlig slik at tester (bl.a. {@code OppgaveDokumentUtlederRenderingTest}) kan verifisere
-     * rendret HTML direkte - PDF/UA-oppsettet mangler {@code ToUnicode}-CMap, så tekst kan ikke
-     * pålitelig hentes ut igjen fra PDF-byte. Legger ikke til funksjonalitet utover
-     * {@link #genererPdf(PdfDokument)}, bare uten rasteriseringen.
+     * Public for testing.
      */
     public String tilHtml(PdfDokument dokument) {
         Objects.requireNonNull(dokument, "dokument");
