@@ -18,7 +18,7 @@ arkiv; denne siden dekker den ferdige løsningen.
   vedtak treffes og få høve til å uttale seg innen en frist. Loven krever også at varselet «gjøre
   greie for hva saken gjelder» (§ 16 tredje ledd) — det er derfor ytelsen alltid skal framgå
   tydelig av tittel og brevtekst, se «Dokumentet som journalføres» under. Brevkoden
-  `FVL 04-16.0` (se «Kjente begrensninger») er valgt ut fra denne bestemmelsen.
+  (se «Kjente begrensninger») er valgt ut fra denne bestemmelsen.
 
 ## Når journalføres en oppgave?
 
@@ -168,7 +168,9 @@ Kode: [`JournalføringMetrikker`](../tjeneste/src/main/java/no/nav/ung/brukerdia
 
 ## Kjente begrensninger / åpne punkter
 
-- **Brevkode** `FVL 04-16.0` (jf. [§ 16 i forvaltningsloven](https://lovdata.no/lov/1967-02-10/§16),
+- **Brevkode** er per ytelse (`Brevkode`-enum): `FVL – forhåndsvarsel – ungdomsytelsen` og
+  `FVL – forhåndsvarsel – aktivitetspenger` — foreløpige verdier, ikke bekreftet med Team
+  Dokumentløsninger.
 - **K9-ytelser** (`Fagsaksystem.K9`, `Tema.OMS`) er ikke støttet ennå.
 - **`fagsakId` er foreløpig valgfri** selv for oppgavetyper som normalt har fagsak —
   `@GyldigJournalføring` (som ville håndhevet dette som en 400-feil) er bevisst fjernet fra

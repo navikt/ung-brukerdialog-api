@@ -23,7 +23,8 @@ public interface OppgaveDokumentUtleder {
     }
 
     /**
-     * Tittel på journalposten og på dokumentet i journalposten (vises i Gosys/SAF).
+     * Tittel på dokumentet i journalposten (vises i Gosys/SAF). Journalpostens egen tittel
+     * utledes separat, se {@link JournalføringParametre#journalposttittel}.
      */
     String utledTittel(BrukerdialogOppgaveEntitet oppgave);
 
