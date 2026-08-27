@@ -101,12 +101,12 @@ Hver oppgavetype har en egen `OppgaveDokumentUtleder`-implementasjon (SPI, koble
 [`LEGG_TIL_NY_OPPGAVETYPE.md`](../tjeneste/LEGG_TIL_NY_OPPGAVETYPE.md) for hvordan dette kobles
 for en ny oppgavetype.
 
-To dokumentvarianter følger med journalposten:
-
-| Variant | Format | Innhold |
-|---|---|---|
-| `ARKIV` | PDF | Brukerrettet dokument |
-| `ORIGINAL` | JSON | Maskinlesbar oppgavedata |
+Journalposten får kun **én** dokumentvariant: `ARKIV` (PDF). Dokarkiv krever kun denne varianten
+for å kunne ferdigstille journalposten. Vi sender **ikke** en `ORIGINAL`/JSON-variant med de rå
+oppgavedataene — Dokarkivs eget skjema beskriver `ORIGINAL` som ment for maskinlesbare data "som
+brukes for automatisk saksbehandling" (slik `k9-brukerdialog-prosessering` bruker det for
+innkommende søknader `k9-sak` leser tilbake), noe som ikke gjelder her: dette er utgående brev,
+og ingen nedstrøms system leser dataene tilbake fra journalposten.
 
 `OppgaveDokumentUtleder`-implementasjonene skal **aldri** returnere navn eller fødselsnummer —
 disse hentes fra PDL og flettes inn av `JournalførOppgaveTask` selv, slik at implementasjonene

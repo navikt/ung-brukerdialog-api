@@ -1,6 +1,5 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
-import java.io.UncheckedIOException;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
@@ -34,7 +31,6 @@ import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
-import no.nav.ung.brukerdialog.JsonObjectMapper;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.pdf.PdfDokument;
 import no.nav.ung.brukerdialog.pdf.PdfGenerator;
@@ -133,13 +129,12 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         String opprettetDato = oppgave.getOpprettetTidspunkt().toLocalDate().toString();
         byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(dokumentUtleder.malnavn(), byggPdfData(dokumentTittel, opprettetDato, oppgaveData, person)));
-        byte[] json = tilOriginalJson(oppgaveData);
 
         JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
         Saksnummer saksnummer = hentSaksnummer(prosessTaskData);
         Sakstype sakstype = saksnummer != null ? Sakstype.FAGSAK : Sakstype.GENERELL_SAK;
 
-        OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, parametre, sakstype, saksnummer, person, dokumentTittel, pdf, json);
+        OpprettJournalpostRequest request = byggJournalpostRequest(oppgave, parametre, sakstype, saksnummer, person, dokumentTittel, pdf);
 
         OpprettJournalpostResponse response = dokarkivKlient.opprettJournalpost(request);
 
@@ -230,19 +225,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * {@code oppgaveData} inneholder aldri navn/fødselsnummer, men kan inneholde andre
-     * personopplysninger (datoer, beløp, brukerskrevet fritekst m.m.) - skal aldri logges.
-     */
-    private byte[] tilOriginalJson(Map<String, Object> oppgaveData) {
-        try {
-            return JsonObjectMapper.getMapper().writeValueAsBytes(oppgaveData);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(
-                "Klarte ikke å serialisere oppgavedata til JSON (ORIGINAL-variant)", e);
-        }
-    }
-
-    /**
      * Journalpostens tittel ({@link JournalføringParametre#journalposttittel}) er bevisst
      * forskjellig fra {@code dokumentTittel} - journalposten får en generisk per-ytelse-tittel,
      * mens dokumentet beholder sin oppgavetype-spesifikke tittel (samme skille som
@@ -254,8 +236,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                                                                Saksnummer saksnummer,
                                                                PersonInfo person,
                                                                String dokumentTittel,
-                                                               byte[] pdf,
-                                                               byte[] json) {
+                                                               byte[] pdf) {
         var bruker = new Bruker(person.fødselsnummer(), Bruker.BrukerIdType.FNR);
         // navn utelates bevisst - Dokarkiv slår selv opp navn i PDL.
         var avsenderMottaker = new OpprettJournalpostRequest.AvsenderMottaker(
@@ -269,10 +250,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             dokumentTittel,
             parametre.brevkode().getKode(),
             null,
-            List.of(
-                new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf),
-                dokumentVariantJson(json)
-            )
+            List.of(new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(pdf))
         );
 
         String oppgavereferanse = oppgave.getOppgavereferanse().toString();
@@ -288,16 +266,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .medSak(sak)
             .medDokumenter(List.of(dokument))
             .build();
-    }
-
-    /**
-     * "ArkivertPDFA" er k9-felles sitt navn på denne recorden, men feltene
-     * (filtype/variantformat/fysiskDokument) er generiske - brukes her til ORIGINAL/JSON-
-     * varianten også, ikke bare PDF/A-arkivvarianten.
-     */
-    private static OpprettJournalpostRequest.DokumentVariantArkivertPDFA dokumentVariantJson(byte[] json) {
-        return new OpprettJournalpostRequest.DokumentVariantArkivertPDFA(
-            OpprettJournalpostRequest.Filtype.JSON, OpprettJournalpostRequest.Variantformat.ORIGINAL, json);
     }
 
     /**
