@@ -9,17 +9,30 @@ import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.DeaktiverMinSideVarselTask;
 import no.nav.ung.brukerdialog.PubliserMinSideVarselTask;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
+import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
+import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 
 @ApplicationScoped
 public class OppgaveLivssyklusTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(OppgaveLivssyklusTjeneste.class);
+
+    /**
+     * Speiler den kommenterte {@code @AssertTrue}-valideringen i {@code OpprettOppgaveDto}
+     * (kontrakt-modulen) - kan ikke dele konstanten på tvers av modulgrensen. Hold i sync hvis
+     * regelen endres.
+     */
+    private static final Set<OppgaveType> UTEN_FAGSAK = EnumSet.of(OppgaveType.SØK_YTELSE);
 
     private ProsessTaskTjeneste prosessTaskTjeneste;
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
@@ -84,12 +97,11 @@ public class OppgaveLivssyklusTjeneste {
     }
 
     /**
-     * Persisterer oppgave og publiserer varsel til Min Side.
+     * Alt skjer i én transaksjon (transactional outbox): committes sammen, eller ingen av dem.
      *
-     * @param oppgaveEntitet  Oppgave som skal opprettes og publiseres.
-     * @param oppgavetypeData
+     * @param journalføring Kan være {@code null} - behandles da som om {@code saksnummer} mangler.
      */
-    public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData) {
+    public void opprettOppgave(BrukerdialogOppgaveEntitet oppgaveEntitet, OppgavetypeDataDto oppgavetypeData, JournalføringDto journalføring) {
         if (oppgaveEntitet.getId() != null) {
             throw new IllegalArgumentException("Oppgave er allerede persistert med id: " + oppgaveEntitet.getId());
         }
@@ -107,6 +119,7 @@ public class OppgaveLivssyklusTjeneste {
         oppgaveEntitet.setOppgaveData(oppgaveData);
         brukerdialogOppgaveRepository.lagre(oppgaveEntitet);
         opprettTaskForPubliseringAvVarsel(oppgaveEntitet);
+        opprettTaskForJournalføringHvisAktuelt(oppgaveEntitet, journalføring);
     }
 
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
@@ -125,5 +138,25 @@ public class OppgaveLivssyklusTjeneste {
         prosessTaskTjeneste.lagre(prosessTaskData);
     }
 
+    /**
+     * {@code saksnummer} sendes med som en task-property siden den ikke er utledbar fra oppgaven
+     * selv.
+     */
+    private void opprettTaskForJournalføringHvisAktuelt(BrukerdialogOppgaveEntitet oppgaveEntitet, JournalføringDto journalføring) {
+        Saksnummer saksnummer = journalføring != null ? journalføring.saksnummer() : null;
+        boolean skalJournalføres = saksnummer != null || UTEN_FAGSAK.contains(oppgaveEntitet.getOppgaveType());
+        if (!skalJournalføres) {
+            logger.warn("Oppretter ikke journalføringstask: saksnummer mangler for oppgavetype {} som krever fagsak ved journalføring. oppgaveReferanse={}",
+                oppgaveEntitet.getOppgaveType(), oppgaveEntitet.getOppgavereferanse());
+            return;
+        }
+
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(JournalførOppgaveTask.class);
+        prosessTaskData.setProperty(JournalførOppgaveTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
+        if (saksnummer != null) {
+            prosessTaskData.setProperty(JournalførOppgaveTask.SAKSNUMMER, saksnummer.getVerdi());
+        }
+        prosessTaskTjeneste.lagre(prosessTaskData);
+    }
 
 }

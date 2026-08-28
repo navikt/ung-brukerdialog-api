@@ -11,6 +11,7 @@ import no.nav.ung.brukerdialog.typer.AktørId;
 import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity(name = "BrukerdialogOppgave")
@@ -71,18 +72,22 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.oppgaveType = oppgaveType;
         this.aktørId = aktørId;
         this.fristTid = fristTid;
-        this.ytelsetype = ytelsetype != null ? ytelsetype : OppgaveYtelsetype.UNGDOMSYTELSE;
+        this.ytelsetype = Objects.requireNonNull(ytelsetype, "ytelsetype");
     }
 
     /**
      * Konstruktør for migrering av oppgave fra annen applikasjon.
      * Brukes når alle felter inkludert status og datoer skal settes.
+     * <p>
+     * {@code ytelsetype} er en eksplisitt parameter, ikke defaultet - kallere som migrerer eldre
+     * oppgaver uten dette feltet må selv avgjøre riktig verdi.
      */
     public BrukerdialogOppgaveEntitet(UUID oppgavereferanse,
                                       OppgaveType oppgaveType,
                                       AktørId aktørId,
                                       OppgaveResponsDto respons,
                                       OppgaveStatus status,
+                                      OppgaveYtelsetype ytelsetype,
                                       LocalDateTime fristTid,
                                       LocalDateTime løstDato,
                                       LocalDateTime opprettetTidspunkt,
@@ -94,7 +99,7 @@ public class BrukerdialogOppgaveEntitet extends BaseEntitet {
         this.status = status;
         this.fristTid = fristTid;
         this.løstDato = løstDato;
-        this.ytelsetype = OppgaveYtelsetype.UNGDOMSYTELSE;
+        this.ytelsetype = Objects.requireNonNull(ytelsetype, "ytelsetype");
         this.setOpprettetTidspunkt(opprettetTidspunkt);
         this.opprettetAv = opprettetAv;
     }

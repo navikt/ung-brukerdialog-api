@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8"/>
+    <title>{{tittel}}</title>
+    <meta name="subject" content="{{tittel}}"/>
+    <meta name="author" content="nav.no"/>
+    {{> style}}
+</head>
+<body>
+{{> partial/header}}
+
+<div class="innholdscontainer">
+    <p>Din siste dag med {{oppgave.ytelseNavn}} er <strong>{{datoLang oppgave.sluttdato}}</strong>. Det er fordi du har brukt opp dagene du kan motta {{oppgave.ytelseNavn}}.</p>
+    <p>Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på {{> partial/min-side-lenke}}.</p>
+    <p>Ingen tilbakemelding? Kryss av på "Nei" med en gang og send inn svaret ditt.</p>
+    {{#isNotNull oppgave.svarfrist}}
+    <div class="frist">
+    <p>Fristen for å svare er senest {{datoLang oppgave.svarfrist}}.</p>
+    <p>Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi {{datoLang oppgave.sluttdato}} som siste dag med ytelsen når vi behandler saken din.</p>
+    </div>
+    {{/isNotNull}}
+</div>
+
+{{> partial/footer}}
+</body>
+</html>

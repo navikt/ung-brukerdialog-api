@@ -31,7 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <felles.version>11.2.13</felles.version>
+        <felles.version>12.1.0</felles.version>
         <swagger.version>2.2.53</swagger.version>
         <junit.version>6.1.2</junit.version>
         <k9format.version>13.4.0</k9format.version>
@@ -222,6 +222,11 @@
             <dependency>
                 <groupId>no.nav.ung.brukerdialog</groupId>
                 <artifactId>brukerdialog-oppgave-min-side-varsel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.ung.brukerdialog</groupId>
+                <artifactId>brukerdialog-oppgave-pdf</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -523,6 +528,11 @@
             <dependency>
                 <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>
+                <version>${openhtmltopdf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openhtmltopdf</groupId>
+                <artifactId>openhtmltopdf-pdfbox</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>
             <dependency>

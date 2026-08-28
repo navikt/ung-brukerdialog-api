@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import no.nav.k9.felles.integrasjon.pdl.Pdl;
+import no.nav.k9.felles.integrasjon.pdl.PdlKlient;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
@@ -34,14 +34,14 @@ public class BrukerOppgaveRestTjeneste {
     static final String BASE_PATH = "/oppgave";
 
     private BrukerdialogOppgaveTjeneste oppgaveTjeneste;
-    private Pdl pdl;
+    private PdlKlient pdl;
 
     public BrukerOppgaveRestTjeneste() {
         // CDI proxy
     }
 
     @Inject
-    public BrukerOppgaveRestTjeneste(BrukerdialogOppgaveTjeneste oppgaveTjeneste, Pdl pdl) {
+    public BrukerOppgaveRestTjeneste(BrukerdialogOppgaveTjeneste oppgaveTjeneste, PdlKlient pdl) {
         this.oppgaveTjeneste = oppgaveTjeneste;
         this.pdl = pdl;
     }

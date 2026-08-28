@@ -81,6 +81,7 @@ spec:
         - application: sif-abac-pdp
       external:
         - host: "pdl-api.prod-fss-pub.nais.io"
+        - host: "dokarkiv.prod-fss-pub.nais.io"
     inbound:
       rules:
         - application: k9-swagger
@@ -148,6 +149,16 @@ spec:
     # PDL
     - name: PDL_TEMA
       value: UNG
+
+    # Journalføring (Dokarkiv) - se brukerdialog-oppgave/docs
+    # JOURNALFORING_ENABLED er "false" til flyten er verifisert i dev.
+    # Satt eksplisitt selv om det også er kodedefault, slik at intensjonen er lesbar i manifestet.
+    - name: DOKARKIV_BASE_URL
+      value: https://dokarkiv.prod-fss-pub.nais.io
+    - name: DOKARKIV_SCOPE
+      value: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
+    - name: JOURNALFORING_ENABLED
+      value: "false"
 
     # Restservice Generelle
     - name: PDL_BASE_URL

@@ -26,6 +26,10 @@
             <groupId>no.nav.ung.brukerdialog</groupId>
             <artifactId>kontrakt</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.ung.brukerdialog</groupId>
+            <artifactId>brukerdialog-oppgave-pdf</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>no.nav.ung.brukerdialog</groupId>
@@ -46,6 +50,10 @@
         <dependency>
             <groupId>no.nav.k9.felles.integrasjon</groupId>
             <artifactId>k9-kafka-klient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-dokarkiv-klient</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.k9.prosesstask</groupId>

@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.integrasjon.kafka.GenerellKafkaProducer;
 import no.nav.k9.felles.integrasjon.kafka.KafkaPropertiesBuilder;
-import no.nav.k9.felles.integrasjon.pdl.Pdl;
+import no.nav.k9.felles.integrasjon.pdl.PdlKlient;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
@@ -32,7 +32,7 @@ public class PubliserMinSideVarselTask implements ProsessTaskHandler {
     private static final Logger log = LoggerFactory.getLogger(PubliserMinSideVarselTask.class);
 
     private GenerellKafkaProducer producer;
-    private Pdl pdl;
+    private PdlKlient pdl;
     private String appNamespace;
     private String appNavn;
     private String clusterNavn;
@@ -43,7 +43,7 @@ public class PubliserMinSideVarselTask implements ProsessTaskHandler {
 
     @Inject
     public PubliserMinSideVarselTask(
-        Pdl pdl,
+        PdlKlient pdl,
         @KonfigVerdi(value = "kafka.minside.varsel.topic", defaultVerdi = "min-side.aapen-brukervarsel-v1") String topic,
         @KonfigVerdi(value = "KAFKA_BROKERS") String kafkaBrokers,
         @KonfigVerdi(value = "KAFKA_TRUSTSTORE_PATH", required = false) String trustStorePath,

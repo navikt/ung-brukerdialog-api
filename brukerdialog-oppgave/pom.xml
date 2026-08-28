@@ -17,6 +17,7 @@
         <module>saksbehandling-api</module>
         <module>tjeneste</module>
         <module>min-side-varsel</module>
+        <module>pdf</module>
     </modules>
 
 </project>

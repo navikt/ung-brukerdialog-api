@@ -23,6 +23,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigrerOppgaveDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsRequest;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.MigreringsResultat;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraDtoTilEntitet;
@@ -115,6 +116,9 @@ public class MigrerBrukerdialogOppgaverRestTjeneste {
                     oppgaveDto.aktørId(),
                     oppgaveDto.respons(),
                     oppgaveDto.status(),
+                    // MigrerOppgaveDto mangler ytelsetype - migrering gjelder kun ungdomsytelse.
+                    // Journalføres ikke: oppgaver opprettes direkte via repository, ikke via OppgaveLivssyklusTjeneste.
+                    OppgaveYtelsetype.UNGDOMSYTELSE,
                     frist,
                     løstDato,
                     opprettetTidspunkt,
