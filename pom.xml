@@ -32,10 +32,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.deploy.skip>true</maven.deploy.skip>
         <felles.version>12.1.0</felles.version>
-        <swagger.version>2.2.53</swagger.version>
-        <junit.version>6.1.2</junit.version>
+        <swagger.version>2.2.54</swagger.version>
+        <junit.version>6.1.3</junit.version>
         <k9format.version>13.4.0</k9format.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <asm.version>9.10.1</asm.version>
         <kotlin-stdlib.version>2.4.10</kotlin-stdlib.version>
         <jandex.version>3.6.0</jandex.version>
@@ -46,9 +46,9 @@
         <ung-deltakelse-opplyser.version>2.11.3</ung-deltakelse-opplyser.version>
         <handlebars.version>4.5.4</handlebars.version>
         <validation-model-jakarta.version>1.30.2</validation-model-jakarta.version>
-        <openhtmltopdf.version>1.1.66</openhtmltopdf.version>
+        <openhtmltopdf.version>1.1.74</openhtmltopdf.version>
         <jsoup.version>1.23.1</jsoup.version>
-        <commonmark.version>0.29.0</commonmark.version>
+        <commonmark.version>0.30.0</commonmark.version>
         <tms-mikrofrontend-builder.version>3.0.0</tms-mikrofrontend-builder.version>
         <tms-java-builder.version>2.2.0</tms-java-builder.version>
     </properties>
@@ -176,7 +176,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>2.30.0</version>
+                <version>2.31.0</version>
             </dependency>
 
             <!-- Prosjektets egne biblioteker -->
@@ -453,7 +453,7 @@
                 <!-- lagt her for å sikre dependencyConvergence -->
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.186</version>
+                <version>4.8.193</version>
             </dependency>
             <dependency>
                 <!-- lagt her for å sikre dependencyConvergence -->
@@ -506,7 +506,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.12.1</version>
+                <version>1.12.2</version>
             </dependency>
 
             <!-- Brev/formidling -->
