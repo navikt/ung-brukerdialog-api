@@ -6,6 +6,7 @@ import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
@@ -185,7 +186,7 @@ class OppgaveDokumentUtlederRenderingTest {
     void svarfrist_utelates_når_fristTid_mangler_bosted_opphør() {
         var utleder = new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(
             new BekreftBostedOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1), false, null,
-                BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT)));
+                BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)));
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
@@ -227,14 +228,14 @@ class OppgaveDokumentUtlederRenderingTest {
             Arguments.of(scenario("bosted - bundet periode, ANNET-årsak, svarfrist",
                 new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,
-                    "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET))),
+                    "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.ANNET, "en veileder hos Nav"))),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 2, 1, 0, 0)),
-                "1. januar 2025", "31. januar 2025", "Bor i Trondheim: Ja", "Bor midlertidig i utlandet",
+                "1. januar 2025", "31. januar 2025", "Bor i Trondheim: Ja", "Bor midlertidig i utlandet", "en veileder hos Nav",
                 "Fristen for å svare er senest 1. februar 2025.")),
 
             Arguments.of(scenario("bosted - opphør, UDEFINERT-årsak, ingen svarfrist",
                 new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
-                    LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT))),
+                    LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null))),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Dette gjelder fra og med", "1. mars 2025", "Bor i Trondheim: Nei")),
 

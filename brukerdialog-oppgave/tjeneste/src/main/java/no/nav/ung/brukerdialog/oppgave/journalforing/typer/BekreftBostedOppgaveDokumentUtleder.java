@@ -8,6 +8,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
@@ -64,6 +65,8 @@ public class BekreftBostedOppgaveDokumentUtleder implements OppgaveDokumentUtled
         boolean erBosattITrondheim;
         String fritekst;
         BostedsvilkårIkkeOppfyltÅrsak årsak;
+        BostedsavklaringKildeType kilde;
+        String kildeFritekst;
 
         if (dto instanceof BekreftBostedOppgavetypeDataDto bundet) {
             fom = bundet.fom();
@@ -71,6 +74,8 @@ public class BekreftBostedOppgaveDokumentUtleder implements OppgaveDokumentUtled
             erBosattITrondheim = bundet.erBosattITrondheim();
             fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
             årsak = bundet.ikkeOppfyltÅrsak();
+            kilde = bundet.kilde();
+            kildeFritekst = bundet.kildeFritekst();
         } else {
             var opphør = (BekreftBostedOpphørOppgavetypeDataDto) dto;
             fom = opphør.fom();
@@ -78,6 +83,8 @@ public class BekreftBostedOppgaveDokumentUtleder implements OppgaveDokumentUtled
             erBosattITrondheim = opphør.erBosattITrondheim();
             fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
             årsak = opphør.ikkeOppfyltÅrsak();
+            kilde = opphør.kilde();
+            kildeFritekst = opphør.kildeFritekst();
         }
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -90,6 +97,7 @@ public class BekreftBostedOppgaveDokumentUtleder implements OppgaveDokumentUtled
         if (forklaring != null) {
             data.put("ikkeOppfyltForklaring", forklaring);
         }
+        data.put("kildeForklaring", OppgaveDokumentTekster.bostedKildeForklaring(kilde, kildeFritekst));
         OppgaveDokumentTekster.leggTilSvarfrist(data, oppgave.getFristTid());
         return data;
     }

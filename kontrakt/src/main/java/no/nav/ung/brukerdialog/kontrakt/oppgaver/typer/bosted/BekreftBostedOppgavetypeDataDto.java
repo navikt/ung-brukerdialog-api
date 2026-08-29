@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 
@@ -24,7 +25,13 @@ public record BekreftBostedOppgavetypeDataDto(
     String ikkeOppfyltÅrsakFritekstbeskrivelse,
 
     @NotNull
-    BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
+    BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
+
+    @NotNull
+    BostedsavklaringKildeType kilde,
+
+    @Size(max = 1000)
+    String kildeFritekst
 
 ) implements OppgavetypeDataDto {
     @Override

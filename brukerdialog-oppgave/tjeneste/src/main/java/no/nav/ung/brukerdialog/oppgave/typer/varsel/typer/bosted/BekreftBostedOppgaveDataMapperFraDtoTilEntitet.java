@@ -5,6 +5,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraDtoTilEntitet;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
@@ -28,14 +29,18 @@ public class BekreftBostedOppgaveDataMapperFraDtoTilEntitet implements OppgaveDa
                 LocalDate tom,
                 Boolean erBosattITrondheim,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
-                BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
-            ) -> new BekreftBostedOppgaveDataEntitet(fom, tom, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak);
+                BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
+                BostedsavklaringKildeType kilde,
+                String kildeFritekst
+            ) -> new BekreftBostedOppgaveDataEntitet(fom, tom, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak, kilde, kildeFritekst);
             case BekreftBostedOpphørOppgavetypeDataDto(
                 LocalDate fom,
                 Boolean erBosattITrondheim,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
-                BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak
-            ) -> new BekreftBostedOppgaveDataEntitet(fom, null, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak);
+                BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
+                BostedsavklaringKildeType kilde,
+                String kildeFritekst
+            ) -> new BekreftBostedOppgaveDataEntitet(fom, null, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak, kilde, kildeFritekst);
             default -> throw new IllegalArgumentException("Ugyldig data type: " + data.getClass());
         };
     }
