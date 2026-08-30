@@ -171,10 +171,11 @@ public final class OppgaveDokumentTekster {
     }
 
     public static String bostedKildeForklaring(BostedsavklaringKildeType kilde, String kildeFritekst) {
+        var fritekst = kildeFritekst == null ? "" : kildeFritekst.strip().replaceAll("\\.+$", "");
         return switch (kilde) {
-            case BRUKER -> "Vi har fått opplysninger fra deg.";
-            case FOLKEREGISTER -> "Vi har fått opplysninger fra Folkeregisteret";
-            case ANNET -> "Vi har fått opplysninger fra " + kildeFritekst;
+            case BRUKER -> "Vi har fått opplysninger om dette fra deg.";
+            case FOLKEREGISTER -> "Vi har fått opplysninger om dette fra Folkeregisteret.";
+            case ANNET ->"Vi har fått opplysninger om dette fra " + fritekst + ".";
         };
     }
 }

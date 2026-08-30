@@ -28,7 +28,7 @@ Kontrakt: [`BekreftBostedOppgavetypeDataDto`](../../../../kontrakt/src/main/java
 | `ikkeOppfyltÅrsak` | `BostedsvilkårIkkeOppfyltÅrsak` | Årsak til at bostedsvilkåret tas opp til vurdering     |
 | `ikkeOppfyltÅrsakFritekstbeskrivelse` | `String` | Fritekst, utfylt kun når årsak = `ANNET`               |
 | `kilde` | `BostedsavklaringKildeType` | Påkrevd. Hvor saksbehandler har fått opplysningene fra |
-| `kildeFritekst` | `String` | Fritekst, utfylt kun når kilde = `ANNET                |
+| `kildeFritekst` | `String` | Påkrevd når kilde = `ANNET`                            |
 
 Opphørsvarianten [`BekreftBostedOpphørOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/bosted/BekreftBostedOpph%C3%B8rOppgavetypeDataDto.java)
 har de samme feltene, men uten `tom`.

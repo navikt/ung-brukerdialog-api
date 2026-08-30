@@ -50,6 +50,9 @@ public class BekreftBostedOppgaveDataEntitet extends OppgaveDataEntitet {
         this.ikkeOppfyltÅrsakFritekstbeskrivelse = ikkeOppfyltÅrsakFritekstbeskrivelse;
         this.ikkeOppfyltÅrsak = ikkeOppfyltÅrsak;
         this.kilde = Objects.requireNonNull(kilde, "kilde");
+        if (kilde == BostedsavklaringKildeType.ANNET && (kildeFritekst == null || kildeFritekst.isBlank())) {
+            throw new IllegalArgumentException("kildeFritekst er påkrevd når kilde = ANNET");
+        }
         this.kildeFritekst = kildeFritekst;
     }
 

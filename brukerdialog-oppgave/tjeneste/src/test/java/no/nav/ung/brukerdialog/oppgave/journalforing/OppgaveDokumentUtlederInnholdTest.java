@@ -107,7 +107,7 @@ class OppgaveDokumentUtlederInnholdTest {
                     "tom", "2025-01-31",
                     "erBosattITrondheim", "Ja",
                     "ikkeOppfyltForklaring", "Annet.",
-                    "kildeForklaring", "Vi har fått opplysninger fra deg."));
+                    "kildeForklaring", "Vi har fått opplysninger om dette fra deg."));
 
             case BEKREFT_ENDRET_STARTDATO -> new Scenario(
                 new EndretStartdatoOppgaveDokumentUtleder(mappereSomGir(
