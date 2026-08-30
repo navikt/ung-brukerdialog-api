@@ -3,7 +3,9 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import no.nav.k9.felles.validering.InputValideringRegex;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 
@@ -20,6 +22,8 @@ public record BekreftBostedOpphørOppgavetypeDataDto(
     @NotNull
     Boolean erBosattITrondheim,
 
+    @Size(max = 4000)
+    @Pattern(regexp = InputValideringRegex.FRITEKST, message = "ikkeOppfyltÅrsakFritekstbeskrivelse inneholder ugyldige tegn")
     String ikkeOppfyltÅrsakFritekstbeskrivelse,
 
     @NotNull
@@ -29,6 +33,7 @@ public record BekreftBostedOpphørOppgavetypeDataDto(
     BostedsavklaringKildeType kilde,
 
     @Size(max = 1000)
+    @Pattern(regexp = InputValideringRegex.FRITEKST, message = "kildeFritekst inneholder ugyldige tegn")
     String kildeFritekst
 
 ) implements OppgavetypeDataDto {

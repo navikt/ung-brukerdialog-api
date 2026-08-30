@@ -68,23 +68,27 @@ public class BekreftBostedOppgaveDokumentUtleder implements OppgaveDokumentUtled
         BostedsavklaringKildeType kilde;
         String kildeFritekst;
 
-        if (dto instanceof BekreftBostedOppgavetypeDataDto bundet) {
-            fom = bundet.fom();
-            tom = bundet.tom();
-            erBosattITrondheim = bundet.erBosattITrondheim();
-            fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
-            årsak = bundet.ikkeOppfyltÅrsak();
-            kilde = bundet.kilde();
-            kildeFritekst = bundet.kildeFritekst();
-        } else {
-            var opphør = (BekreftBostedOpphørOppgavetypeDataDto) dto;
-            fom = opphør.fom();
-            tom = null;
-            erBosattITrondheim = opphør.erBosattITrondheim();
-            fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
-            årsak = opphør.ikkeOppfyltÅrsak();
-            kilde = opphør.kilde();
-            kildeFritekst = opphør.kildeFritekst();
+        switch (dto) {
+            case BekreftBostedOppgavetypeDataDto bundet -> {
+                fom = bundet.fom();
+                tom = bundet.tom();
+                erBosattITrondheim = bundet.erBosattITrondheim();
+                fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
+                årsak = bundet.ikkeOppfyltÅrsak();
+                kilde = bundet.kilde();
+                kildeFritekst = bundet.kildeFritekst();
+            }
+            case BekreftBostedOpphørOppgavetypeDataDto opphør -> {
+                fom = opphør.fom();
+                tom = null;
+                erBosattITrondheim = opphør.erBosattITrondheim();
+                fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
+                årsak = opphør.ikkeOppfyltÅrsak();
+                kilde = opphør.kilde();
+                kildeFritekst = opphør.kildeFritekst();
+            }
+            default -> throw new IllegalArgumentException(
+                "Ikke støttet oppgavedata for " + OppgaveType.BEKREFT_BOSTED + ": " + dto.getClass().getName());
         }
 
         Map<String, Object> data = new LinkedHashMap<>();
