@@ -1,6 +1,7 @@
 package no.nav.ung.brukerdialog.oppgave.journalforing;
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
 
 import java.time.LocalDate;
@@ -166,6 +167,14 @@ public final class OppgaveDokumentTekster {
             case STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM -> "Studiestedet eller arbeidsstedet ditt er utenfor Trondheim.";
             case ANNET -> (fritekstbeskrivelse != null && !fritekstbeskrivelse.isBlank()) ? fritekstbeskrivelse : "Annet.";
             case UDEFINERT -> null;
+        };
+    }
+
+    public static String bostedKildeForklaring(BostedsavklaringKildeType kilde, String kildeFritekst) {
+        return switch (kilde) {
+            case BRUKER -> "Vi har fått opplysninger om dette fra deg.";
+            case FOLKEREGISTER -> "Vi har fått opplysninger om dette fra Folkeregisteret.";
+            case ANNET -> "Vi har fått opplysninger om dette fra " + kildeFritekst + ".";
         };
     }
 }

@@ -6,6 +6,7 @@ import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
@@ -92,7 +93,7 @@ class OppgaveLivssyklusTjenesteTest {
             UUID.randomUUID(), OppgaveType.BEKREFT_BOSTED, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
         var oppgavetypeData = new BekreftBostedOppgavetypeDataDto(
-            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null);
+            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null, BostedsavklaringKildeType.BRUKER, null);
 
         // Act
         tjeneste.opprettOppgave(oppgave, oppgavetypeData, null);
@@ -116,7 +117,7 @@ class OppgaveLivssyklusTjenesteTest {
             UUID.randomUUID(), OppgaveType.SØK_YTELSE, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
         var oppgavetypeData = new BekreftBostedOppgavetypeDataDto(
-            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null);
+            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null, BostedsavklaringKildeType.BRUKER, null);
 
         // Act
         tjeneste.opprettOppgave(oppgave, oppgavetypeData, null);
@@ -138,7 +139,7 @@ class OppgaveLivssyklusTjenesteTest {
             UUID.randomUUID(), OppgaveType.BEKREFT_BOSTED, new AktørId("1234567890123"),
             OppgaveYtelsetype.UNGDOMSYTELSE, null);
         var oppgavetypeData = new BekreftBostedOppgavetypeDataDto(
-            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null);
+            LocalDate.now(), LocalDate.now().plusMonths(1), true, null, null, BostedsavklaringKildeType.BRUKER, null);
         var saksnummer = new Saksnummer("ABC123");
 
         // Act

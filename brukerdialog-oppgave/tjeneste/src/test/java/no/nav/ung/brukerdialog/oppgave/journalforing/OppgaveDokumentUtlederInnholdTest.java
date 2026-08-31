@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
@@ -98,14 +99,15 @@ class OppgaveDokumentUtlederInnholdTest {
             case BEKREFT_BOSTED -> new Scenario(
                 new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null,
-                    BostedsvilkårIkkeOppfyltÅrsak.ANNET))),
+                    BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.BRUKER, null))),
                 "Bekrefte bosted for aktivitetspenger",
                 "typer/bekreft-bosted",
                 Map.of(
                     "fom", "2025-01-01",
                     "tom", "2025-01-31",
                     "erBosattITrondheim", "Ja",
-                    "ikkeOppfyltForklaring", "Annet."));
+                    "ikkeOppfyltForklaring", "Annet.",
+                    "kildeForklaring", "Vi har fått opplysninger om dette fra deg."));
 
             case BEKREFT_ENDRET_STARTDATO -> new Scenario(
                 new EndretStartdatoOppgaveDokumentUtleder(mappereSomGir(
@@ -299,7 +301,7 @@ class OppgaveDokumentUtlederInnholdTest {
     @Test
     void bekreftBosted_bundet_periode_uten_ikkeOppfyltÅrsak() {
         var utleder = new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
-            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT)));
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.BRUKER, null)));
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         Map<String, Object> innhold = utleder.utledInnholdsdata(oppgave);
@@ -312,7 +314,7 @@ class OppgaveDokumentUtlederInnholdTest {
     @Test
     void bekreftBosted_opphør_periode_uten_tom() {
         var utleder = new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
-            LocalDate.of(2025, 1, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSATTADRESSE_I_TRONDHEIM)));
+            LocalDate.of(2025, 1, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSATTADRESSE_I_TRONDHEIM, BostedsavklaringKildeType.BRUKER, null)));
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         Map<String, Object> innhold = utleder.utledInnholdsdata(oppgave);
@@ -325,7 +327,7 @@ class OppgaveDokumentUtlederInnholdTest {
     @Test
     void bekreftBosted_tittel_er_uavhengig_av_ytelsetype() {
         var utleder = new BekreftBostedOppgaveDokumentUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
-            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT)));
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.BRUKER, null)));
 
         assertThat(utleder.utledTittel(oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null)))
             .isEqualTo("Bekrefte bosted for aktivitetspenger");
