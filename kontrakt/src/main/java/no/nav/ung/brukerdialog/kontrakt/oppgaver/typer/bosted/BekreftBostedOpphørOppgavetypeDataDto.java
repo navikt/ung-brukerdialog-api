@@ -1,5 +1,6 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,7 @@ public record BekreftBostedOpphørOppgavetypeDataDto(
         return OppgaveType.BEKREFT_BOSTED;
     }
 
+    @JsonIgnore
     @AssertTrue(message = "kildeFritekst er påkrevd når kilde = ANNET")
     public boolean isKildeFritekstOk() {
         return kilde != BostedsavklaringKildeType.ANNET || (kildeFritekst != null && !kildeFritekst.isBlank());
