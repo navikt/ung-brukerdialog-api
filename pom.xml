@@ -14,6 +14,7 @@
         <module>kontrakt</module>
         <module>felles</module>
         <module>brukerdialog-oppgave</module>
+        <module>brukerdialog-sak</module>
 
         <!-- Web klient og server -->
         <module>web</module>
@@ -227,6 +228,11 @@
             <dependency>
                 <groupId>no.nav.ung.brukerdialog</groupId>
                 <artifactId>brukerdialog-oppgave-pdf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.ung.brukerdialog</groupId>
+                <artifactId>brukerdialog-sak</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
