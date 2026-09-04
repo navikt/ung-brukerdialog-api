@@ -26,10 +26,10 @@ public class SøknadHendelseRepository {
 
     public List<SøknadHendelseEntitet> hentForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
         TypedQuery<SøknadHendelseEntitet> query = entityManager.createQuery(
-            "SELECT s FROM SøknadHendelse s WHERE s.aktørId = :aktoerId AND s.ytelseType = :ytelseType AND s.aktiv = true ORDER BY s.mottatt DESC",
+            "SELECT s FROM SøknadHendelse s WHERE s.aktørId = :aktørId AND s.ytelseType = :ytelseType AND s.aktiv = true ORDER BY s.mottatt DESC",
             SøknadHendelseEntitet.class
         );
-        query.setParameter("aktoerId", aktørId);
+        query.setParameter("aktørId", aktørId);
         query.setParameter("ytelseType", ytelseType);
         return query.getResultList();
     }

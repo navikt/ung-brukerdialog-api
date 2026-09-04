@@ -9,18 +9,18 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity(name = "SøknadHendelse")
-@Table(name = "BD_SOKNAD_HENDELSE")
+@Table(name = "BD_SOEKNAD_HENDELSE")
 public class SøknadHendelseEntitet extends BaseEntitet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_SOKNAD_HENDELSE")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_SOEKNAD_HENDELSE")
     private Long id;
 
     @Version
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    @Column(name = "soknad_id", nullable = false, updatable = false, unique = true)
+    @Column(name = "soeknad_id", nullable = false, updatable = false, unique = true)
     private UUID søknadId;
 
     @Embedded
