@@ -32,10 +32,12 @@ import no.nav.k9.prosesstask.api.ProsessTask;
 import no.nav.k9.prosesstask.api.ProsessTaskData;
 import no.nav.k9.prosesstask.api.ProsessTaskHandler;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.pdf.PdfDokument;
 import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
+import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.JournalpostId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
@@ -61,6 +63,9 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     /** Helautomatisk journalføring - ingen saksbehandler er involvert. */
     private static final String JOURNALFOERENDE_ENHET = "9999";
 
+    /** Ett generisk Handlebars-oppsett for alle oppgavetyper - se handlebars/oppgave.hbs. */
+    private static final String MALNAVN = "oppgave";
+
     private static final String TILLEGGSOPPLYSNING_NOKKEL = "ung.oppgave.eRef";
 
     private static final Set<OppgaveType> DEAKTIVERTE_OPPGAVETYPER = EnumSet.noneOf(OppgaveType.class);
@@ -70,7 +75,7 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     private OppgaveJournalføringRepository journalføringRepository;
     private BrukerdialogOppgaveRepository oppgaveRepository;
     private boolean journalføringEnabled;
-    private Instance<OppgaveDokumentUtleder> dokumentUtledere;
+    private Instance<OppgaveInnholdUtleder> innholdUtledere;
     private PdlKlient pdl;
     private PdfGenerator pdfGenerator;
     private DokarkivKlient dokarkivKlient;
@@ -84,14 +89,14 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
                                   BrukerdialogOppgaveRepository oppgaveRepository,
                                   @KonfigVerdi(value = "JOURNALFORING_ENABLED", defaultVerdi = "false")
                                   boolean journalføringEnabled,
-                                  @Any Instance<OppgaveDokumentUtleder> dokumentUtledere,
+                                  @Any Instance<OppgaveInnholdUtleder> innholdUtledere,
                                   PdlKlient pdl,
                                   PdfGenerator pdfGenerator,
                                   DokarkivKlient dokarkivKlient) {
         this.journalføringRepository = journalføringRepository;
         this.oppgaveRepository = oppgaveRepository;
         this.journalføringEnabled = journalføringEnabled;
-        this.dokumentUtledere = dokumentUtledere;
+        this.innholdUtledere = innholdUtledere;
         this.pdl = pdl;
         this.pdfGenerator = pdfGenerator;
         this.dokarkivKlient = dokarkivKlient;
@@ -123,12 +128,13 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         PersonInfo person = hentPersonInfo(oppgave);
 
-        OppgaveDokumentUtleder dokumentUtleder = OppgaveDokumentUtleder.finnUtleder(dokumentUtledere, oppgave.getOppgaveType());
-        String dokumentTittel = dokumentUtleder.utledTittel(oppgave);
-        Map<String, Object> oppgaveData = byggOppgaveData(dokumentUtleder, oppgave);
+        OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());
+        String dokumentTittel = innholdUtleder.tittel(oppgave);
+        List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgave);
 
         String opprettetDato = oppgave.getOpprettetTidspunkt().toLocalDate().toString();
-        byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(dokumentUtleder.malnavn(), byggPdfData(dokumentTittel, opprettetDato, oppgaveData, person)));
+        Map<String, Object> pdfData = byggPdfData(dokumentTittel, opprettetDato, tekster, oppgave.getOppgavereferanse().toString(), person);
+        byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(MALNAVN, pdfData));
 
         JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
         Saksnummer saksnummer = hentSaksnummer(prosessTaskData);
@@ -206,15 +212,16 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
     }
 
     /**
-     * Satt sentralt her for å unngå duplisering i alle {@link OppgaveDokumentUtleder}-implementasjonene.
+     * {@code oppgave}-undermappen inneholder både {@link OppgaveInnholdUtleder#tekster} (rendres
+     * i {@code {{#each oppgave.tekster}}}) og {@code oppgaveReferanse} (brukt av
+     * {@code partial/footer.hbs}).
      */
-    private Map<String, Object> byggOppgaveData(OppgaveDokumentUtleder utleder, BrukerdialogOppgaveEntitet oppgave) {
-        Map<String, Object> data = new LinkedHashMap<>(utleder.utledInnholdsdata(oppgave));
-        data.putIfAbsent("oppgaveReferanse", oppgave.getOppgavereferanse().toString());
-        return data;
-    }
+    private Map<String, Object> byggPdfData(String tittel, String opprettetDato, List<OppgaveTekst> tekster,
+                                             String oppgaveReferanse, PersonInfo person) {
+        Map<String, Object> oppgaveData = new LinkedHashMap<>();
+        oppgaveData.put("tekster", tekster);
+        oppgaveData.put("oppgaveReferanse", oppgaveReferanse);
 
-    private Map<String, Object> byggPdfData(String tittel, String opprettetDato, Map<String, Object> oppgaveData, PersonInfo person) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("tittel", tittel);
         data.put("opprettetDato", opprettetDato);

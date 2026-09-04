@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -49,7 +51,17 @@ public record BrukerdialogOppgaveDto(
 
     @JsonProperty(value = "frist")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime frist
+    ZonedDateTime frist,
+
+    /**
+     * Fullstendig brevtekst for oppgaven, i visningsrekkefølge. Samme tekster som brukes i
+     * PDF-dokumentet og (det første elementet) i min-side-varselet - se {@link OppgaveTekst}.
+     * Tom liste dersom teksten ikke kunne utledes (se {@code BrukerdialogOppgaveMapper}), ikke
+     * en feilende respons.
+     */
+    @JsonProperty(value = "tekster", required = true)
+    @NotNull
+    List<OppgaveTekst> tekster
 ) {
 }
 

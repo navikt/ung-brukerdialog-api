@@ -15,7 +15,12 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveListe;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfBoxRenderer;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -36,6 +41,10 @@ public class PdfGenerator {
     private static final String FONTNAVN = "Source Sans Pro";
     private static final DateTimeFormatter DATO_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter TIDSPUNKT_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+    /** URL og lenketekst for «Min side»-lenken - se {@link #registrerLenkifyHelper}. */
+    private static final String MIN_SIDE_FRASE = "Min side på nav.no";
+    private static final String MIN_SIDE_URL = "https://www.nav.no/minside";
 
     private static final byte[] REGULAR_FONT = lesFontFil("Regular");
     private static final byte[] BOLD_FONT = lesFontFil("Bold");
@@ -61,7 +70,10 @@ public class PdfGenerator {
         Objects.requireNonNull(dokument, "dokument");
         Template template = kompilerMal(dokument.malnavn());
         Context context = Context.newBuilder(dokument.data())
-            .resolver(MapValueResolver.INSTANCE)
+            // MethodValueResolver trengs for å lese OppgaveTekst-recordenes accessor-metoder
+            // (tittel/innhold/fet/punkter/kolonneOverskrifter/rader) - MapValueResolver alene
+            // løser kun Map-nøkler, ikke metodekall på POJO-er/records nøstet i dataen.
+            .resolver(MapValueResolver.INSTANCE, MethodValueResolver.INSTANCE)
             .build();
         try {
             return template.apply(context);
@@ -107,6 +119,8 @@ public class PdfGenerator {
         registrerEqHelper(handlebars);
         registrerIsNotNullHelper(handlebars);
         registrerKronerHelper(handlebars);
+        registrerBlokktypeHelpere(handlebars);
+        registrerLenkifyHelper(handlebars);
         handlebars.infiniteLoops(true);
         return handlebars;
     }
@@ -157,24 +171,42 @@ public class PdfGenerator {
             context != null ? options.fn() : options.inverse());
     }
 
-    /** F.eks. «12 345 kr» - space som tusenskilletegn, ingen desimaler (beløp er alltid hele kroner). */
     private static void registrerKronerHelper(Handlebars handlebars) {
         handlebars.registerHelper("kroner", (Helper<Object>) (context, options) ->
-            context == null ? "" : formaterKroner(((Number) context).longValue()));
+            context == null ? "" : NorskBeløpFormat.kroner(((Number) context).longValue()));
     }
 
-    private static String formaterKroner(long beløp) {
-        String siffer = Long.toString(Math.abs(beløp));
-        StringBuilder gruppert = new StringBuilder();
-        int count = 0;
-        for (int i = siffer.length() - 1; i >= 0; i--) {
-            gruppert.append(siffer.charAt(i));
-            count++;
-            if (count % 3 == 0 && i != 0) {
-                gruppert.append(' ');
+    /**
+     * Blokktype-forgrening for {@code oppgave.hbs} - jknack Handlebars har ingen innebygd
+     * {@code instanceof}, så disse tre erstatter det for {@link OppgaveTekst}s forseglede
+     * undertyper. Alternativet (en egen strengbasert diskriminator-metode på grensesnittet) ville
+     * duplisert det {@code @JsonTypeInfo} allerede uttrykker for JSON - unngås bevisst.
+     */
+    private static void registrerBlokktypeHelpere(Handlebars handlebars) {
+        handlebars.registerHelper("isAvsnitt", (Helper<OppgaveTekst>) (tekst, options) ->
+            tekst instanceof OppgaveAvsnitt ? options.fn() : options.inverse());
+        handlebars.registerHelper("isListe", (Helper<OppgaveTekst>) (tekst, options) ->
+            tekst instanceof OppgaveListe ? options.fn() : options.inverse());
+        handlebars.registerHelper("isTabell", (Helper<OppgaveTekst>) (tekst, options) ->
+            tekst instanceof OppgaveTabell ? options.fn() : options.inverse());
+    }
+
+    /**
+     * Erstatter den faste frasen «Min side på nav.no» i en (allerede fritt formulert)
+     * tekstblokk med en faktisk lenke til Min side. Selve frasen er alltid en hardkodet konstant
+     * i {@code OppgaveTekster}/{@code *OppgaveInnholdUtleder} - aldri brukerinnhold - så det er
+     * trygt å sette inn rå HTML for akkurat denne frasen etter at resten av strengen er escapet.
+     */
+    private static void registrerLenkifyHelper(Handlebars handlebars) {
+        handlebars.registerHelper("lenkify", (Helper<String>) (context, options) -> {
+            if (context == null) {
+                return "";
             }
-        }
-        return (beløp < 0 ? "-" : "") + gruppert.reverse() + " kr";
+            String escaped = Handlebars.Utils.escapeExpression(context).toString();
+            String lenket = escaped.replace(MIN_SIDE_FRASE,
+                "<a href=\"%s\" title=\"%s\">%s</a>".formatted(MIN_SIDE_URL, MIN_SIDE_FRASE, MIN_SIDE_FRASE));
+            return new Handlebars.SafeString(lenket);
+        });
     }
 
     private static byte[] lesFontFil(String variant) {

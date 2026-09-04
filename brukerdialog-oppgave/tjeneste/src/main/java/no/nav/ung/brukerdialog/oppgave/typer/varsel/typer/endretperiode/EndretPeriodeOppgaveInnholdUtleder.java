@@ -1,22 +1,24 @@
-package no.nav.ung.brukerdialog.oppgave.journalforing.typer;
+package no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.PeriodeDTO;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.PeriodeEndringType;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
+import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
-import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveDokumentTekster;
-import no.nav.ung.brukerdialog.oppgave.journalforing.OppgaveDokumentUtleder;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,13 +26,17 @@ import java.util.Set;
  * {@code sif-api/src/api/parse-utils/parseOppgaverElement.ts} - se {@link #bestemGren}.
  * <p>
  * <b>Bevisst avvik fra frontend:</b> uventede kombinasjoner (bl.a. {@code ANDRE_ENDRINGER}) får
- * frontend til å kaste et unntak, siden oppgaven da bare ikke vises. Journalføring MÅ likevel
- * produsere et gyldig, arkiverbart dokument - derfor finnes {@code GrenType.UKJENT} som fallback
- * i stedet for en exception.
+ * frontend til å kaste et unntak, siden oppgaven da bare ikke vises. Journalføring og varsel MÅ
+ * likevel produsere gyldig innhold - derfor finnes {@code GrenType.UKJENT} som fallback i stedet
+ * for en exception.
+ * <p>
+ * Delt tekstbygging med {@code EndretStartdatoOppgaveInnholdUtleder} (gren {@code STARTDATO}) og
+ * {@code EndretSluttdatoOppgaveInnholdUtleder} (gren {@code SLUTTDATO}) via {@link OppgaveTekster},
+ * slik at teksten ikke kan drifte i to retninger.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_PERIODE)
 @ApplicationScoped
-public class EndretPeriodeOppgaveDokumentUtleder implements OppgaveDokumentUtleder {
+public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
 
     private enum GrenType {STARTDATO, SLUTTDATO, FJERNET, START_OG_SLUTT, UKJENT}
 
@@ -38,36 +44,36 @@ public class EndretPeriodeOppgaveDokumentUtleder implements OppgaveDokumentUtled
     }
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
+    private String ungdomsprogramytelsenDeltakerBaseUrl;
 
-    EndretPeriodeOppgaveDokumentUtleder() {
+    EndretPeriodeOppgaveInnholdUtleder() {
         // for CDI proxy
     }
 
     @Inject
-    public EndretPeriodeOppgaveDokumentUtleder(@Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere) {
+    public EndretPeriodeOppgaveInnholdUtleder(
+        @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+    ) {
         this.mappere = mappere;
+        this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
     }
 
     @Override
-    public String utledTittel(BrukerdialogOppgaveEntitet oppgave) {
+    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
         Gren gren = bestemGren(hentDto(oppgave));
         OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();
         return switch (gren.type()) {
-            case STARTDATO -> OppgaveDokumentTekster.endretStartdatoTittel(ytelsetype);
-            case SLUTTDATO -> OppgaveDokumentTekster.endretSluttdatoTittel(ytelsetype, gren.erMeldtUt());
-            case FJERNET -> OppgaveDokumentTekster.fjernetPeriodeTittel(ytelsetype);
-            case START_OG_SLUTT -> OppgaveDokumentTekster.endretStartOgSluttdatoTittel(ytelsetype);
-            case UKJENT -> OppgaveDokumentTekster.ukjentPeriodeendringTittel(ytelsetype);
+            case STARTDATO -> OppgaveTekster.endretStartdatoTittel(ytelsetype);
+            case SLUTTDATO -> OppgaveTekster.endretSluttdatoTittel(ytelsetype, gren.erMeldtUt());
+            case FJERNET -> OppgaveTekster.fjernetPeriodeTittel(ytelsetype);
+            case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoTittel(ytelsetype);
+            case UKJENT -> OppgaveTekster.ukjentPeriodeendringTittel(ytelsetype);
         };
     }
 
     @Override
-    public String malnavn() {
-        return "typer/endret-periode";
-    }
-
-    @Override
-    public Map<String, Object> utledInnholdsdata(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
         EndretPeriodeDataDto dto = hentDto(oppgave);
         Gren gren = bestemGren(dto);
         OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();
@@ -75,19 +81,22 @@ public class EndretPeriodeOppgaveDokumentUtleder implements OppgaveDokumentUtled
         PeriodeDTO ny = dto.nyPeriode();
         PeriodeDTO forrige = dto.forrigePeriode();
 
-        Map<String, Object> data = switch (gren.type()) {
-            case STARTDATO -> OppgaveDokumentTekster.endretStartdatoInnhold(
+        return switch (gren.type()) {
+            case STARTDATO -> OppgaveTekster.endretStartdatoInnhold(
                 ny.getFomDato(), forrige.getFomDato(), ytelsetype, fristTid);
-            case SLUTTDATO -> OppgaveDokumentTekster.endretSluttdatoInnhold(
+            case SLUTTDATO -> OppgaveTekster.endretSluttdatoInnhold(
                 ny.getTomDato(), forrige != null ? forrige.getTomDato() : null, ytelsetype, fristTid);
-            case FJERNET -> OppgaveDokumentTekster.fjernetPeriodeInnhold(ytelsetype, fristTid);
-            case START_OG_SLUTT -> OppgaveDokumentTekster.endretStartOgSluttdatoInnhold(
+            case FJERNET -> OppgaveTekster.fjernetPeriodeInnhold(ytelsetype, fristTid);
+            case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoInnhold(
                 ny.getFomDato(), ny.getTomDato(), ytelsetype, fristTid);
-            case UKJENT -> OppgaveDokumentTekster.ukjentPeriodeendringInnhold(
+            case UKJENT -> OppgaveTekster.ukjentPeriodeendringInnhold(
                 ny != null ? ny.getFomDato() : null, ny != null ? ny.getTomDato() : null, ytelsetype, fristTid);
         };
-        data.put("periodeEndringType", gren.type().name());
-        return data;
+    }
+
+    @Override
+    public String varselLenke(BrukerdialogOppgaveEntitet oppgave) {
+        return ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
     }
 
     /**

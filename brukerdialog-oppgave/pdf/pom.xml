@@ -24,6 +24,11 @@
             <groupId>no.nav.k9.felles.integrasjon</groupId>
             <artifactId>k9-felles-integrasjon-rest-klient</artifactId>
         </dependency>
+        <!-- OppgaveTekst-hierarkiet (delt datamodell for PDF/varsel/DTO) - se kontrakt/.../tekst. -->
+        <dependency>
+            <groupId>no.nav.ung.brukerdialog</groupId>
+            <artifactId>kontrakt</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars</artifactId>
