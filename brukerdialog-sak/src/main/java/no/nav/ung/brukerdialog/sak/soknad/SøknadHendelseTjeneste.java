@@ -34,8 +34,8 @@ public class SøknadHendelseTjeneste {
         if (TilgjengeligSøknadUtleder.utled(tidligereSøknader).type() == TilgjengeligSøknadType.INGEN) {
             throw new SøknadIkkeTilgjengeligException(tidligereSøknader.stream()
                 .findFirst()
-                .map(s -> "Deltakeren kan ikke sende søknad nå. Det finnes allerede en registrert søknad, innsendt " + s.getMottatt() + ".")
-                .orElse("Deltakeren kan ikke sende søknad nå."));
+                .map(s -> "Bruker kan ikke sende søknad nå. Det finnes allerede en registrert søknad, innsendt " + s.getMottatt() + ".")
+                .orElse("Bruker kan ikke sende søknad nå."));
         }
 
         var entitet = new SøknadHendelseEntitet(request.søknadId(), aktørId, ytelseType, request.mottatt());

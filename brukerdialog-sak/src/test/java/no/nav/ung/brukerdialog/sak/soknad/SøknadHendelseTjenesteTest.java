@@ -63,7 +63,7 @@ class SøknadHendelseTjenesteTest {
     }
 
     @Test
-    void skal_kunne_sende_førstegangssøknad_når_deltakeren_ikke_har_søkt_før() {
+    void skal_kunne_sende_førstegangssøknad_når_bruker_ikke_har_søkt_før() {
         var tilgjengeligSøknad = tjeneste.finnTilgjengeligSøknad(AktørId.dummy(), YTELSE);
 
         assertThat(tilgjengeligSøknad.type()).isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
@@ -72,7 +72,7 @@ class SøknadHendelseTjenesteTest {
 
     @Test
     @Disabled("aktiveres i del 2 PR")
-    void skal_ikke_kunne_søke_når_deltakeren_allerede_har_søkt() {
+    void skal_ikke_kunne_søke_når_bruker_allerede_har_søkt() {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
@@ -87,7 +87,7 @@ class SøknadHendelseTjenesteTest {
     }
 
     @Test
-    void deaktivert_søknad_skal_ikke_sperre_deltakeren_fra_å_søke_på_nytt() {
+    void deaktivert_søknad_skal_ikke_bruker_deltakeren_fra_å_søke_på_nytt() {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
