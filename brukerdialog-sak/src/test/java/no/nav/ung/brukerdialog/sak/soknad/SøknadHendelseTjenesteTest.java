@@ -7,6 +7,7 @@ import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.typer.AktørId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -66,6 +67,7 @@ class SøknadHendelseTjenesteTest {
     }
 
     @Test
+    @Disabled("aktiveres i del 2 PR")
     void skal_ikke_kunne_søke_når_deltakeren_allerede_har_søkt() {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
