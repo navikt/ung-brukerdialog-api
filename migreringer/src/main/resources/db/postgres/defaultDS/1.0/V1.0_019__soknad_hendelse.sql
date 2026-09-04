@@ -18,7 +18,7 @@ create table BD_SOKNAD_HENDELSE
 create index idx_bd_soknad_hendelse_aktoer_ytelse on BD_SOKNAD_HENDELSE (aktoer_id, ytelse_type, mottatt desc);
 
 comment on table BD_SOKNAD_HENDELSE is 'Registrering av at en deltaker har sendt inn søknad. Opprettes synkront av k9-brukerdialog-prosessering ved innsending, og brukes til å avgjøre om deltakeren kan sende ny søknad.';
-comment on column BD_SOKNAD_HENDELSE.soknad_id is 'Søknadens id fra brukerdialogen. Unik - gir idempotens ved gjentatt innsending av samme søknad.';
+comment on column BD_SOKNAD_HENDELSE.soknad_id is 'Søknadens id fra brukerdialogen.';
 comment on column BD_SOKNAD_HENDELSE.aktoer_id is 'AktørId til deltakeren som sendte inn søknaden.';
 comment on column BD_SOKNAD_HENDELSE.ytelse_type is 'Ytelsen søknaden gjelder. En deltaker kan ha flere søknader per ytelse.';
 comment on column BD_SOKNAD_HENDELSE.mottatt is 'Tidspunktet søknaden ble mottatt i brukerdialogen.';

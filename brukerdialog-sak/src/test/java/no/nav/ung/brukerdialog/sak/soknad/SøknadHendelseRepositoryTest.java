@@ -24,7 +24,7 @@ class SøknadHendelseRepositoryTest {
     private SøknadHendelseRepository repository;
 
     @Test
-    void skal_persistere_og_hente_søknadshendelser_for_søknadId_og_for_aktør_og_ytelsetype_sortert_nyeste_først() {
+    void skal_hente_aktive_søknadshendelser_for_aktør_og_ytelsetype_sortert_nyeste_først() {
         var aktørId = AktørId.dummy();
         var annenAktørId = AktørId.dummy();
         var eldsteSøknadId = UUID.randomUUID();
@@ -37,25 +37,24 @@ class SøknadHendelseRepositoryTest {
         entityManager.flush();
         entityManager.clear();
 
-        var hentetPåSøknadId = repository.hentForSøknadId(eldsteSøknadId);
-        assertThat(hentetPåSøknadId).isPresent();
-        assertThat(hentetPåSøknadId.get().getAktørId()).isEqualTo(aktørId);
-        assertThat(hentetPåSøknadId.get().getYtelseType()).isEqualTo(FagsakYtelseType.AKTIVITETSPENGER);
-        assertThat(hentetPåSøknadId.get().getMottatt()).isEqualTo(eldsteMottatt);
-
-        assertThat(repository.hentForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER))
+        var hendelser = repository.hentForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER);
+        assertThat(hendelser)
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(nyesteSøknadId, eldsteSøknadId);
-        assertThat(repository.hentForAktørOgYtelse(annenAktørId, FagsakYtelseType.AKTIVITETSPENGER)).isEmpty();
-        assertThat(repository.hentForSøknadId(UUID.randomUUID())).isEmpty();
+        assertThat(hendelser.getFirst().getAktørId()).isEqualTo(aktørId);
+        assertThat(hendelser.getFirst().getYtelseType()).isEqualTo(FagsakYtelseType.AKTIVITETSPENGER);
+        assertThat(hendelser.getFirst().getMottatt()).isEqualTo(nyesteMottatt);
 
-        repository.hentForSøknadId(nyesteSøknadId).orElseThrow().deaktiver();
+        assertThat(repository.hentForAktørOgYtelse(annenAktørId, FagsakYtelseType.AKTIVITETSPENGER)).isEmpty();
+
+        var nyeste = hendelser.getFirst();
+        nyeste.deaktiver();
         entityManager.flush();
         entityManager.clear();
 
         assertThat(repository.hentForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER))
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(eldsteSøknadId);
-        assertThat(repository.hentForSøknadId(nyesteSøknadId)).isPresent();
+        assertThat(entityManager.find(SøknadHendelseEntitet.class, nyeste.getId())).isNotNull();
     }
 }

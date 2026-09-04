@@ -9,6 +9,8 @@ import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @Dependent
 public class SøknadHendelseTjeneste {
 
@@ -22,12 +24,13 @@ public class SøknadHendelseTjeneste {
     }
 
     public void registrer(AktørId aktørId, FagsakYtelseType ytelseType, OpprettSøknadHendelseRequest request) {
-        if (repository.hentForSøknadId(request.søknadId()).isPresent()) {
+        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentForAktørOgYtelse(aktørId, ytelseType);
+
+        if (tidligereSøknader.stream().anyMatch(it -> it.getSøknadId().equals(request.søknadId()))) {
             log.info("Søknadshendelse for søknadId={} er allerede registrert.", request.søknadId());
             return;
         }
 
-        var tidligereSøknader = repository.hentForAktørOgYtelse(aktørId, ytelseType);
         if (TilgjengeligSøknadUtleder.utled(tidligereSøknader).type() == TilgjengeligSøknadType.INGEN) {
             throw new SøknadIkkeTilgjengeligException(tidligereSøknader.stream()
                 .findFirst()

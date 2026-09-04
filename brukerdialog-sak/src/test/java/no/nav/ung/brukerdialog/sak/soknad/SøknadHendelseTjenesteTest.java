@@ -40,11 +40,12 @@ class SøknadHendelseTjenesteTest {
 
         tjeneste.registrer(aktørId, YTELSE, request);
 
-        var lagret = repository.hentForSøknadId(request.søknadId());
-        assertThat(lagret).isPresent();
-        assertThat(lagret.get().getAktørId()).isEqualTo(aktørId);
-        assertThat(lagret.get().getYtelseType()).isEqualTo(YTELSE);
-        assertThat(lagret.get().getMottatt()).isEqualTo(MOTTATT);
+        var lagret = repository.hentForAktørOgYtelse(aktørId, YTELSE);
+        assertThat(lagret).hasSize(1);
+        assertThat(lagret.getFirst().getSøknadId()).isEqualTo(request.søknadId());
+        assertThat(lagret.getFirst().getAktørId()).isEqualTo(aktørId);
+        assertThat(lagret.getFirst().getYtelseType()).isEqualTo(YTELSE);
+        assertThat(lagret.getFirst().getMottatt()).isEqualTo(MOTTATT);
     }
 
     @Test
@@ -53,7 +54,10 @@ class SøknadHendelseTjenesteTest {
         var request = request();
 
         tjeneste.registrer(aktørId, YTELSE, request);
-        tjeneste.registrer(aktørId, YTELSE, request);
+        entityManager.flush();
+        entityManager.clear();
+        // Ny UUID-instans med samme verdi, slik ei deserialisert gjeninnsending fra kbp ser ut.
+        tjeneste.registrer(aktørId, YTELSE, request(UUID.fromString(request.søknadId().toString())));
 
         assertThat(repository.hentForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
     }
@@ -85,10 +89,11 @@ class SøknadHendelseTjenesteTest {
     @Test
     void deaktivert_søknad_skal_ikke_sperre_deltakeren_fra_å_søke_på_nytt() {
         var aktørId = AktørId.dummy();
-        var førsteRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, førsteRequest);
+        tjeneste.registrer(aktørId, YTELSE, request());
 
-        repository.hentForSøknadId(førsteRequest.søknadId()).orElseThrow().deaktiver();
+        var førsteSøknad = repository.hentForAktørOgYtelse(aktørId, YTELSE).getFirst();
+        var førsteSøknadId = førsteSøknad.getId();
+        førsteSøknad.deaktiver();
         entityManager.flush();
         entityManager.clear();
 
@@ -101,10 +106,14 @@ class SøknadHendelseTjenesteTest {
         assertThat(repository.hentForAktørOgYtelse(aktørId, YTELSE))
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(nyRequest.søknadId());
-        assertThat(repository.hentForSøknadId(førsteRequest.søknadId())).isPresent();
+        assertThat(entityManager.find(SøknadHendelseEntitet.class, førsteSøknadId)).isNotNull();
     }
 
     private static OpprettSøknadHendelseRequest request() {
-        return new OpprettSøknadHendelseRequest(UUID.randomUUID(), MOTTATT);
+        return request(UUID.randomUUID());
+    }
+
+    private static OpprettSøknadHendelseRequest request(UUID søknadId) {
+        return new OpprettSøknadHendelseRequest(søknadId, MOTTATT);
     }
 }
