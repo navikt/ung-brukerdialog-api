@@ -3,7 +3,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
-import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadDto;
+import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class SøknadHendelseTjeneste {
         log.info("Registrerte søknadshendelse for søknadId={}.", request.søknadId());
     }
 
-    public TilgjengeligSøknadDto finnTilgjengeligSøknad(AktørId aktørId, FagsakYtelseType ytelseType) {
+    public TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId, FagsakYtelseType ytelseType) {
         return TilgjengeligSøknadUtleder.utled(repository.hentForAktørOgYtelse(aktørId, ytelseType));
     }
 }
