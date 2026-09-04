@@ -1,6 +1,6 @@
 package no.nav.ung.brukerdialog.sak.soknad;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -11,14 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@ApplicationScoped
+@Dependent
 public class SøknadHendelseRepository {
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    public SøknadHendelseRepository() {
-        // CDI proxy
-    }
 
     @Inject
     public SøknadHendelseRepository(EntityManager entityManager) {

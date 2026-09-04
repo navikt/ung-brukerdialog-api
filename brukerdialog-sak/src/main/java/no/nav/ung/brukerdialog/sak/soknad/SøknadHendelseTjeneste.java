@@ -1,6 +1,6 @@
 package no.nav.ung.brukerdialog.sak.soknad;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadDto;
@@ -9,16 +9,12 @@ import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ApplicationScoped
+@Dependent
 public class SøknadHendelseTjeneste {
 
     private static final Logger log = LoggerFactory.getLogger(SøknadHendelseTjeneste.class);
 
-    private SøknadHendelseRepository repository;
-
-    public SøknadHendelseTjeneste() {
-        // CDI proxy
-    }
+    private final SøknadHendelseRepository repository;
 
     @Inject
     public SøknadHendelseTjeneste(SøknadHendelseRepository repository) {
