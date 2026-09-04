@@ -1,0 +1,30 @@
+package no.nav.ung.brukerdialog.web.app.exceptions;
+
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import no.nav.k9.felles.log.util.LoggerUtils;
+import no.nav.ung.brukerdialog.kontrakt.FeilDto;
+import no.nav.ung.brukerdialog.kontrakt.FeilType;
+import no.nav.ung.brukerdialog.sak.soknad.SøknadIkkeTilgjengeligException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SøknadIkkeTilgjengeligExceptionMapper implements ExceptionMapper<SøknadIkkeTilgjengeligException> {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    @Override
+    public Response toResponse(SøknadIkkeTilgjengeligException exception) {
+        String message = exception.getMessage() != null ? LoggerUtils.removeLineBreaks(exception.getMessage()) : "";
+        log.info("Søknad ikke tilgjengelig: {}", message); // NOSONAR
+
+
+        return Response
+            .status(Response.Status.CONFLICT)
+            .entity(new FeilDto(FeilType.GENERELL_FEIL, exception.getMessage()))
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+
+    }
+}

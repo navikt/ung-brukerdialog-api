@@ -3,7 +3,6 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd">
 
-	<!-- Hibernate persistence unit. -->
 	<persistence-unit name="pu-default" transaction-type="RESOURCE_LOCAL">
 	   <provider>no.nav.k9.felles.jpa.VLPersistenceUnitProvider</provider>
 		<non-jta-data-source>jdbc/defaultDS</non-jta-data-source>
