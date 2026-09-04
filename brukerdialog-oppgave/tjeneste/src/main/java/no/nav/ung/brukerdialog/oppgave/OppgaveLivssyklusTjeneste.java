@@ -12,6 +12,8 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,7 +39,7 @@ public class OppgaveLivssyklusTjeneste {
 
     private ProsessTaskTjeneste prosessTaskTjeneste;
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
-    private Instance<OppgavelInnholdUtleder> varselInnholdUtledere;
+    private Instance<OppgaveInnholdUtleder> innholdUtledere;
     private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper;
 
     public OppgaveLivssyklusTjeneste() {
@@ -45,11 +48,11 @@ public class OppgaveLivssyklusTjeneste {
     @Inject
     public OppgaveLivssyklusTjeneste(ProsessTaskTjeneste prosessTaskTjeneste,
                                      BrukerdialogOppgaveRepository brukerdialogOppgaveRepository,
-                                     @Any Instance<OppgavelInnholdUtleder> varselInnholdUtledere,
+                                     @Any Instance<OppgaveInnholdUtleder> innholdUtledere,
                                      @Any Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapper) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.brukerdialogOppgaveRepository = brukerdialogOppgaveRepository;
-        this.varselInnholdUtledere = varselInnholdUtledere;
+        this.innholdUtledere = innholdUtledere;
         this.oppgaveDataMapper = oppgaveDataMapper;
     }
 
@@ -122,13 +125,21 @@ public class OppgaveLivssyklusTjeneste {
         opprettTaskForJournalføringHvisAktuelt(oppgaveEntitet, journalføring);
     }
 
+    /**
+     * Varselteksten på Min Side er alltid {@link OppgaveInnholdUtleder}s FØRSTE tekstblokk (se
+     * kontrakten på {@link OppgaveInnholdUtleder#tekster}) - samme tekst som første avsnitt i
+     * PDF-brevet og første element i {@code BrukerdialogOppgaveDto.tekster()}.
+     */
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
-        OppgavelInnholdUtleder oppgavelInnholdUtleder = OppgavelInnholdUtleder.finnUtleder(varselInnholdUtledere, oppgaveEntitet.getOppgaveType());
+        OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgaveEntitet.getOppgaveType());
+        List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgaveEntitet);
+        String varselTekst = ((OppgaveAvsnitt) tekster.getFirst()).innhold();
+
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(PubliserMinSideVarselTask.class);
         prosessTaskData.setProperty(PubliserMinSideVarselTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
         prosessTaskData.setProperty(ProsessTaskData.AKTØR_ID, oppgaveEntitet.getAktørId().getId());
-        prosessTaskData.setProperty(PubliserMinSideVarselTask.VARSEL_TEKST, oppgavelInnholdUtleder.utledVarselTekst(oppgaveEntitet));
-        prosessTaskData.setProperty(PubliserMinSideVarselTask.VARSEL_LENKE, oppgavelInnholdUtleder.utledVarselLenke(oppgaveEntitet));
+        prosessTaskData.setProperty(PubliserMinSideVarselTask.VARSEL_TEKST, varselTekst);
+        prosessTaskData.setProperty(PubliserMinSideVarselTask.VARSEL_LENKE, innholdUtleder.varselLenke(oppgaveEntitet));
         prosessTaskTjeneste.lagre(prosessTaskData);
     }
 

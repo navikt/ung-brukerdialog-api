@@ -6,11 +6,11 @@ import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
 import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgavelInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,9 +46,11 @@ class OppgaveLivssyklusTjenesteTest {
     @Mock
     private BrukerdialogOppgaveRepository brukerdialogOppgaveRepository;
     @Mock
-    private Instance<OppgavelInnholdUtleder> varselInnholdUtledereInstance;
+    private Instance<OppgaveInnholdUtleder> innholdUtledereInstance;
     @Mock
-    private Instance<OppgavelInnholdUtleder> varselInnholdUtlederValgt;
+    private Instance<OppgaveInnholdUtleder> innholdUtlederValgt;
+    @Mock
+    private OppgaveInnholdUtleder innholdUtleder;
     @Mock
     private Instance<OppgaveDataMapperFraDtoTilEntitet> oppgaveDataMapperInstance;
     @Mock
@@ -60,9 +62,11 @@ class OppgaveLivssyklusTjenesteTest {
 
     @BeforeEach
     void setUp() {
-        when(varselInnholdUtledereInstance.select(any(Annotation.class))).thenReturn(varselInnholdUtlederValgt);
-        when(varselInnholdUtlederValgt.isResolvable()).thenReturn(true);
-        when(varselInnholdUtlederValgt.get()).thenReturn(new BekreftBostedOppgavelInnholdUtleder());
+        when(innholdUtledereInstance.select(any(Annotation.class))).thenReturn(innholdUtlederValgt);
+        when(innholdUtlederValgt.isResolvable()).thenReturn(true);
+        when(innholdUtlederValgt.get()).thenReturn(innholdUtleder);
+        when(innholdUtleder.tekster(any())).thenReturn(List.of(new OppgaveAvsnitt("Varseltekst")));
+        when(innholdUtleder.varselLenke(any())).thenReturn("https://nav.no/minside");
 
         when(oppgaveDataMapperInstance.select(any(Annotation.class))).thenReturn(oppgaveDataMapperValgt);
         when(oppgaveDataMapperValgt.isResolvable()).thenReturn(true);
@@ -72,7 +76,7 @@ class OppgaveLivssyklusTjenesteTest {
         tjeneste = new OppgaveLivssyklusTjeneste(
             prosessTaskTjeneste,
             brukerdialogOppgaveRepository,
-            varselInnholdUtledereInstance,
+            innholdUtledereInstance,
             oppgaveDataMapperInstance
         );
     }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8"/>
+    <title>{{tittel}}</title>
+    <meta name="subject" content="{{tittel}}"/>
+    <meta name="author" content="nav.no"/>
+    {{> style}}
+</head>
+<body>
+{{> partial/header}}
+
+<div class="innholdscontainer">
+    {{#each oppgave.tekster}}
+        {{#isNotNull tittel}}<h3>{{tittel}}</h3>{{/isNotNull}}
+        {{#isAvsnitt this}}
+            <p{{#if fet}} class="fet"{{/if}}>{{lenkify innhold}}</p>
+        {{/isAvsnitt}}
+        {{#isListe this}}
+            <ul{{#if fet}} class="fet"{{/if}}>
+                {{#each punkter}}
+                    <li>{{lenkify this}}</li>
+                {{/each}}
+            </ul>
+        {{/isListe}}
+        {{#isTabell this}}
+            <table{{#if fet}} class="fet"{{/if}}>
+                <thead>
+                <tr>
+                    {{#each kolonneOverskrifter}}
+                        <th>{{this}}</th>
+                    {{/each}}
+                </tr>
+                </thead>
+                <tbody>
+                {{#each rader}}
+                    <tr>
+                        {{#each this}}
+                            <td>{{this}}</td>
+                        {{/each}}
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        {{/isTabell}}
+    {{/each}}
+</div>
+
+{{> partial/footer}}
+</body>
+</html>

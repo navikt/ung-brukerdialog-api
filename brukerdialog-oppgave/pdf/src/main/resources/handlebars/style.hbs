@@ -61,13 +61,12 @@
         line-height: 1.5;
     }
 
-    /* Seksjonsbrudd før svarfrist-avsnittet; fristsetningen er alltid blokkens første
-       avsnitt (verifisert i alle 8 maler), derfor auto-fet via :first-child. */
-    .frist {
-        margin-top: 24px;
-    }
-
-    .frist p:first-child {
+    /* Fet skrift for hele blokken - satt av OppgaveTekst#fet() (f.eks. den innledende
+       svarfrist-setningen). Gjelder hele blokken, ikke enkeltord/delsetninger - se Fase 1-
+       beslutning i plansporet for denne modellen. Bevisst tap: den forrige seksjonsbrudd-
+       marginen før svarfrist-avsnittet (.frist { margin-top: 24px }) er ikke gjenskapt, siden
+       den flate blokklisten ikke har noe strukturelt signal for et slikt skille. */
+    .fet, .fet li, .fet th, .fet td {
         font-weight: 700;
     }
 
@@ -80,7 +79,7 @@
         padding: 0;
     }
 
-    /* Første lenke i disse dokumentene (partial/min-side-lenke). */
+    /* Lenke inn i flytende brødtekst (se lenkify-Handlebars-helperen i PdfGenerator). */
     a {
         color: #0067c5;
         text-decoration: underline;
