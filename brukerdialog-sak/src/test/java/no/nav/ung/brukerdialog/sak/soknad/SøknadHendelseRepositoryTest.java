@@ -37,7 +37,7 @@ class SøknadHendelseRepositoryTest {
         entityManager.flush();
         entityManager.clear();
 
-        var hendelser = repository.hentForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER);
+        var hendelser = repository.hentAktivSøknadForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER);
         assertThat(hendelser)
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(nyesteSøknadId, eldsteSøknadId);
@@ -45,14 +45,14 @@ class SøknadHendelseRepositoryTest {
         assertThat(hendelser.getFirst().getYtelseType()).isEqualTo(FagsakYtelseType.AKTIVITETSPENGER);
         assertThat(hendelser.getFirst().getMottatt()).isEqualTo(nyesteMottatt);
 
-        assertThat(repository.hentForAktørOgYtelse(annenAktørId, FagsakYtelseType.AKTIVITETSPENGER)).isEmpty();
+        assertThat(repository.hentAktivSøknadForAktørOgYtelse(annenAktørId, FagsakYtelseType.AKTIVITETSPENGER)).isEmpty();
 
         var nyeste = hendelser.getFirst();
         nyeste.deaktiver();
         entityManager.flush();
         entityManager.clear();
 
-        assertThat(repository.hentForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER))
+        assertThat(repository.hentAktivSøknadForAktørOgYtelse(aktørId, FagsakYtelseType.AKTIVITETSPENGER))
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(eldsteSøknadId);
         assertThat(entityManager.find(SøknadHendelseEntitet.class, nyeste.getId())).isNotNull();

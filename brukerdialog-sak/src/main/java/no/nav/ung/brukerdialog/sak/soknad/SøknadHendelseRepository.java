@@ -24,7 +24,7 @@ public class SøknadHendelseRepository {
         entityManager.flush();
     }
 
-    public List<SøknadHendelseEntitet> hentForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
+    public List<SøknadHendelseEntitet> hentAktivSøknadForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
         TypedQuery<SøknadHendelseEntitet> query = entityManager.createQuery(
             "SELECT s FROM SøknadHendelse s WHERE s.aktørId = :aktørId AND s.ytelseType = :ytelseType AND s.aktiv = true ORDER BY s.mottatt DESC",
             SøknadHendelseEntitet.class

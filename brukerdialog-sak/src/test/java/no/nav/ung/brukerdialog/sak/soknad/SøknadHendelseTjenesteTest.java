@@ -40,7 +40,7 @@ class SøknadHendelseTjenesteTest {
 
         tjeneste.registrer(aktørId, YTELSE, request);
 
-        var lagret = repository.hentForAktørOgYtelse(aktørId, YTELSE);
+        var lagret = repository.hentAktivSøknadForAktørOgYtelse(aktørId, YTELSE);
         assertThat(lagret).hasSize(1);
         assertThat(lagret.getFirst().getSøknadId()).isEqualTo(request.søknadId());
         assertThat(lagret.getFirst().getAktørId()).isEqualTo(aktørId);
@@ -59,7 +59,7 @@ class SøknadHendelseTjenesteTest {
         // Ny UUID-instans med samme verdi, slik ei deserialisert gjeninnsending fra kbp ser ut.
         tjeneste.registrer(aktørId, YTELSE, request(UUID.fromString(request.søknadId().toString())));
 
-        assertThat(repository.hentForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
+        assertThat(repository.hentAktivSøknadForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
     }
 
     @Test
@@ -91,7 +91,7 @@ class SøknadHendelseTjenesteTest {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
-        var førsteSøknad = repository.hentForAktørOgYtelse(aktørId, YTELSE).getFirst();
+        var førsteSøknad = repository.hentAktivSøknadForAktørOgYtelse(aktørId, YTELSE).getFirst();
         var førsteSøknadId = førsteSøknad.getId();
         førsteSøknad.deaktiver();
         entityManager.flush();
@@ -103,7 +103,7 @@ class SøknadHendelseTjenesteTest {
         var nyRequest = request();
         tjeneste.registrer(aktørId, YTELSE, nyRequest);
 
-        assertThat(repository.hentForAktørOgYtelse(aktørId, YTELSE))
+        assertThat(repository.hentAktivSøknadForAktørOgYtelse(aktørId, YTELSE))
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(nyRequest.søknadId());
         assertThat(entityManager.find(SøknadHendelseEntitet.class, førsteSøknadId)).isNotNull();
