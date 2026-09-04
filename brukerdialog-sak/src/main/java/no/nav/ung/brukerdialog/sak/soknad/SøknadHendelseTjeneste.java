@@ -5,10 +5,13 @@ import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
+import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Dependent
@@ -17,33 +20,53 @@ public class SøknadHendelseTjeneste {
     private static final Logger log = LoggerFactory.getLogger(SøknadHendelseTjeneste.class);
 
     private final SøknadHendelseRepository repository;
+    private final FagsakRepository fagsakRepository;
+
 
     @Inject
-    public SøknadHendelseTjeneste(SøknadHendelseRepository repository) {
+    public SøknadHendelseTjeneste(SøknadHendelseRepository repository, FagsakRepository fagsakRepository) {
         this.repository = repository;
+        this.fagsakRepository = fagsakRepository;
     }
 
     public void registrer(AktørId aktørId, FagsakYtelseType ytelseType, OpprettSøknadHendelseRequest request) {
-        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentAktivSøknadForAktørOgYtelse(aktørId, ytelseType);
+        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, ytelseType);
 
         if (tidligereSøknader.stream().anyMatch(it -> it.getSøknadId().equals(request.søknadId()))) {
             log.info("Søknadshendelse for søknadId={} er allerede registrert.", request.søknadId());
             return;
         }
 
-        if (TilgjengeligSøknadUtleder.utled(tidligereSøknader).type() == TilgjengeligSøknadType.INGEN) {
+        var tilgjengeligeSøknad = utled(tidligereSøknader, aktørId, ytelseType);
+        if (tilgjengeligeSøknad.type() == TilgjengeligSøknadType.INGEN) {
             throw new SøknadIkkeTilgjengeligException(tidligereSøknader.stream()
+                .filter(hendelse -> hendelse.getMottattIFagsak() != null)
                 .findFirst()
-                .map(s -> "Bruker kan ikke sende søknad nå. Det finnes allerede en registrert søknad, innsendt " + s.getMottatt() + ".")
+                .map(hendelse -> "Bruker har allerede en ubehandlet søknad mottatt " + hendelse.getMottatt() + ".")
                 .orElse("Bruker kan ikke sende søknad nå."));
         }
 
-        var entitet = new SøknadHendelseEntitet(request.søknadId(), aktørId, ytelseType, request.mottatt());
-        repository.lagre(entitet);
+        repository.lagre(new SøknadHendelseEntitet(request.søknadId(), aktørId, ytelseType, request.mottatt()));
         log.info("Registrerte søknadshendelse for søknadId={}.", request.søknadId());
     }
 
     public TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId, FagsakYtelseType ytelseType) {
-        return TilgjengeligSøknadUtleder.utled(repository.hentAktivSøknadForAktørOgYtelse(aktørId, ytelseType));
+        List<SøknadHendelseEntitet> søknader = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, ytelseType);
+        return TilgjengeligSøknadUtleder.utled(LocalDate.now(), søknader, finnFagsak(aktørId, ytelseType));
+    }
+
+    private TilgjengeligSøknadResponse utled(List<SøknadHendelseEntitet> søknader, AktørId aktørId, FagsakYtelseType ytelseType) {
+        return TilgjengeligSøknadUtleder.utled(
+            LocalDate.now(),
+            søknader,
+            finnFagsak(aktørId, ytelseType));
+    }
+
+    private FagSakEntitet finnFagsak(AktørId aktørId, FagsakYtelseType ytelseType) {
+        List<FagSakEntitet> fagsaker = fagsakRepository.hentForAktørOgYtelse(aktørId, ytelseType);
+        if (fagsaker.size() > 1) {
+            log.warn("Fant flere fagsaker på aktør med saksnummer {}. Bruker den nyeste.", fagsaker.stream().map(FagSakEntitet::getSaksnummer).toList());
+        }
+        return fagsaker.stream().findFirst().orElse(null);
     }
 }
