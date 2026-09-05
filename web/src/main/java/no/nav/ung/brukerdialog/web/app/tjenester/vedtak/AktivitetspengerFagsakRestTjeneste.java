@@ -45,7 +45,7 @@ public class AktivitetspengerFagsakRestTjeneste {
 
     @POST
     @Operation(summary = "Melder inn vedtaksperioder og behandlede søknader for en bruker", tags = "fagsak")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.OPPGAVE)
+    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response mottaFagsak(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) FagSakRequest request) {
         fagsakTjeneste.motta(FagsakYtelseType.AKTIVITETSPENGER, request);
         return Response.ok().build();
