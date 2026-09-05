@@ -51,7 +51,7 @@ class SøknadHendelseTjenesteTest {
 
         tjeneste.registrer(aktørId, YTELSE, request);
 
-        var lagret = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE);
+        var lagret = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE);
         assertThat(lagret).hasSize(1);
         assertThat(lagret.getFirst().getSøknadId()).isEqualTo(request.søknadId());
         assertThat(lagret.getFirst().getAktørId()).isEqualTo(aktørId);
@@ -70,7 +70,7 @@ class SøknadHendelseTjenesteTest {
         // Ny UUID-instans med samme verdi, slik ei deserialisert gjeninnsending fra kbp ser ut.
         tjeneste.registrer(aktørId, YTELSE, request(UUID.fromString(request.søknadId().toString())));
 
-        assertThat(repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
+        assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
     }
 
     @Test
@@ -101,7 +101,7 @@ class SøknadHendelseTjenesteTest {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
-        var førsteSøknad = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE).getFirst();
+        var førsteSøknad = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE).getFirst();
         var førsteSøknadId = førsteSøknad.getId();
         førsteSøknad.deaktiver();
         entityManager.flush();
@@ -113,7 +113,7 @@ class SøknadHendelseTjenesteTest {
         var nyRequest = request();
         tjeneste.registrer(aktørId, YTELSE, nyRequest);
 
-        assertThat(repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE))
+        assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
             .extracting(SøknadHendelseEntitet::getSøknadId)
             .containsExactly(nyRequest.søknadId());
         assertThat(entityManager.find(SøknadHendelseEntitet.class, førsteSøknadId)).isNotNull();
@@ -140,7 +140,7 @@ class SøknadHendelseTjenesteTest {
         var nyRequest = request();
         tjeneste.registrer(aktørId, YTELSE, nyRequest);
 
-        assertThat(repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
+        assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
     }
 
     @Test
@@ -157,7 +157,7 @@ class SøknadHendelseTjenesteTest {
         var nyRequest = request();
         tjeneste.registrer(aktørId, YTELSE, nyRequest);
 
-          assertThat(repository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
+          assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
     }
 
     @Test

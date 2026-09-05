@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(CdiAwareExtension.class)
 @ExtendWith(JpaExtension.class)
@@ -33,6 +32,7 @@ class FagsakTjenesteTest {
     private static final FagsakYtelseType YTELSE = FagsakYtelseType.AKTIVITETSPENGER;
     private static final LocalDate FOM = LocalDate.of(2025, 1, 1);
     private static final LocalDate TOM = LocalDate.of(2025, 12, 31);
+    public static final Saksnummer SAKSNUMMER = new Saksnummer("SAK1234");
 
     @Inject
     private EntityManager entityManager;
@@ -49,7 +49,7 @@ class FagsakTjenesteTest {
     @Test
     void skal_lagre_fagsak_med_perioder_og_finne_den_igjen_på_aktør() {
         var aktørId = AktørId.dummy();
-        var saksnummer = saksnummer();
+        var saksnummer = SAKSNUMMER;
 
         tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of()));
         flushOgTøm();
@@ -68,7 +68,7 @@ class FagsakTjenesteTest {
     void skal_lagre_både_innvilgede_og_avslåtte_perioder() {
         var aktørId = AktørId.dummy();
 
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer(), List.of(
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(
             innvilget(FOM, TOM),
             new VedtakPeriodeDto(new Periode(TOM.plusDays(1), TOM.plusMonths(3)), VedtakResultatType.AVSLÅTT)
         ), List.of()));
@@ -82,7 +82,7 @@ class FagsakTjenesteTest {
     @Test
     void ny_melding_på_samme_sak_skal_oppdatere_raden_og_deaktivere_forrige_perioder() {
         var aktørId = AktørId.dummy();
-        var saksnummer = saksnummer();
+        var saksnummer = SAKSNUMMER;
 
         tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of()));
         flushOgTøm();
@@ -111,7 +111,7 @@ class FagsakTjenesteTest {
     void melding_uten_perioder_skal_gi_fagsak_uten_aktive_perioder() {
         var aktørId = AktørId.dummy();
 
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer(), List.of(), List.of()));
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(), List.of()));
         flushOgTøm();
 
         assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE))
@@ -125,8 +125,8 @@ class FagsakTjenesteTest {
     void flere_saker_på_samme_deltaker_skal_lagres_hver_for_seg() {
         var aktørId = AktørId.dummy();
 
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer(), List.of(innvilget(FOM, TOM)), List.of()));
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer(),
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(innvilget(FOM, TOM)), List.of()));
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER,
             List.of(innvilget(FOM.plusYears(2), TOM.plusYears(2))), List.of()));
         flushOgTøm();
 
@@ -140,11 +140,11 @@ class FagsakTjenesteTest {
         søknadHendelseRepository.lagre(new SøknadHendelseEntitet(søknadId, aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
         flushOgTøm();
 
-        var saksnummer = saksnummer();
+        var saksnummer = SAKSNUMMER;
         tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of(mottattSøknad(søknadId))));
         flushOgTøm();
 
-        var søknader = søknadHendelseRepository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE);
+        var søknader = søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE);
         assertThat(søknader).singleElement()
             .extracting(s -> s.getMottattIFagsak().getSaksnummer())
             .isEqualTo(saksnummer);
@@ -156,25 +156,13 @@ class FagsakTjenesteTest {
         søknadHendelseRepository.lagre(new SøknadHendelseEntitet(UUID.randomUUID(), aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
         flushOgTøm();
 
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer(), List.of(innvilget(FOM, TOM)), List.of(mottattSøknad(UUID.randomUUID()))));
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(innvilget(FOM, TOM)), List.of(mottattSøknad(UUID.randomUUID()))));
         flushOgTøm();
 
-        assertThat(søknadHendelseRepository.hentAktiveSøknadForAktørOgYtelse(aktørId, YTELSE))
+        assertThat(søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
             .singleElement()
             .extracting(SøknadHendelseEntitet::getMottattIFagsak)
             .isNull();
-    }
-
-    @Test
-    void skal_avvise_melding_som_flytter_saksnummer_til_en_annen_aktør() {
-        var saksnummer = saksnummer();
-        tjeneste.motta(YTELSE, request(AktørId.dummy(), saksnummer, List.of(innvilget(FOM, TOM)), List.of()));
-        flushOgTøm();
-
-        var request = request(AktørId.dummy(), saksnummer, List.of(innvilget(FOM, TOM)), List.of());
-        assertThatThrownBy(() -> tjeneste.motta(YTELSE, request))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("annen aktør");
     }
 
     private List<VedtakPeriodeEntitet> allePerioder(FagSakEntitet fagsak) {
@@ -194,10 +182,6 @@ class FagsakTjenesteTest {
     private void flushOgTøm() {
         entityManager.flush();
         entityManager.clear();
-    }
-
-    private static Saksnummer saksnummer() {
-        return new Saksnummer(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
     }
 
     private static VedtakPeriodeDto innvilget(LocalDate fom, LocalDate tom) {

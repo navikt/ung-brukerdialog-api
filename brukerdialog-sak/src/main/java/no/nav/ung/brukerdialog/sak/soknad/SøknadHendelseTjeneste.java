@@ -30,7 +30,7 @@ public class SøknadHendelseTjeneste {
     }
 
     public void registrer(AktørId aktørId, FagsakYtelseType ytelseType, OpprettSøknadHendelseRequest request) {
-        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, ytelseType);
+        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType);
 
         if (tidligereSøknader.stream().anyMatch(it -> it.getSøknadId().equals(request.søknadId()))) {
             log.info("Søknadshendelse for søknadId={} er allerede registrert.", request.søknadId());
@@ -51,7 +51,7 @@ public class SøknadHendelseTjeneste {
     }
 
     public TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId, FagsakYtelseType ytelseType) {
-        List<SøknadHendelseEntitet> søknader = repository.hentAktiveSøknadForAktørOgYtelse(aktørId, ytelseType);
+        List<SøknadHendelseEntitet> søknader = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType);
         return TilgjengeligSøknadUtleder.utled(LocalDate.now(), søknader, finnFagsak(aktørId, ytelseType));
     }
 

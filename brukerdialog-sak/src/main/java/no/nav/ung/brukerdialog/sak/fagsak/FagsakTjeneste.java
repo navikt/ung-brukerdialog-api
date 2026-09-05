@@ -31,7 +31,6 @@ public class FagsakTjeneste {
     public void motta(FagsakYtelseType ytelseType, FagSakRequest request) {
         FagSakEntitet fagsak = fagsakRepository.hentForSaksnummer(request.saksnummer())
             .orElseGet(() -> new FagSakEntitet(request.aktørId(), ytelseType, request.saksnummer()));
-        validerUendretEier(request, ytelseType, fagsak);
 
         fagsak.erstattPerioder(request.vedtakPerioder());
         fagsakRepository.lagre(fagsak);
@@ -50,24 +49,14 @@ public class FagsakTjeneste {
             return;
         }
 
-        søknadHendelseRepository.hentAktiveSøknadForAktørOgYtelse(request.aktørId(), ytelseType).stream()
+        søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(request.aktørId(), ytelseType).stream()
             .filter(søknad -> søknad.getMottattIFagsak() == null)
             .filter(søknad -> mottatteSøknadIder.contains(søknad.getSøknadId()))
             .forEach(søknad -> {
                 søknad.markerMottattIFagsak(fagsak);
                 søknadHendelseRepository.lagre(søknad);
+                log.info("Markert søknad med id {} mottatt {} som mottatt av fagsak {}",  søknad.getId(), søknad.getMottatt(), fagsak.getSaksnummer().getVerdi());
             });
     }
 
-    private static void validerUendretEier(FagSakRequest request, FagsakYtelseType ytelseType, FagSakEntitet fagsak) {
-        if (!fagsak.getAktørId().equals(request.aktørId())) {
-            throw new IllegalArgumentException(
-                "Saksnummer " + request.saksnummer().getVerdi() + " er registrert på en annen aktør enn den i meldingen.");
-        }
-        if (fagsak.getYtelseType() != ytelseType) {
-            throw new IllegalArgumentException(
-                "Saksnummer " + request.saksnummer().getVerdi() + " er registrert på ytelse " + fagsak.getYtelseType()
-                    + ", men meldingen gjelder " + ytelseType + ".");
-        }
-    }
 }

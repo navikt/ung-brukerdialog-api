@@ -30,6 +30,7 @@ public class FagsakRepository {
         if (fagsak.getId() == null) {
             entityManager.persist(fagsak);
         }
+        fagsak.getAktivePerioder().forEach(entityManager::persist);
         entityManager.flush();
     }
 

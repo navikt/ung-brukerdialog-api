@@ -68,10 +68,6 @@ public class FagSakEntitet extends BaseEntitet {
         return perioder.stream().filter(VedtakPeriodeEntitet::isAktiv).toList();
     }
 
-    /**
-     * Periodene fra ung-sak skrives om i sin helhet ved hver melding. De forrige beholdes deaktivert,
-     * slik at det i ettertid går an å se hva saken så ut som da en søknad ble sluppet gjennom eller stoppet.
-     */
     public void erstattPerioder(List<VedtakPeriodeDto> nyePerioder) {
         Objects.requireNonNull(nyePerioder, "nyePerioder");
         perioder.forEach(VedtakPeriodeEntitet::deaktiver);
