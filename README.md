@@ -16,7 +16,9 @@ Kjør `no.nav.ung.brukerdialog.db.util.Databaseskjemainitialisering` for å få 
    `cd dev; docker-compose up postgres`
 
 2. Start webserver fra f.eks. IDE
-   Start `JettyDevServer --vtp`
+   Start `JettyDevServer` med working directory satt til `web`.
+   Konfigurasjonen leses fra `web/app-local.properties` og `web/app-vtp.properties` i working
+   directory — `--vtp`-argumentet er en no-op og kan ignoreres.
 
 Swagger: http://localhost:8902/ung/brukerdialog/swagger
 
