@@ -30,7 +30,7 @@ public class SøknadHendelseTjeneste {
     }
 
     public void registrer(AktørId aktørId, FagsakYtelseType ytelseType, OpprettSøknadHendelseRequest request) {
-        List<SøknadHendelseEntitet> tidligereSøknader = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType);
+        var tidligereSøknader = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType);
 
         if (tidligereSøknader.stream().anyMatch(it -> it.getSøknadId().equals(request.søknadId()))) {
             log.info("Søknadshendelse for søknadId={} er allerede registrert.", request.søknadId());

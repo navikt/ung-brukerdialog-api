@@ -3,6 +3,7 @@ package no.nav.ung.brukerdialog.sak.fagsak;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import no.nav.k9.felles.jpa.HibernateVerktøy;
 import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
@@ -29,6 +30,11 @@ public class FagsakRepository {
     public void lagre(FagSakEntitet fagsak) {
         if (fagsak.getId() == null) {
             entityManager.persist(fagsak);
+        } else {
+            // Hibernate bumper ikke versjonen når bare den inverse periodesamlingen endres (VedtakPeriode),
+            // så to samtidige meldinger på samme sak ville begge gått gjennom uten dette.
+            // Version på VedtakPeriode ville ikke fanget det hvis lista opprinnelig var tom
+            entityManager.lock(fagsak, LockModeType.PESSIMISTIC_FORCE_INCREMENT);
         }
         fagsak.getAktivePerioder().forEach(entityManager::persist);
         entityManager.flush();
