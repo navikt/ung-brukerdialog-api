@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,10 @@ public class SøknadHendelseEntitet extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mottatt_i_fagsak")
+    private FagSakEntitet mottattIFagsak;
+
     protected SøknadHendelseEntitet() {
         // For JPA
     }
@@ -70,5 +75,18 @@ public class SøknadHendelseEntitet extends BaseEntitet {
 
     public void deaktiver() {
         this.aktiv = false;
+    }
+
+    public boolean isAktiv() {
+        return aktiv;
+    }
+
+    public FagSakEntitet getMottattIFagsak() {
+        return mottattIFagsak;
+    }
+
+    public void markerMottattIFagsak(FagSakEntitet fagsak) {
+        this.mottattIFagsak = fagsak;
+
     }
 }
