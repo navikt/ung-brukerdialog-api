@@ -19,12 +19,11 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_VEDTAK_PERIODE")
     private Long id;
 
-
     @Type(PostgreSQLRangeType.class)
-    @Column(name = "periode", columnDefinition = "daterange")
+    @Column(name = "periode", columnDefinition = "daterange", nullable = false, updatable = false)
     private Range<LocalDate> periode;
 
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "resultat", nullable = false, updatable = false)
     private VedtakResultatType resultat;
 
@@ -32,12 +31,16 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
     @JoinColumn(name = "fagsak_id", nullable = false, updatable = false)
     private FagSakEntitet fagsak;
 
+    @Column(name = "aktiv", nullable = false)
+    private boolean aktiv = true;
+
     protected VedtakPeriodeEntitet() {
         // For JPA
     }
 
-    VedtakPeriodeEntitet(FagSakEntitet fagsak, LocalDate fom, LocalDate tom) {
-        this.fagsak = Objects.requireNonNull(fagsak, "vedtaksstatus");
+    VedtakPeriodeEntitet(FagSakEntitet fagsak, LocalDate fom, LocalDate tom, VedtakResultatType resultat) {
+        this.fagsak = Objects.requireNonNull(fagsak, "fagsak");
+        this.resultat = Objects.requireNonNull(resultat, "resultat");
         Objects.requireNonNull(fom, "fom");
         Objects.requireNonNull(tom, "tom");
         this.periode = DatoIntervallEntitet.fra(fom, tom).toRange();
@@ -53,5 +56,13 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
 
     public VedtakResultatType getResultat() {
         return resultat;
+    }
+
+    public boolean isAktiv() {
+        return aktiv;
+    }
+
+    void deaktiver() {
+        this.aktiv = false;
     }
 }

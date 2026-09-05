@@ -40,7 +40,7 @@ public class SøknadHendelseTjeneste {
         var tilgjengeligeSøknad = utled(tidligereSøknader, aktørId, ytelseType);
         if (tilgjengeligeSøknad.type() == TilgjengeligSøknadType.INGEN) {
             throw new SøknadIkkeTilgjengeligException(tidligereSøknader.stream()
-                .filter(hendelse -> hendelse.getMottattIFagsak() != null)
+                .filter(hendelse -> hendelse.getMottattIFagsak() == null)
                 .findFirst()
                 .map(hendelse -> "Bruker har allerede en ubehandlet søknad mottatt " + hendelse.getMottatt() + ".")
                 .orElse("Bruker kan ikke sende søknad nå."));

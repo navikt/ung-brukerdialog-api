@@ -2,6 +2,8 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
 import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Periode;
@@ -162,7 +164,9 @@ class TilgjengeligSøknadUtlederTest {
     private static FagSakEntitet fagsak(Periode... perioder) {
         var entitet = new FagSakEntitet(AktørId.dummy(), YTELSE, new Saksnummer("SAK123")
         );
-        entitet.settPerioder(List.of(perioder));
+        entitet.erstattPerioder(java.util.Arrays.stream(perioder)
+            .map(it -> new VedtakPeriodeDto(it, VedtakResultatType.INNVILGET))
+            .toList());
         return entitet;
     }
 }

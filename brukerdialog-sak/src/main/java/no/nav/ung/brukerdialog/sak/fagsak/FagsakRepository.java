@@ -27,19 +27,15 @@ public class FagsakRepository {
     }
 
     public void lagre(FagSakEntitet fagsak) {
-        Optional<FagSakEntitet> eksisterendeOpt = hentForSaksnummer(fagsak.getSaksnummer());
-        if (eksisterendeOpt.isPresent()) {
-            FagSakEntitet eksisterendeSak = eksisterendeOpt.get();
-            eksisterendeSak.deaktiver();
-            entityManager.persist(eksisterendeSak);
+        if (fagsak.getId() == null) {
+            entityManager.persist(fagsak);
         }
-        entityManager.persist(fagsak);
         entityManager.flush();
     }
 
     public Optional<FagSakEntitet> hentForSaksnummer(Saksnummer saksnummer) {
         TypedQuery<FagSakEntitet> query = entityManager.createQuery(
-            "SELECT v FROM Fagsak v WHERE v.saksnummer = :saksnummer",
+            "SELECT f FROM Fagsak f WHERE f.saksnummer = :saksnummer",
             FagSakEntitet.class
         );
         query.setParameter("saksnummer", saksnummer);
@@ -48,7 +44,7 @@ public class FagsakRepository {
 
     public List<FagSakEntitet> hentForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
         TypedQuery<FagSakEntitet> query = entityManager.createQuery(
-            "SELECT v FROM Fagsak v WHERE v.aktørId = :aktoerId AND v.ytelseType = :ytelseType ORDER BY v.opprettetTidspunkt DESC",
+            "SELECT f FROM Fagsak f WHERE f.aktørId = :aktoerId AND f.ytelseType = :ytelseType ORDER BY f.opprettetTidspunkt DESC",
             FagSakEntitet.class
         );
         query.setParameter("aktoerId", aktørId);

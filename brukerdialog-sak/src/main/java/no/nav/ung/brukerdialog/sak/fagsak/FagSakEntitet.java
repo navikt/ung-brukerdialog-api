@@ -2,9 +2,9 @@ package no.nav.ung.brukerdialog.sak.fagsak;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
 import no.nav.ung.brukerdialog.typer.AktørId;
-import no.nav.ung.brukerdialog.typer.Periode;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ public class FagSakEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_FAGSAK")
     private Long id;
 
-
     @Embedded
     @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", nullable = false, updatable = false)))
     private AktørId aktørId;
@@ -32,11 +31,8 @@ public class FagSakEntitet extends BaseEntitet {
     @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", nullable = false, updatable = false)))
     private Saksnummer saksnummer;
 
-    @OneToMany(mappedBy = "fagsak", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fagsak", cascade = CascadeType.ALL)
     private List<VedtakPeriodeEntitet> perioder = new ArrayList<>();
-
-    @Column(name = "aktiv", nullable = false)
-    private boolean aktiv = true;
 
     @Version
     @Column(name = "versjon", nullable = false)
@@ -68,16 +64,21 @@ public class FagSakEntitet extends BaseEntitet {
         return saksnummer;
     }
 
-    public List<VedtakPeriodeEntitet> getPerioder() {
-        return perioder;
+    public List<VedtakPeriodeEntitet> getAktivePerioder() {
+        return perioder.stream().filter(VedtakPeriodeEntitet::isAktiv).toList();
     }
 
-    public void settPerioder(List<Periode> nyePerioder) {
-        Objects.requireNonNull(nyePerioder, "nyePerioder").forEach(
-            p -> this.perioder.add(new VedtakPeriodeEntitet(this, p.getFom(), p.getTom())));
-    }
-
-    public void deaktiver() {
-        aktiv = false;
+    /**
+     * Periodene fra ung-sak skrives om i sin helhet ved hver melding. De forrige beholdes deaktivert,
+     * slik at det i ettertid går an å se hva saken så ut som da en søknad ble sluppet gjennom eller stoppet.
+     */
+    public void erstattPerioder(List<VedtakPeriodeDto> nyePerioder) {
+        Objects.requireNonNull(nyePerioder, "nyePerioder");
+        perioder.forEach(VedtakPeriodeEntitet::deaktiver);
+        nyePerioder.forEach(dto -> perioder.add(new VedtakPeriodeEntitet(
+            this,
+            dto.periode().getFom(),
+            dto.periode().getTom(),
+            dto.vedtakResultatType())));
     }
 }

@@ -8,5 +8,7 @@ public record VedtakPeriodeDto(
     @NotNull
     @Valid
     Periode periode,
+
+    @NotNull
     VedtakResultatType vedtakResultatType
 ){}
