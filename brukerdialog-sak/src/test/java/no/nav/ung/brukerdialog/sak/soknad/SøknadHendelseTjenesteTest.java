@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
+import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.FagSakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
@@ -75,7 +76,7 @@ class SøknadHendelseTjenesteTest {
 
     @Test
     void skal_kunne_sende_førstegangssøknad_når_bruker_ikke_har_søkt_før() {
-        var tilgjengeligSøknad = tjeneste.finnTilgjengeligSøknad(AktørId.dummy(), YTELSE);
+        var tilgjengeligSøknad = finnTilgjengeligSøknad(AktørId.dummy());
 
         assertThat(tilgjengeligSøknad.type()).isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
         assertThat(tilgjengeligSøknad.harUbehandletSøknad()).isFalse();
@@ -86,7 +87,7 @@ class SøknadHendelseTjenesteTest {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
-        var tilgjengeligSøknad = tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE);
+        var tilgjengeligSøknad = finnTilgjengeligSøknad(aktørId);
 
         assertThat(tilgjengeligSøknad.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
         assertThat(tilgjengeligSøknad.harUbehandletSøknad()).isTrue();
@@ -97,7 +98,7 @@ class SøknadHendelseTjenesteTest {
     }
 
     @Test
-    void deaktivert_søknad_skal_ikke_bruker_deltakeren_fra_å_søke_på_nytt() {
+    void deaktivert_søknad_skal_ikke_hindre_bruker_fra_å_søke_på_nytt() {
         var aktørId = AktørId.dummy();
         tjeneste.registrer(aktørId, YTELSE, request());
 
@@ -107,16 +108,9 @@ class SøknadHendelseTjenesteTest {
         entityManager.flush();
         entityManager.clear();
 
-        assertThat(tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE).type())
+        assertThat(finnTilgjengeligSøknad(aktørId).type())
             .isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
 
-        var nyRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, nyRequest);
-
-        assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
-            .extracting(SøknadHendelseEntitet::getSøknadId)
-            .containsExactly(nyRequest.søknadId());
-        assertThat(entityManager.find(SøknadHendelseEntitet.class, førsteSøknadId)).isNotNull();
     }
 
     private static OpprettSøknadHendelseRequest request() {
@@ -127,65 +121,46 @@ class SøknadHendelseTjenesteTest {
         return new OpprettSøknadHendelseRequest(søknadId, MOTTATT);
     }
 
-    @Test
-    void deltaker_med_fullt_avslag_skal_kunne_sende_ny_førstegangssøknad() {
-        var aktørId = AktørId.dummy();
-        var behandletRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        behandleISak(aktørId, behandletRequest.søknadId(), List.of());
-
-        assertThat(tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE).type())
-            .isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
-
-        var nyRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, nyRequest);
-
-        assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
+    private TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId) {
+        return tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE);
     }
 
     @Test
-    void deltaker_med_innvilgelse_innenfor_vinduet_skal_få_ny_periode_søknad() {
+    void bruker_med_innvilgelse_innenfor_vinduet_skal_få_ny_periode_søknad() {
         var aktørId = AktørId.dummy();
         var behandletRequest = request();
         tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        behandleISak(aktørId, behandletRequest.søknadId(), List.of(periodeMedTom(LocalDate.now())));
+        mottaSak(aktørId, behandletRequest.søknadId(), List.of(innvilgetTom(LocalDate.now())));
 
-        var tilgjengelig = tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE);
+        var tilgjengelig = finnTilgjengeligSøknad(aktørId);
         assertThat(tilgjengelig.type()).isEqualTo(TilgjengeligSøknadType.NY_PERIODE_SØKNAD);
         assertThat(tilgjengelig.harInnsyn()).isTrue();
 
-        var nyRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, nyRequest);
+        tjeneste.registrer(aktørId, YTELSE, request());
 
-          assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).isNotNull();
-    }
-
-    @Test
-    void deltaker_med_løpende_innvilgelse_utenfor_vinduet_skal_avvises_ved_registrering() {
-        var aktørId = AktørId.dummy();
-        var behandletRequest = request();
-        tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        behandleISak(aktørId, behandletRequest.søknadId(), List.of(periodeMedTom(LocalDate.now().plusMonths(6))));
-
-        assertThat(tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE).type())
-            .isEqualTo(TilgjengeligSøknadType.INGEN);
-
+        var etterNySøknad = finnTilgjengeligSøknad(aktørId);
+        assertThat(etterNySøknad.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
+        assertThat(etterNySøknad.harUbehandletSøknad()).isTrue();
         assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request()))
             .isInstanceOf(SøknadIkkeTilgjengeligException.class);
     }
 
     @Test
-    void deltaker_som_avsluttet_programmet_for_lenge_siden_skal_få_førstegangssøknad() {
+    void bruker_med_løpende_innvilgelse_utenfor_vinduet_skal_avvises_ved_registrering() {
         var aktørId = AktørId.dummy();
         var behandletRequest = request();
         tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        behandleISak(aktørId, behandletRequest.søknadId(), List.of(periodeMedTom(LocalDate.now().minusWeeks(53))));
+        mottaSak(aktørId, behandletRequest.søknadId(), List.of(innvilgetTom(LocalDate.now().plusMonths(6))));
 
-        assertThat(tjeneste.finnTilgjengeligSøknad(aktørId, YTELSE).type())
-            .isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
+        assertThat(finnTilgjengeligSøknad(aktørId).type())
+            .isEqualTo(TilgjengeligSøknadType.INGEN);
+
+        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request()))
+            .isInstanceOf(SøknadIkkeTilgjengeligException.class)
+            .hasMessage("Bruker kan ikke sende søknad nå.");
     }
 
-    private void behandleISak(AktørId aktørId, UUID søknadId, List<VedtakPeriodeDto> vedtaksperioder) {
+    private void mottaSak(AktørId aktørId, UUID søknadId, List<VedtakPeriodeDto> vedtaksperioder) {
         fagsakTjeneste.motta(YTELSE, new FagSakRequest(
             aktørId,
             new Saksnummer("1234"),
@@ -195,8 +170,7 @@ class SøknadHendelseTjenesteTest {
         entityManager.clear();
     }
 
-    private VedtakPeriodeDto periodeMedTom(LocalDate tom) {
+    private VedtakPeriodeDto innvilgetTom(LocalDate tom) {
         return new VedtakPeriodeDto(new Periode(tom.minusWeeks(52).plusDays(1), tom), VedtakResultatType.INNVILGET);
     }
-
 }
