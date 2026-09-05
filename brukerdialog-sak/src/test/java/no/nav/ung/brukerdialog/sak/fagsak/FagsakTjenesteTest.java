@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @ExtendWith(CdiAwareExtension.class)
 @ExtendWith(JpaExtension.class)
@@ -47,36 +48,34 @@ class FagsakTjenesteTest {
     private SøknadHendelseRepository søknadHendelseRepository;
 
     @Test
-    void skal_lagre_fagsak_med_perioder_og_finne_den_igjen_på_aktør() {
+    void skal_lagre_fagsak_med_perioder_og_koble_mottatt_søknad() {
         var aktørId = AktørId.dummy();
-        var saksnummer = SAKSNUMMER;
+        var søknadId = UUID.randomUUID();
+        var avslåttFom = TOM.plusDays(1);
+        var avslåttTom = TOM.plusMonths(3);
+        søknadHendelseRepository.lagre(new SøknadHendelseEntitet(søknadId, aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
+        flushOgTøm();
 
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of()));
+        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(
+            innvilget(FOM, TOM),
+            new VedtakPeriodeDto(new Periode(avslåttFom, avslåttTom), VedtakResultatType.AVSLÅTT)
+        ), List.of(mottattSøknad(søknadId))));
         flushOgTøm();
 
         var lagret = fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE);
         assertThat(lagret).hasSize(1);
-        assertThat(lagret.getFirst().getSaksnummer()).isEqualTo(saksnummer);
+        assertThat(lagret.getFirst().getSaksnummer()).isEqualTo(SAKSNUMMER);
 
-        var perioder = lagret.getFirst().getAktivePerioder();
-        assertThat(perioder).hasSize(1);
-        assertThat(perioder.getFirst().getPeriode()).isEqualTo(DatoIntervallEntitet.fra(FOM, TOM));
-        assertThat(perioder.getFirst().getResultat()).isEqualTo(VedtakResultatType.INNVILGET);
-    }
+        assertThat(lagret.getFirst().getAktivePerioder())
+            .extracting(VedtakPeriodeEntitet::getPeriode, VedtakPeriodeEntitet::getResultat)
+            .containsExactlyInAnyOrder(
+                tuple(DatoIntervallEntitet.fra(FOM, TOM), VedtakResultatType.INNVILGET),
+                tuple(DatoIntervallEntitet.fra(avslåttFom, avslåttTom), VedtakResultatType.AVSLÅTT));
 
-    @Test
-    void skal_lagre_både_innvilgede_og_avslåtte_perioder() {
-        var aktørId = AktørId.dummy();
-
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(
-            innvilget(FOM, TOM),
-            new VedtakPeriodeDto(new Periode(TOM.plusDays(1), TOM.plusMonths(3)), VedtakResultatType.AVSLÅTT)
-        ), List.of()));
-        flushOgTøm();
-
-        var perioder = fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE).getFirst().getAktivePerioder();
-        assertThat(perioder).extracting(VedtakPeriodeEntitet::getResultat)
-            .containsExactlyInAnyOrder(VedtakResultatType.INNVILGET, VedtakResultatType.AVSLÅTT);
+        assertThat(søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
+            .singleElement()
+            .extracting(s -> s.getMottattIFagsak().getSaksnummer())
+            .isEqualTo(SAKSNUMMER);
     }
 
     @Test
@@ -114,10 +113,7 @@ class FagsakTjenesteTest {
         tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(), List.of()));
         flushOgTøm();
 
-        assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE))
-            .singleElement()
-            .extracting(FagSakEntitet::getAktivePerioder)
-            .asInstanceOf(org.assertj.core.api.InstanceOfAssertFactories.LIST)
+        assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE).getFirst().getAktivePerioder())
             .isEmpty();
     }
 
@@ -126,7 +122,7 @@ class FagsakTjenesteTest {
         var aktørId = AktørId.dummy();
 
         tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(innvilget(FOM, TOM)), List.of()));
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER,
+        tjeneste.motta(YTELSE, request(aktørId, new Saksnummer("SAK5678"),
             List.of(innvilget(FOM.plusYears(2), TOM.plusYears(2))), List.of()));
         flushOgTøm();
 
@@ -134,24 +130,7 @@ class FagsakTjenesteTest {
     }
 
     @Test
-    void skal_koble_mottatte_søknader_til_fagsaken() {
-        var aktørId = AktørId.dummy();
-        var søknadId = UUID.randomUUID();
-        søknadHendelseRepository.lagre(new SøknadHendelseEntitet(søknadId, aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
-        flushOgTøm();
-
-        var saksnummer = SAKSNUMMER;
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of(mottattSøknad(søknadId))));
-        flushOgTøm();
-
-        var søknader = søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE);
-        assertThat(søknader).singleElement()
-            .extracting(s -> s.getMottattIFagsak().getSaksnummer())
-            .isEqualTo(saksnummer);
-    }
-
-    @Test
-    void skal_ikke_koble_søknader_ung_sak_ikke_har_meldt_inn() {
+    void skal_ikke_koble_søknader_ung_sak_ikke_har_meldt_inn_på_aktør() {
         var aktørId = AktørId.dummy();
         søknadHendelseRepository.lagre(new SøknadHendelseEntitet(UUID.randomUUID(), aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
         flushOgTøm();
