@@ -7,9 +7,11 @@
     <sequence-generator name="SEQ_BD_SOEKNAD_HENDELSE" allocation-size="50" sequence-name="SEQ_BD_SOEKNAD_HENDELSE"/>
     <sequence-generator name="SEQ_BD_FAGSAK" allocation-size="50" sequence-name="SEQ_BD_FAGSAK"/>
     <sequence-generator name="SEQ_BD_VEDTAK_PERIODE" allocation-size="50" sequence-name="SEQ_BD_VEDTAK_PERIODE"/>
+    <sequence-generator name="SEQ_DIAGNOSTIKK_SAK_LOGG" allocation-size="50" sequence-name="SEQ_DIAGNOSTIKK_SAK_LOGG"/>
 
     <entity class="no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet"/>
     <entity class="no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet"/>
     <entity class="no.nav.ung.brukerdialog.sak.fagsak.VedtakPeriodeEntitet"/>
+    <entity class="no.nav.ung.brukerdialog.sak.diagnostikk.DiagnostikkSakLogg"/>
 
 </entity-mappings>

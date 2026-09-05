@@ -43,3 +43,26 @@ alter table BD_SOEKNAD_HENDELSE
 create index idx_bd_soeknad_hendelse_fagsak on BD_SOEKNAD_HENDELSE (mottatt_i_fagsak);
 
 comment on column BD_SOEKNAD_HENDELSE.mottatt_i_fagsak is 'Fagsaken ung-sak meldte at søknaden er mottatt i. NULL betyr at ung-sak har ikke behandlet saken.';
+
+create sequence if not exists SEQ_DIAGNOSTIKK_SAK_LOGG increment by 50 minvalue 1000000;
+
+create table DIAGNOSTIKK_SAK_LOGG
+(
+    id            bigint       not null primary key,
+    aktoer_id     varchar(20),
+    saksnummer    varchar(19),
+    tjeneste      varchar(200),
+    begrunnelse   varchar(4000),
+    opprettet_av  varchar(20)  not null default 'VL',
+    opprettet_tid timestamp(3) not null default current_timestamp,
+    endret_av     varchar(20),
+    endret_tid    timestamp(3)
+);
+
+create index idx_diagnostikk_sak_logg_aktoer on DIAGNOSTIKK_SAK_LOGG (aktoer_id);
+create index idx_diagnostikk_sak_logg_saksnummer on DIAGNOSTIKK_SAK_LOGG (saksnummer);
+
+comment on table DIAGNOSTIKK_SAK_LOGG is 'Logger aksess mot sakstabellene for diagnostikk- og revisjonsformål.';
+comment on column DIAGNOSTIKK_SAK_LOGG.aktoer_id is 'Oppslagsnøkkelen som ble brukt, eller aktøren saksnummeret ble slått opp til.';
+comment on column DIAGNOSTIKK_SAK_LOGG.saksnummer is 'Saksnummeret det ble slått opp på. NULL når oppslaget gikk på aktørId.';
+comment on column DIAGNOSTIKK_SAK_LOGG.begrunnelse is 'Begrunnelse for aksess, oppgitt av den som utfører oppslaget.';
