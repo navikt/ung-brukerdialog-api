@@ -41,13 +41,13 @@ public class FagsakTjeneste {
         fagsak.erstattPerioder(request.vedtakPerioder());
         fagsakRepository.lagre(fagsak);
 
-        koblSøknaderTilFagsak(request, ytelseType, fagsak);
+        kobleSøknaderTilFagsak(request, ytelseType, fagsak);
 
         log.info("Mottok fagsakinfo for saksnummer={} med {} perioder.",
             request.saksnummer().getVerdi(), request.vedtakPerioder().size());
     }
 
-    private void koblSøknaderTilFagsak(FagSakRequest request, FagsakYtelseType ytelseType, FagSakEntitet fagsak) {
+    private void kobleSøknaderTilFagsak(FagSakRequest request, FagsakYtelseType ytelseType, FagSakEntitet fagsak) {
         Set<UUID> mottatteSøknadIder = request.mottatteSøknader().stream()
             .map(MottattSøknadDto::søknadId)
             .collect(Collectors.toSet());
@@ -60,7 +60,7 @@ public class FagsakTjeneste {
             .filter(søknad -> mottatteSøknadIder.contains(søknad.getSøknadId()))
             .forEach(søknad -> {
                 søknad.markerMottattIFagsak(fagsak);
-                søknadHendelseRepository.lagre(søknad);
+                //flushes etter transaksjonen
                 log.info("Markert søknad med id {} mottatt {} som mottatt av fagsak {}",  søknad.getId(), søknad.getMottatt(), fagsak.getSaksnummer().getVerdi());
             });
     }
