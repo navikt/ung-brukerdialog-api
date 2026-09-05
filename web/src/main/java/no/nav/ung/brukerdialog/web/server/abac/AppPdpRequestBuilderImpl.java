@@ -10,6 +10,9 @@ import no.nav.k9.felles.sikkerhet.abac.*;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
+import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
+import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +32,17 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         CLUSTER.PROD_GCP.clusterName() + ":dusseldorf"
     );
 
-    private final BrukerdialogOppgaveRepository oppgaveRepository;
+    private BrukerdialogOppgaveRepository oppgaveRepository;
+    private FagsakRepository fagsakRepository;
 
     public AppPdpRequestBuilderImpl() {
-        this(null);
+        this(null, null);
     }
 
     @Inject
-    public AppPdpRequestBuilderImpl(BrukerdialogOppgaveRepository oppgaveRepository) {
+    public AppPdpRequestBuilderImpl(BrukerdialogOppgaveRepository oppgaveRepository, FagsakRepository fagsakRepository) {
         this.oppgaveRepository = oppgaveRepository;
+        this.fagsakRepository = fagsakRepository;
     }
 
 
@@ -51,6 +56,7 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         Set<String> aktørIder = new HashSet<>(attributter.getVerdier(StandardAbacAttributtType.AKTØR_ID));
 
         mapAktørIdFraEksternReferanser(attributter, aktørIder);
+        mapAktørIdFraSaksnummer(attributter, aktørIder);
 
         Set<String> fødselsnumre = attributter.getVerdier(StandardAbacAttributtType.FNR);
         pdpRequest.setAktørIderStr(aktørIder);
@@ -67,6 +73,17 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
             eksternReferanser.stream().map(UUID::fromString).map(oppgaveRepository::hentOppgaveForOppgavereferanse)
                 .flatMap(Optional::stream)
                 .map(BrukerdialogOppgaveEntitet::getAktørId)
+                .map(no.nav.ung.brukerdialog.typer.AktørId::getId)
+                .forEach(aktørIder::add);
+        }
+    }
+
+    private void mapAktørIdFraSaksnummer(AbacAttributtSamling attributter, Set<String> aktørIder) {
+        Set<String> saksnummer = attributter.getVerdier(StandardAbacAttributtType.SAKSNUMMER);
+        if (!saksnummer.isEmpty()) {
+            saksnummer.stream().map(it -> fagsakRepository.hentForSaksnummer(new Saksnummer(it)))
+                .flatMap(Optional::stream)
+                .map(FagSakEntitet::getAktørId)
                 .map(no.nav.ung.brukerdialog.typer.AktørId::getId)
                 .forEach(aktørIder::add);
         }
