@@ -18,7 +18,7 @@ Kjør `no.nav.ung.brukerdialog.db.util.Databaseskjemainitialisering` for å få 
 2. Start webserver fra f.eks. IDE
    Start `JettyDevServer` med working directory satt til `web`.
    Konfigurasjonen leses fra `web/app-local.properties` og `web/app-vtp.properties` i working
-   directory — `--vtp`-argumentet er en no-op og kan ignoreres.
+   directory.
 
 Swagger: http://localhost:8902/ung/brukerdialog/swagger
 
