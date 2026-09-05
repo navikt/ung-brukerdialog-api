@@ -9,6 +9,7 @@ import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,7 +30,12 @@ public class FagsakTjeneste {
     }
 
     public void motta(FagsakYtelseType ytelseType, FagSakRequest request) {
-        FagSakEntitet fagsak = fagsakRepository.hentForSaksnummer(request.saksnummer())
+        Optional<FagSakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
+        if (eksisterendeFagsak.isPresent() && !eksisterendeFagsak.get().getAktørId().equals(request.aktørId())) {
+            throw new IllegalStateException("Saken tilhører en annen aktør. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
+        }
+
+        FagSakEntitet fagsak = eksisterendeFagsak
             .orElseGet(() -> new FagSakEntitet(request.aktørId(), ytelseType, request.saksnummer()));
 
         fagsak.erstattPerioder(request.vedtakPerioder());
