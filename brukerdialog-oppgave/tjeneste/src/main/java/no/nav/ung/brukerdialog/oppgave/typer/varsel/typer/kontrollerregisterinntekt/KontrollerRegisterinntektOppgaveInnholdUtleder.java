@@ -26,14 +26,6 @@ import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/avvik-registerinntekt/i18n/nb.ts}, med
- * forgreningen gjenskapt fra {@code AvvikRegisterinntektOppgavetekst.tsx} og
- * {@code avvikRegisterinntektOppgaveUtils.ts}.
- * <p>
- * <b>Bevisst forenkling:</b> gjenskaper ikke frontendens {@code .ingenOpplysninger}-variant, som
- * sammenligner med et tidligere brukerselvrapportert tall vi ikke har tilgang til i denne DTO-en.
- */
 @OppgaveTypeRef(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT)
 @ApplicationScoped
 public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
@@ -136,7 +128,6 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
             .tilDto(oppgave.getOppgaveData());
     }
 
-    /** Visningsnavn for {@code YtelseType}, gjenskapt fra {@code ung-innsyn/src/i18n/nb.ts}. */
     private static String ytelseTypeNavn(YtelseType type) {
         return switch (type) {
             case DAGPENGER -> "Dagpenger";

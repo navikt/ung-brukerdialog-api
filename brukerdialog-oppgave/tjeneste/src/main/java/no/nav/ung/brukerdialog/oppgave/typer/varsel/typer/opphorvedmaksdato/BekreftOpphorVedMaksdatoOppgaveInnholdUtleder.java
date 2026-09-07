@@ -19,14 +19,6 @@ import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/opphor-ved-maksdato/i18n/nb.ts} og
- * {@code OpphorVedMaksdatoOppgavetekst.tsx}. {@code maxDato} er bevisst utelatt - kilden bruker
- * kun {@code sluttdato}/«sisteDag».
- * <p>
- * Bruker {@link OppgaveTekster#ytelseNavn} direkte («med ungdomsprogramytelsen»/«med
- * aktivitetspenger» passer begge grammatisk) - ingen ytelseskvalifikator-metode trengs her.
- */
 @OppgaveTypeRef(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO)
 @ApplicationScoped
 public class BekreftOpphorVedMaksdatoOppgaveInnholdUtleder implements OppgaveInnholdUtleder {

@@ -20,16 +20,6 @@ import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/sok-ytelse/i18n/nb.ts} og
- * {@code SokYtelseOppgavetekst.tsx}. Kilden har ingen brødtekst for uløst tilstand her (kun
- * tittel + kort info-setning + lenkeknapp til forsiden) - erstattet med skriftlig henvisning til
- * Min side, siden et PDF-brev/varsel ikke kan ha en lenkeknapp.
- * <p>
- * <b>Bevisst avvik, videreført:</b> {@link #varselLenke} peker på selve base-URL-en (uten
- * {@code /oppgave}-suffiks), i motsetning til alle andre typer her - dette speiler opprinnelig
- * oppførsel og er ikke endret som del av denne refaktoreringen.
- */
 @OppgaveTypeRef(OppgaveType.SØK_YTELSE)
 @ApplicationScoped
 public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
@@ -55,7 +45,6 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
         return "Søknad";
     }
 
-    /** Ikke et varsel om caseworker-satte opplysninger til motsigelse - brukeren søker selv. */
     @Override
     public boolean omVarselSeksjonAktivert() {
         return false;

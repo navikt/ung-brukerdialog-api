@@ -20,12 +20,6 @@ import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/rapporter-inntekt/i18n/nb.ts} og
- * {@code RapporterInntektOppgavetekst.tsx}. «Les mer om inntekt» er i kilden en sammenleggbar
- * {@code <ReadMore>}, men skrives her ut som vanlig løpende tekst - et arkivert PDF-brev/varsel
- * har ingen sammenleggbar visning.
- */
 @OppgaveTypeRef(OppgaveType.RAPPORTER_INNTEKT)
 @ApplicationScoped
 public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
@@ -55,7 +49,6 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
         return "Inntekt i %s".formatted(NorskDatoFormat.månedÅr(dto.fraOgMed()));
     }
 
-    /** Ikke et varsel om caseworker-satte opplysninger til motsigelse - brukeren rapporterer selv. */
     @Override
     public boolean omVarselSeksjonAktivert() {
         return false;

@@ -16,13 +16,6 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 
 import java.util.List;
 
-/**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/endret-startdato/i18n/nb.ts} (samme tekst
- * som på Min Side / ungdomsprogram-deltaker).
- * <p>
- * Delt med {@code EndretPeriodeOppgaveInnholdUtleder} (gren {@code STARTDATO}) via
- * {@link OppgaveTekster}, slik at teksten ikke kan drifte i to retninger.
- */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_STARTDATO)
 @ApplicationScoped
 public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtleder {

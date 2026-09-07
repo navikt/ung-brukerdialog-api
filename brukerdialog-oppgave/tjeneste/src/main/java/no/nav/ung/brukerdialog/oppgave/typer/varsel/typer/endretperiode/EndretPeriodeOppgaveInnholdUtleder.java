@@ -21,24 +21,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-/**
- * {@link EndretPeriodeDataDto#endringer()} avgjør gren, gjenskapt fra frontendens forgrening i
- * {@code sif-api/src/api/parse-utils/parseOppgaverElement.ts} - se {@link #bestemGren}.
- * <p>
- * <b>Bevisst avvik fra frontend:</b> uventede kombinasjoner (bl.a. {@code ANDRE_ENDRINGER}) får
- * frontend til å kaste et unntak, siden oppgaven da bare ikke vises. Journalføring og varsel MÅ
- * likevel produsere gyldig innhold - derfor finnes {@code GrenType.UKJENT} som fallback i stedet
- * for en exception.
- * <p>
- * Delt tekstbygging med {@code EndretStartdatoOppgaveInnholdUtleder} (gren {@code STARTDATO}) og
- * {@code EndretSluttdatoOppgaveInnholdUtleder} (gren {@code SLUTTDATO}) via {@link OppgaveTekster},
- * slik at teksten ikke kan drifte i to retninger.
- */
 @OppgaveTypeRef(OppgaveType.BEKREFT_ENDRET_PERIODE)
 @ApplicationScoped
 public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
 
-    private enum GrenType {STARTDATO, SLUTTDATO, FJERNET, START_OG_SLUTT, UKJENT}
+    private enum GrenType {STARTDATO, SLUTTDATO, FJERNET, START_OG_SLUTT, FALLBACK_UKJENT_KOMBINASJON}
 
     private record Gren(GrenType type, boolean erMeldtUt) {
     }
@@ -67,7 +54,7 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case SLUTTDATO -> OppgaveTekster.endretSluttdatoTittel(gren.erMeldtUt());
             case FJERNET -> OppgaveTekster.fjernetPeriodeTittel();
             case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoTittel();
-            case UKJENT -> OppgaveTekster.ukjentPeriodeendringTittel();
+            case FALLBACK_UKJENT_KOMBINASJON -> OppgaveTekster.ukjentPeriodeendringTittel();
         };
     }
 
@@ -88,7 +75,7 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case FJERNET -> OppgaveTekster.fjernetPeriodeInnhold(ytelsetype, fristTid);
             case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoInnhold(
                 ny.getFomDato(), ny.getTomDato(), ytelsetype, fristTid);
-            case UKJENT -> OppgaveTekster.ukjentPeriodeendringInnhold(
+            case FALLBACK_UKJENT_KOMBINASJON -> OppgaveTekster.ukjentPeriodeendringInnhold(
                 ny != null ? ny.getFomDato() : null, ny != null ? ny.getTomDato() : null, ytelsetype, fristTid);
         };
     }
@@ -98,10 +85,6 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
         return ungdomsprogramytelsenDeltakerBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
     }
 
-    /**
-     * Krever både riktig {@code endringer}-kombinasjon og at datoene faktisk finnes - manglende
-     * datoer havner i fallback-grenen, ikke en {@code NullPointerException} eller en halvferdig setning.
-     */
     private Gren bestemGren(EndretPeriodeDataDto dto) {
         Set<PeriodeEndringType> endringer = dto.endringer();
         PeriodeDTO ny = dto.nyPeriode();
@@ -125,7 +108,7 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
         }
         // Fallback: bl.a. ANDRE_ENDRINGER, en uventet/udokumentert kombinasjon, eller en
         // ellers gjenkjent kombinasjon med manglende datoer.
-        return new Gren(GrenType.UKJENT, false);
+        return new Gren(GrenType.FALLBACK_UKJENT_KOMBINASJON, false);
     }
 
     private EndretPeriodeDataDto hentDto(BrukerdialogOppgaveEntitet oppgave) {

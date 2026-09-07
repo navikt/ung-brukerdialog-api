@@ -44,27 +44,16 @@ import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Journalfører en brukerdialogoppgave mot Dokarkiv, uavhengig av
- * {@code OppgaveLivssyklusTjeneste} som oppretter tasken - feil her blokkerer aldri
- * oppgaveopprettelsen.
- * <p>
- * Journalføringsraden ({@link OppgaveJournalføringEntitet}) finnes hvis og bare hvis
- * journalføringen faktisk har lykkes.
- */
 @ApplicationScoped
 @ProsessTask(value = JournalførOppgaveTask.TASKTYPE)
 public class JournalførOppgaveTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "oppgave.journalfor";
     public static final String OPPGAVE_REFERANSE = "oppgaveReferanse";
-    /** Valgfri - satt kun når oppgavetypen krever fagsak og saksbehandlingssystemet har oppgitt den. */
     public static final String SAKSNUMMER = "saksnummer";
 
-    /** Helautomatisk journalføring - ingen saksbehandler er involvert. */
     private static final String JOURNALFOERENDE_ENHET = "9999";
 
-    /** Ett generisk Handlebars-oppsett for alle oppgavetyper - se handlebars/oppgave.hbs. */
     private static final String MALNAVN = "oppgave";
 
     private static final String TILLEGGSOPPLYSNING_NOKKEL = "ung.oppgave.eRef";
@@ -182,10 +171,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         return new PersonInfo(hentFødselsnummer(oppgave), hentNavn(oppgave));
     }
 
-    /**
-     * Kun gjeldende {@code FOLKEREGISTERIDENT}, uten historikk - unngår å sende et opphørt
-     * fødselsnummer til arkivet.
-     */
     private String hentFødselsnummer(BrukerdialogOppgaveEntitet oppgave) {
         return pdl.hentPersonIdentForAktørId(oppgave.getAktørId().getId())
             .orElseThrow(() -> new JournalføringException(
@@ -215,11 +200,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .collect(Collectors.joining(" "));
     }
 
-    /**
-     * {@code oppgave}-undermappen inneholder både {@link OppgaveInnholdUtleder#tekster} (rendres
-     * i {@code {{#each oppgave.tekster}}}) og {@code oppgaveReferanse} (brukt av
-     * {@code partial/footer.hbs}).
-     */
     private Map<String, Object> byggPdfData(String tittel, String undertittel, String ytelse, String opprettetDato,
                                              List<OppgaveTekst> tekster, String oppgaveReferanse, PersonInfo person) {
         Map<String, Object> oppgaveData = new LinkedHashMap<>();
@@ -237,12 +217,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
         return data;
     }
 
-    /**
-     * Journalpostens tittel ({@link JournalføringParametre#journalposttittel}) er bevisst
-     * forskjellig fra {@code dokumentTittel} - journalposten får en generisk per-ytelse-tittel,
-     * mens dokumentet beholder sin oppgavetype-spesifikke tittel (samme skille som
-     * {@code k9-brukerdialog-prosessering} gjør).
-     */
     private OpprettJournalpostRequest byggJournalpostRequest(BrukerdialogOppgaveEntitet oppgave,
                                                                JournalføringParametre parametre,
                                                                Sakstype sakstype,
@@ -281,9 +255,6 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
             .build();
     }
 
-    /**
-     * Bevisst PII-fri {@code toString()} - fnr og navn skal aldri havne i logg.
-     */
     private record PersonInfo(String fødselsnummer, String navn) {
         @Override
         public String toString() {

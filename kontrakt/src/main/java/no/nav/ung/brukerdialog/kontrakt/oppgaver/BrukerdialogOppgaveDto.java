@@ -11,9 +11,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * DTO for oppgave med all nødvendig informasjon for visning og håndtering.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record BrukerdialogOppgaveDto(
     @JsonProperty(value = "oppgaveReferanse", required = true)
@@ -53,21 +50,10 @@ public record BrukerdialogOppgaveDto(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime frist,
 
-    /**
-     * Fullstendig brevtekst for oppgaven, i visningsrekkefølge. Samme tekster som brukes i
-     * PDF-dokumentet og (det første elementet) i min-side-varselet - se {@link OppgaveTekst}.
-     * Tom liste dersom teksten ikke kunne utledes (se {@code BrukerdialogOppgaveMapper}), ikke
-     * en feilende respons.
-     */
     @JsonProperty(value = "tekster", required = true)
     @NotNull
     List<OppgaveTekst> tekster,
 
-    /**
-     * Kort, oppgavetype-spesifikk undertittel/tema (f.eks. «Bostedsadresse»), samme verdi som
-     * vises under tittelen i PDF-dokumentet - se {@code OppgaveInnholdUtleder#undertittel}.
-     * {@code null} dersom den ikke kunne utledes (samme degraderingsstrategi som {@link #tekster}).
-     */
     @JsonProperty(value = "undertittel")
     String undertittel
 ) {

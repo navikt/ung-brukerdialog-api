@@ -54,24 +54,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Tester det kuraterte brevinnholdet (PDF/min-side-varsel/DTO) per oppgavetype. Dekker:
- * <ul>
- *     <li>tittel og {@code tekster()} for alle 8 {@link OppgaveType}-verdier (én representativ
- *     "lykkelig sti"-scenario per type), samt at {@code varselLenke()} peker riktig sted</li>
- *     <li>alle grener i {@link EndretPeriodeOppgaveInnholdUtleder} (startdato/sluttdato/
- *     meldt-ut/fjernet/start-og-slutt/fallback), inkludert at innholdet ikke drifter fra de
- *     dedikerte typene for de grenene som deler tekst (jf. javadoc i typer-klassene)</li>
- *     <li>{@link BekreftBostedOppgaveInnholdUtleder}: bundet vs. opphør, samt alle
- *     {@link BostedsvilkårIkkeOppfyltÅrsak}- og {@link BostedsavklaringKildeType}-verdier</li>
- *     <li>{@link KontrollerRegisterinntektOppgaveInnholdUtleder}: inntektskombinasjoner og
- *     {@link YtelseType}-visningsnavn</li>
- *     <li>ytelseskvalifikator (ungdomsytelse vs. aktivitetspenger) og svarfrist-visning</li>
- * </ul>
- * Siden {@link OppgaveAvsnitt}/{@link OppgaveListe}/{@link OppgaveTabell} er records, kan hele
- * {@code tekster()}-lister sammenlignes med vanlig {@code equals} - ikke bare enkeltnøkler slik
- * det gamle {@code Map<String,Object>}-innholdet krevde.
- */
 class OppgaveInnholdUtlederInnholdTest {
 
     private static final String UNGDOMSPROGRAM_BASE_URL = "https://ungdomsprogram-deltaker.example";
@@ -113,12 +95,6 @@ class OppgaveInnholdUtlederInnholdTest {
             : scenario.forventetVarselLenkeBaseUrl());
     }
 
-    /**
-     * Dedikert, isolert innholdssjekk av {@link OppgaveTekster#omVarselSeksjon()} mot en literal
-     * fasit. Sveipetesten over bygger sin forventede "hale" ved å kalle {@code omVarselSeksjon()}
-     * direkte, noe som kun verifiserer *at* halen legges til (strukturelt), ikke at *innholdet* i
-     * halen er riktig. Denne testen tetter det hullet - uavhengig av alle andre tester.
-     */
     @Test
     void omVarselSeksjon_har_forventet_ordlyd() {
         assertThat(OppgaveTekster.omVarselSeksjon()).containsExactly(
@@ -128,13 +104,6 @@ class OppgaveInnholdUtlederInnholdTest {
             new OppgaveAvsnitt("Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes."));
     }
 
-    /**
-     * Låser fast at fristen faktisk vises i PDF-en/{@code tekster()} når {@code fristTid} er satt
-     * - for **alle** 8 oppgavetyper, ikke bare {@code EndretStartdato} (som allerede er dekket av
-     * {@link #svarfrist_tas_med_når_satt_og_utelates_når_null}). Sjekker kun at frist-frasen er
-     * til stede (ikke full tekstlikhet), siden handlingsverb og konsekvenssetning legitimt
-     * varierer per type og allerede er dekket av andre, mer spesifikke tester.
-     */
     @ParameterizedTest
     @EnumSource(OppgaveType.class)
     void frist_vises_i_tekster_for_alle_oppgavetyper_når_satt(OppgaveType oppgaveType) {
@@ -412,12 +381,6 @@ class OppgaveInnholdUtlederInnholdTest {
         assertThat(utleder.undertittel(aktivitetspenger)).isEqualTo("Bostedsadresse");
     }
 
-    /**
-     * Låser fast eksakt ordlyd for alle 5 årsaker × opphør/periode (10 kombinasjoner) mot
-     * literal-tekster - ikke bare en delstreng-sjekk av datoformateringen. Sikrer at en
-     * utilsiktet endring/ombytting av årsaks-setningene (f.eks. "folkeregistrert" vs.
-     * "studie- eller arbeidssted") faktisk blir fanget opp.
-     */
     @ParameterizedTest
     @MethodSource("bostedVarselTekstForventetOrdlyd")
     void bostedVarselTekst_dekker_alle_årsaker_for_opphør_og_periode(
@@ -642,12 +605,6 @@ class OppgaveInnholdUtlederInnholdTest {
             ytelsetype, fristTid);
     }
 
-    /**
-     * Mocker CDI-oppslaget {@code Instance<OppgaveDataMapperFraEntitetTilDto>} slik at
-     * {@link OppgaveDataMapperFraEntitetTilDto#finnTjeneste} returnerer en mapper som gir
-     * {@code dto} uansett input. Annotasjonen/oppgavetypen i det faktiske oppslaget er derfor
-     * uten betydning for testene her.
-     */
     private static Instance<OppgaveDataMapperFraEntitetTilDto> mappereSomGir(OppgavetypeDataDto dto) {
         OppgaveDataMapperFraEntitetTilDto mapper = mock(OppgaveDataMapperFraEntitetTilDto.class);
         when(mapper.tilDto(any())).thenReturn(dto);

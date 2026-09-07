@@ -60,51 +60,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Rendrings-smoketest for den ene, generiske produksjonsmalen {@code handlebars/oppgave.hbs},
- * som brukes for alle 8 {@link OppgaveType}-verdier. {@link OppgaveInnholdUtlederInnholdTest}
- * verifiserer at Java-siden ({@code tittel}/{@code tekster}) gir riktig data - denne testen
- * verifiserer at den dataen faktisk <b>rendres</b> riktig gjennom {@link PdfGenerator}: at malen
- * (inkludert alle tre blokktyper - avsnitt/liste/tabell) kompilerer og rendrer alle scenarioene
- * uten feil, og at Java-datamodellens felter stemmer overens med feltnavnene malen faktisk bruker
- * (et navnefeil her ville gitt et tomt/manglende tekstfragment i stedet for en synlig feil - se
- * assertions under).
- * <p>
- * Scenarioene under er de samme 8+N grenene som tidligere var fordelt på 8 separate
- * Handlebars-filer (én per {@link OppgaveType}) - nå går de alle gjennom samme mal, men
- * scenario-settet beholdes uendret siden hver av dem fortsatt er et distinkt, meningsfullt
- * regresjonspunkt for tekstinnholdet (bl.a. {@code EndretPeriodeOppgaveInnholdUtleder} sine 5
- * grener, se klassens javadoc).
- * <p>
- * Bygger PDF-datamodellen for hånd, på nøyaktig samme form som
- * {@code JournalførOppgaveTask#byggPdfData} - se den metoden der før du endrer denne testens
- * {@link #pdfDokument}.
- * <p>
- * {@link #oppretter_lesbar_pdf_for_visuell_kontroll} kjører de samme scenarioene, men skriver i
- * tillegg PDF-en til disk slik at man kan åpne og se hvordan brevene faktisk ser ut -
- * mønster hentet fra {@code k9-brukerdialog-prosessering} sine {@code *PdfGeneratorTest.kt}.
- */
 class OppgaveInnholdUtlederRenderingTest {
 
     private static final String UNGDOMSPROGRAM_BASE_URL = "https://ungdomsprogram-deltaker.example";
     private static final String AKTIVITETSPENGER_BASE_URL = "https://aktivitetspenger-innsyn.example";
 
-    /**
-     * Katalog for lesbare PDF-er skrevet ut av {@link #oppretter_lesbar_pdf_for_visuell_kontroll}
-     * - relativt til modulens {@code basedir} (Maven Surefire sin arbeidskatalog som standard),
-     * altså {@code brukerdialog-oppgave/tjeneste/target/pdf-preview/}. Gitignoret via
-     * {@code pdf-preview/} i rot-{@code .gitignore} (dekkes i realiteten allerede av den
-     * eksisterende bare {@code target}-regelen, men eksplisitt regel for tydelighet).
-     */
     private static final Path PDF_PREVIEW_DIR = Paths.get("target", "pdf-preview");
 
     private final PdfGenerator pdfGenerator = new PdfGenerator();
 
-    /**
-     * Rydder og gjenoppretter {@link #PDF_PREVIEW_DIR} før hver testkjøring, slik at mappen
-     * alltid reflekterer nøyaktig dagens scenario-sett - ingen foreldede filer fra
-     * fjernede/omdøpte scenarioer henger igjen mellom kjøringer.
-     */
     @BeforeAll
     static void ryddOppLesbarePdfer() throws IOException {
         if (Files.exists(PDF_PREVIEW_DIR)) {
@@ -147,14 +111,6 @@ class OppgaveInnholdUtlederRenderingTest {
             .contains(scenario.forventetFragmenter().toArray(new String[0]));
     }
 
-    /**
-     * Skriver hvert scenario sin rendrede PDF til {@link #PDF_PREVIEW_DIR} for manuell visuell
-     * kontroll (fonter, marger, linjeskift, sidetall) - noe rene tekst-assertions i
-     * {@link #rendrer_gyldig_pdf_med_forventet_innhold} ikke fanger opp. Mønster hentet fra
-     * {@code k9-brukerdialog-prosessering} sine {@code *PdfGeneratorTest.kt}-klasser.
-     * Filnavnet er en slugifisert versjon av {@link RenderScenario#beskrivelse()}, så det er
-     * trivielt å koble en fil på disk til scenariet i kildekoden.
-     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("scenarioer")
     void oppretter_lesbar_pdf_for_visuell_kontroll(RenderScenario scenario) throws IOException {
@@ -168,20 +124,11 @@ class OppgaveInnholdUtlederRenderingTest {
         assertThat(Files.size(fil)).as("filstørrelse for %s", scenario.beskrivelse()).isPositive();
     }
 
-    /**
-     * Slugifiserer en scenario-beskrivelse til et trygt filnavn: små bokstaver, mellomrom/tegn
-     * erstattet med {@code -}, ingen ledende/avsluttende bindestrek. Norske bokstaver (æøå)
-     * beholdes - gyldig på både macOS/APFS og Linux/ext4.
-     */
     private static String slug(String beskrivelse) {
         String slugifisert = beskrivelse.toLowerCase(Locale.ROOT).replaceAll("[^a-zæøå0-9]+", "-");
         return slugifisert.replaceAll("^-+|-+$", "");
     }
 
-    /**
-     * To dedikerte tester (utenfor sveipet over) som verifiserer at svarfrist-avsnittet faktisk
-     * utelates når fristen mangler - ikke bare at et tomt felt ikke gir en feil.
-     */
     @Test
     void svarfrist_utelates_når_fristTid_mangler_bosted_opphør() {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(
@@ -400,13 +347,6 @@ class OppgaveInnholdUtlederRenderingTest {
     // Testoppsett - se OppgaveInnholdUtlederInnholdTest for samme mønster
     // ---------------------------------------------------------------------------------------
 
-    /**
-     * Bygger PDF-datamodellen på nøyaktig samme form som
-     * {@code JournalførOppgaveTask#byggPdfData} - se den metoden der. Duplisert her (i stedet for
-     * gjort tilgjengelig fra produksjonskoden) fordi {@code MALNAVN} og {@code byggPdfData} er
-     * private og kun binder sammen tittel/navn/fødselsnummer/oppgavedata til én {@code Map} -
-     * ingen forretningslogikk å dele.
-     */
     private static PdfDokument pdfDokument(OppgaveInnholdUtleder utleder, BrukerdialogOppgaveEntitet oppgave) {
         Map<String, Object> oppgaveData = new LinkedHashMap<>();
         oppgaveData.put("tekster", utleder.tekster(oppgave));
@@ -431,12 +371,6 @@ class OppgaveInnholdUtlederRenderingTest {
             ytelsetype, fristTid);
     }
 
-    /**
-     * Mocker CDI-oppslaget {@code Instance<OppgaveDataMapperFraEntitetTilDto>} slik at
-     * {@link OppgaveDataMapperFraEntitetTilDto#finnTjeneste} returnerer en mapper som gir
-     * {@code dto} uansett input - se {@code OppgaveInnholdUtlederInnholdTest} for samme mønster
-     * og forklaring på {@code isResolvable()}-stubbingen.
-     */
     private static Instance<OppgaveDataMapperFraEntitetTilDto> mappereSomGir(OppgavetypeDataDto dto) {
         OppgaveDataMapperFraEntitetTilDto mapper = mock(OppgaveDataMapperFraEntitetTilDto.class);
         when(mapper.tilDto(any())).thenReturn(dto);

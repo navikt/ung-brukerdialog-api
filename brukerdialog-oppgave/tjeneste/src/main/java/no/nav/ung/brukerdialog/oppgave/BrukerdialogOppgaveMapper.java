@@ -56,12 +56,6 @@ public class BrukerdialogOppgaveMapper {
     private record OppgaveInnhold(List<OppgaveTekst> tekster, String undertittel) {
     }
 
-    /**
-     * Degraderer til tom tekstliste/{@code null}-undertittel ved feil, i stedet for å la hele
-     * {@code GET /oppgave/hent/alle} feile pga. én oppgave med f.eks. korrupt oppgavedata - se
-     * Fase 3-review i plansporet for denne endringen. Loggmeldingen inneholder bevisst verken
-     * fnr/navn eller annet oppgaveinnhold, kun oppgavetype og -referanse.
-     */
     private OppgaveInnhold innhold(BrukerdialogOppgaveEntitet oppgave) {
         try {
             OppgaveInnholdUtleder utleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());

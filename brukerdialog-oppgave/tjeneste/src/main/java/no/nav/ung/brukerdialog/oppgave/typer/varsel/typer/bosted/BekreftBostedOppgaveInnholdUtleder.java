@@ -23,15 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Kilde: fagside-levert tekst-/formateringstabell (se plansporet), erstatter tidligere
- * frontend-avledet tekst (ingen forelegg i {@code sif-brukerdialog}). Ingen ytelseskvalifikator -
- * gjelder alltid aktivitetspenger.
- * <p>
- * To DTO-varianter fra vår mapper: bundet periode ({@link BekreftBostedOppgavetypeDataDto},
- * {@code fom}-{@code tom}) og åpen/opphørt periode ({@link BekreftBostedOpphørOppgavetypeDataDto},
- * kun {@code fom}) - se {@link OppgaveTekster#bostedVarselTekst}.
- */
 @OppgaveTypeRef(OppgaveType.BEKREFT_BOSTED)
 @ApplicationScoped
 public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
