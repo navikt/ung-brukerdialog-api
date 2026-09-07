@@ -3,7 +3,7 @@ package no.nav.ung.brukerdialog.sak.diagnostikk;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.VedtakPeriodeEntitet;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
@@ -27,10 +27,10 @@ public class DiagnostikkSakRepository {
         this.entityManager = entityManager;
     }
 
-    public List<FagSakEntitet> hentAlleFagsaker(AktørId aktørId) {
+    public List<FagsakEntitet> hentAlleFagsaker(AktørId aktørId) {
         return entityManager.createQuery(
                 "SELECT f FROM Fagsak f WHERE f.aktørId = :aktørId ORDER BY f.id",
-                FagSakEntitet.class)
+                FagsakEntitet.class)
             .setParameter("aktørId", aktørId)
             .getResultList();
     }

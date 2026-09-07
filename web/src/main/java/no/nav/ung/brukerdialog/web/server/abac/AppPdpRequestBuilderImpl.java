@@ -10,7 +10,7 @@ import no.nav.k9.felles.sikkerhet.abac.*;
 import no.nav.ung.brukerdialog.abac.AppAbacAttributtType;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
@@ -83,7 +83,7 @@ public class AppPdpRequestBuilderImpl implements PdpRequestBuilder {
         if (!saksnummer.isEmpty()) {
             saksnummer.stream().map(it -> fagsakRepository.hentForSaksnummer(new Saksnummer(it)))
                 .flatMap(Optional::stream)
-                .map(FagSakEntitet::getAktørId)
+                .map(FagsakEntitet::getAktørId)
                 .map(no.nav.ung.brukerdialog.typer.AktørId::getId)
                 .forEach(aktørIder::add);
         }

@@ -6,7 +6,7 @@ import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet;
@@ -47,7 +47,7 @@ class DiagnostikkSakTjenesteTest {
     @Test
     void dumper_også_deaktiverte_vedtaksperioder() {
         var aktørId = AktørId.dummy();
-        var fagsak = new FagSakEntitet(aktørId, YTELSE, nyttSaksnummer());
+        var fagsak = new FagsakEntitet(aktørId, YTELSE, nyttSaksnummer());
         fagsak.erstattPerioder(List.of(new VedtakPeriodeDto(new Periode(FOM, TOM), VedtakResultatType.INNVILGET)));
         fagsakRepository.lagre(fagsak);
 
@@ -96,7 +96,7 @@ class DiagnostikkSakTjenesteTest {
     void finner_aktør_for_saksnummer() {
         var aktørId = AktørId.dummy();
         var saksnummer = nyttSaksnummer();
-        fagsakRepository.lagre(new FagSakEntitet(aktørId, YTELSE, saksnummer));
+        fagsakRepository.lagre(new FagsakEntitet(aktørId, YTELSE, saksnummer));
         entityManager.flush();
         entityManager.clear();
 

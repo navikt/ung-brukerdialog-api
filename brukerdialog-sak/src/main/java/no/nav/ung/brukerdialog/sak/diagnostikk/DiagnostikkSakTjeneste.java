@@ -6,7 +6,7 @@ import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.DiagnostikkSakResponse;
 import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.FagsakDumpDto;
 import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.SøknadHendelseDumpDto;
 import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.VedtakPeriodeDumpDto;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.sak.fagsak.VedtakPeriodeEntitet;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet;
@@ -34,13 +34,13 @@ public class DiagnostikkSakTjeneste {
     }
 
     public Optional<AktørId> finnAktørForSaksnummer(Saksnummer saksnummer) {
-        return fagsakRepository.hentForSaksnummer(saksnummer).map(FagSakEntitet::getAktørId);
+        return fagsakRepository.hentForSaksnummer(saksnummer).map(FagsakEntitet::getAktørId);
     }
 
     public DiagnostikkSakResponse dump(AktørId aktørId) {
-        List<FagSakEntitet> fagsaker = diagnostikkSakRepository.hentAlleFagsaker(aktørId);
+        List<FagsakEntitet> fagsaker = diagnostikkSakRepository.hentAlleFagsaker(aktørId);
         Map<Saksnummer, List<VedtakPeriodeEntitet>> perioder =
-            diagnostikkSakRepository.hentAllePerioderPerSaksnummer(fagsaker.stream().map(FagSakEntitet::getSaksnummer).toList());
+            diagnostikkSakRepository.hentAllePerioderPerSaksnummer(fagsaker.stream().map(FagsakEntitet::getSaksnummer).toList());
 
         return new DiagnostikkSakResponse(
             aktørId.getId(),
@@ -48,7 +48,7 @@ public class DiagnostikkSakTjeneste {
             diagnostikkSakRepository.hentAlleSøknadHendelser(aktørId).stream().map(DiagnostikkSakTjeneste::tilDto).toList());
     }
 
-    private static FagsakDumpDto tilDto(FagSakEntitet fagsak, List<VedtakPeriodeEntitet> perioder) {
+    private static FagsakDumpDto tilDto(FagsakEntitet fagsak, List<VedtakPeriodeEntitet> perioder) {
         return new FagsakDumpDto(
             fagsak.getId(),
             fagsak.getSaksnummer().getVerdi(),
