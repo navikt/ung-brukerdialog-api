@@ -32,7 +32,7 @@ public class FagsakTjeneste {
     public void motta(FagsakYtelseType ytelseType, FagsakRequest request) {
         Optional<FagsakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
         if (eksisterendeFagsak.isPresent() && !eksisterendeFagsak.get().getAktørId().equals(request.aktørId())) {
-            throw new IllegalStateException("Saken tilhører en annen aktør. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
+            throw new IllegalStateException("Saken tilhører en annen bruker. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
         }
 
         FagsakEntitet fagsak = eksisterendeFagsak
