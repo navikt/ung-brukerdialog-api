@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagSakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
@@ -144,14 +144,14 @@ class FagsakTjenesteTest {
             .isNull();
     }
 
-    private List<VedtakPeriodeEntitet> allePerioder(FagSakEntitet fagsak) {
+    private List<VedtakPeriodeEntitet> allePerioder(FagsakEntitet fagsak) {
         return entityManager.createQuery(
                 "SELECT p FROM VedtakPeriode p WHERE p.fagsak = :fagsak", VedtakPeriodeEntitet.class)
             .setParameter("fagsak", fagsak)
             .getResultList();
     }
 
-    private List<VedtakPeriodeEntitet> inaktivePerioder(FagSakEntitet fagsak) {
+    private List<VedtakPeriodeEntitet> inaktivePerioder(FagsakEntitet fagsak) {
         return entityManager.createQuery(
                 "SELECT p FROM VedtakPeriode p WHERE p.fagsak = :fagsak AND p.aktiv = false", VedtakPeriodeEntitet.class)
             .setParameter("fagsak", fagsak)
@@ -171,8 +171,8 @@ class FagsakTjenesteTest {
         return new MottattSøknadDto(søknadId, LocalDate.of(2025, 1, 2));
     }
 
-    private static FagSakRequest request(AktørId aktørId, Saksnummer saksnummer,
+    private static FagsakRequest request(AktørId aktørId, Saksnummer saksnummer,
                                          List<VedtakPeriodeDto> perioder, List<MottattSøknadDto> mottatteSøknader) {
-        return new FagSakRequest(aktørId, saksnummer, perioder, mottatteSøknader);
+        return new FagsakRequest(aktørId, saksnummer, perioder, mottatteSøknader);
     }
 }

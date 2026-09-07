@@ -7,7 +7,7 @@ import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagSakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
@@ -161,7 +161,7 @@ class SøknadHendelseTjenesteTest {
     }
 
     private void mottaSak(AktørId aktørId, UUID søknadId, List<VedtakPeriodeDto> vedtaksperioder) {
-        fagsakTjeneste.motta(YTELSE, new FagSakRequest(
+        fagsakTjeneste.motta(YTELSE, new FagsakRequest(
             aktørId,
             new Saksnummer("1234"),
             vedtaksperioder,

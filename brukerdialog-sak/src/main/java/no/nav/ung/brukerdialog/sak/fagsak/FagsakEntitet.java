@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @Entity(name = "Fagsak")
 @Table(name = "BD_FAGSAK")
-public class FagSakEntitet extends BaseEntitet {
+public class FagsakEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BD_FAGSAK")
@@ -38,11 +38,11 @@ public class FagSakEntitet extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    FagSakEntitet() {
+    FagsakEntitet() {
         // For JPA
     }
 
-    public FagSakEntitet(AktørId aktørId, FagsakYtelseType ytelseType, Saksnummer saksnummer) {
+    public FagsakEntitet(AktørId aktørId, FagsakYtelseType ytelseType, Saksnummer saksnummer) {
         this.aktørId = Objects.requireNonNull(aktørId, "aktørId");
         this.ytelseType = Objects.requireNonNull(ytelseType, "ytelseType");
         this.saksnummer = Objects.requireNonNull(saksnummer, "saksnummer");

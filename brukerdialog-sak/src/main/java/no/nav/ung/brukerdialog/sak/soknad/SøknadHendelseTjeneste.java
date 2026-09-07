@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.slf4j.Logger;
@@ -62,10 +62,10 @@ public class SøknadHendelseTjeneste {
             finnFagsak(aktørId, ytelseType));
     }
 
-    private FagSakEntitet finnFagsak(AktørId aktørId, FagsakYtelseType ytelseType) {
-        List<FagSakEntitet> fagsaker = fagsakRepository.hentForAktørOgYtelse(aktørId, ytelseType);
+    private FagsakEntitet finnFagsak(AktørId aktørId, FagsakYtelseType ytelseType) {
+        List<FagsakEntitet> fagsaker = fagsakRepository.hentForAktørOgYtelse(aktørId, ytelseType);
         if (fagsaker.size() > 1) {
-            log.warn("Fant flere fagsaker på aktør med saksnummer {}. Bruker den nyeste.", fagsaker.stream().map(FagSakEntitet::getSaksnummer).toList());
+            log.warn("Fant flere fagsaker på aktør med saksnummer {}. Bruker den nyeste.", fagsaker.stream().map(FagsakEntitet::getSaksnummer).toList());
         }
         return fagsaker.stream().findFirst().orElse(null);
     }

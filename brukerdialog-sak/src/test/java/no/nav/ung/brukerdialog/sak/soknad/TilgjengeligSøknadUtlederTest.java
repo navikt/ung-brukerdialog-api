@@ -4,7 +4,7 @@ import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Periode;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
@@ -48,7 +48,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void fullt_avslag_gir_ny_førstegangssøknad() {
-        FagSakEntitet fagsak = fagsak(avslåttEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(avslåttEtÅrTom(_30juni2025));
         LocalDate iDag = LocalDate.of(2025, 1, 1);
         var resultat = utled(iDag, List.of(behandletSøknad(fagsak)), fagsak);
 
@@ -69,7 +69,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void innvilgelse_i_vinduet_gir_forlengelse_med_innsyn() {
-        FagSakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
         LocalDate iDag = VINDU_ÅPNER_2juni2025;
         var resultat = utled(iDag, List.of(behandletSøknad(fagsak)), fagsak);
 
@@ -80,7 +80,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void innvilgelse_gir_innsyn_selv_når_brukeren_ikke_kan_søke() {
-        FagSakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
         var resultat = utled(VINDU_ÅPNER_2juni2025.minusDays(1), List.of(behandletSøknad(fagsak)), fagsak);
 
         assertThat(resultat.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
@@ -90,7 +90,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void førstegangssøknad_etter_tom_beholder_innsyn_i_den_gamle_saken() {
-        FagSakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
         var resultat = utled(VINDU_LUKKER_30juni2026.plusDays(1), List.of(behandletSøknad(fagsak)), fagsak);
 
         assertThat(resultat.type()).isEqualTo(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD);
@@ -100,7 +100,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void ny_søknad_som_ennå_ikke_er_behandlet_sperrer_selv_midt_i_vinduet() {
-        FagSakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
         var resultat = utled(_30juni2025, List.of(behandletSøknad(fagsak), ubehandletSøknad()), fagsak);
 
         assertThat(resultat.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
@@ -110,7 +110,7 @@ class TilgjengeligSøknadUtlederTest {
 
     @Test
     void løpende_innvilgelse_uten_søknadshendelse_gir_ikke_førstegangssøknad() {
-        FagSakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
+        FagsakEntitet fagsak = fagsak(innvilgetEtÅrTom(_30juni2025));
         var resultat = utled(_30juni2025, List.of(), fagsak);
 
         assertThat(resultat.type()).isEqualTo(TilgjengeligSøknadType.NY_PERIODE_SØKNAD);
@@ -152,7 +152,7 @@ class TilgjengeligSøknadUtlederTest {
         assertThat(resultat.type()).as(beskrivelse).isEqualTo(forventet);
     }
 
-    private static TilgjengeligSøknadResponse utled(LocalDate iDag, List<SøknadHendelseEntitet> hendelser, FagSakEntitet fagsak) {
+    private static TilgjengeligSøknadResponse utled(LocalDate iDag, List<SøknadHendelseEntitet> hendelser, FagsakEntitet fagsak) {
         return TilgjengeligSøknadUtleder.utled(iDag, hendelser, fagsak);
     }
 
@@ -160,7 +160,7 @@ class TilgjengeligSøknadUtlederTest {
         return new SøknadHendelseEntitet(UUID.randomUUID(), AktørId.dummy(), YTELSE, LocalDateTime.of(2025, 1, 1, 12, 0));
     }
 
-    private static SøknadHendelseEntitet behandletSøknad(FagSakEntitet sak123) {
+    private static SøknadHendelseEntitet behandletSøknad(FagsakEntitet sak123) {
         var hendelse = ubehandletSøknad();
         hendelse.markerMottattIFagsak(sak123);
         return hendelse;
@@ -178,8 +178,8 @@ class TilgjengeligSøknadUtlederTest {
         return new VedtakPeriodeDto(new Periode(tom.minusWeeks(52).plusDays(1), tom), resultat);
     }
 
-    private static FagSakEntitet fagsak(VedtakPeriodeDto... perioder) {
-        var entitet = new FagSakEntitet(AktørId.dummy(), YTELSE, new Saksnummer("SAK123"));
+    private static FagsakEntitet fagsak(VedtakPeriodeDto... perioder) {
+        var entitet = new FagsakEntitet(AktørId.dummy(), YTELSE, new Saksnummer("SAK123"));
         entitet.erstattPerioder(List.of(perioder));
         return entitet;
     }

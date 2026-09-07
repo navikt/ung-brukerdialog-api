@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.sak.fagsak;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagSakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
@@ -29,14 +29,14 @@ public class FagsakTjeneste {
         this.søknadHendelseRepository = søknadHendelseRepository;
     }
 
-    public void motta(FagsakYtelseType ytelseType, FagSakRequest request) {
-        Optional<FagSakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
+    public void motta(FagsakYtelseType ytelseType, FagsakRequest request) {
+        Optional<FagsakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
         if (eksisterendeFagsak.isPresent() && !eksisterendeFagsak.get().getAktørId().equals(request.aktørId())) {
             throw new IllegalStateException("Saken tilhører en annen aktør. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
         }
 
-        FagSakEntitet fagsak = eksisterendeFagsak
-            .orElseGet(() -> new FagSakEntitet(request.aktørId(), ytelseType, request.saksnummer()));
+        FagsakEntitet fagsak = eksisterendeFagsak
+            .orElseGet(() -> new FagsakEntitet(request.aktørId(), ytelseType, request.saksnummer()));
 
         fagsak.erstattPerioder(request.vedtakPerioder());
         fagsakRepository.lagre(fagsak);
@@ -47,7 +47,7 @@ public class FagsakTjeneste {
             request.saksnummer().getVerdi(), request.vedtakPerioder().size());
     }
 
-    private void kobleSøknaderTilFagsak(FagSakRequest request, FagsakYtelseType ytelseType, FagSakEntitet fagsak) {
+    private void kobleSøknaderTilFagsak(FagsakRequest request, FagsakYtelseType ytelseType, FagsakEntitet fagsak) {
         Set<UUID> mottatteSøknadIder = request.mottatteSøknader().stream()
             .map(MottattSøknadDto::søknadId)
             .collect(Collectors.toSet());

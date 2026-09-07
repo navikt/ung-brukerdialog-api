@@ -38,7 +38,7 @@ class FagsakRepositoryTest {
     void samtidig_lagring_på_sak_uten_perioder_skal_feile_med_optimistic_lock() {
         // Sak uten perioder: to samtidige meldinger ville begge bare satt inn nye rader, så det
         // finnes ingen delt periode-rad som kunne fanget konflikten. Bare fagsaken er felles.
-        fagsakRepository.lagre(new FagSakEntitet(AktørId.dummy(), YTELSE, SAKSNUMMER));
+        fagsakRepository.lagre(new FagsakEntitet(AktørId.dummy(), YTELSE, SAKSNUMMER));
 
         // Transaksjon 1 leser saken
         var kopi1 = fagsakRepository.hentForSaksnummer(SAKSNUMMER).orElseThrow();

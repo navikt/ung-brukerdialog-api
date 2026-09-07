@@ -29,7 +29,7 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
 
     @ManyToOne
     @JoinColumn(name = "fagsak_id", nullable = false, updatable = false)
-    private FagSakEntitet fagsak;
+    private FagsakEntitet fagsak;
 
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
@@ -38,7 +38,7 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
         // For JPA
     }
 
-    VedtakPeriodeEntitet(FagSakEntitet fagsak, LocalDate fom, LocalDate tom, VedtakResultatType resultat) {
+    VedtakPeriodeEntitet(FagsakEntitet fagsak, LocalDate fom, LocalDate tom, VedtakResultatType resultat) {
         this.fagsak = Objects.requireNonNull(fagsak, "fagsak");
         this.resultat = Objects.requireNonNull(resultat, "resultat");
         Objects.requireNonNull(fom, "fom");

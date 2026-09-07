@@ -9,7 +9,7 @@
     <sequence-generator name="SEQ_BD_VEDTAK_PERIODE" allocation-size="50" sequence-name="SEQ_BD_VEDTAK_PERIODE"/>
 
     <entity class="no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet"/>
-    <entity class="no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet"/>
+    <entity class="no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet"/>
     <entity class="no.nav.ung.brukerdialog.sak.fagsak.VedtakPeriodeEntitet"/>
 
 </entity-mappings>

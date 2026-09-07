@@ -27,7 +27,7 @@ public class FagsakRepository {
         this.entityManager = entityManager;
     }
 
-    public void lagre(FagSakEntitet fagsak) {
+    public void lagre(FagsakEntitet fagsak) {
         if (fagsak.getId() == null) {
             entityManager.persist(fagsak);
         } else {
@@ -40,19 +40,19 @@ public class FagsakRepository {
         entityManager.flush();
     }
 
-    public Optional<FagSakEntitet> hentForSaksnummer(Saksnummer saksnummer) {
-        TypedQuery<FagSakEntitet> query = entityManager.createQuery(
+    public Optional<FagsakEntitet> hentForSaksnummer(Saksnummer saksnummer) {
+        TypedQuery<FagsakEntitet> query = entityManager.createQuery(
             "SELECT f FROM Fagsak f WHERE f.saksnummer = :saksnummer",
-            FagSakEntitet.class
+            FagsakEntitet.class
         );
         query.setParameter("saksnummer", saksnummer);
         return HibernateVerktøy.hentUniktResultat(query);
     }
 
-    public List<FagSakEntitet> hentForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
-        TypedQuery<FagSakEntitet> query = entityManager.createQuery(
+    public List<FagsakEntitet> hentForAktørOgYtelse(AktørId aktørId, FagsakYtelseType ytelseType) {
+        TypedQuery<FagsakEntitet> query = entityManager.createQuery(
             "SELECT f FROM Fagsak f WHERE f.aktørId = :aktoerId AND f.ytelseType = :ytelseType ORDER BY f.opprettetTidspunkt DESC",
-            FagSakEntitet.class
+            FagsakEntitet.class
         );
         query.setParameter("aktoerId", aktørId);
         query.setParameter("ytelseType", ytelseType);

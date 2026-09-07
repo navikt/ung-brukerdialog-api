@@ -17,7 +17,7 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagSakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakTjeneste;
 import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
@@ -46,7 +46,7 @@ public class AktivitetspengerFagsakRestTjeneste {
     @POST
     @Operation(summary = "Melder inn vedtaksperioder og behandlede søknader for en bruker", tags = "fagsak")
     @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
-    public Response mottaFagsak(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) FagSakRequest request) {
+    public Response mottaFagsak(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) FagsakRequest request) {
         fagsakTjeneste.motta(FagsakYtelseType.AKTIVITETSPENGER, request);
         return Response.ok().build();
     }

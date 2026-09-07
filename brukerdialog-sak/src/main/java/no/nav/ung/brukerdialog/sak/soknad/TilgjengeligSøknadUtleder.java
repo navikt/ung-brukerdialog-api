@@ -3,7 +3,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.VedtakPeriodeEntitet;
 import no.nav.ung.brukerdialog.tid.DatoIntervallEntitet;
 
@@ -20,7 +20,7 @@ class TilgjengeligSøknadUtleder {
 
     static TilgjengeligSøknadResponse utled(LocalDate iDag,
                                             List<SøknadHendelseEntitet> søknader,
-                                            FagSakEntitet fagsak) {
+                                            FagsakEntitet fagsak) {
 
 
         var sisteInnvilgedeTom = sisteInnvilgedeTom(fagsak);
@@ -54,7 +54,7 @@ class TilgjengeligSøknadUtleder {
         return new TilgjengeligSøknadResponse(TilgjengeligSøknadType.FØRSTEGANGSSØKNAD, false, true);
     }
 
-    private static LocalDate sisteInnvilgedeTom(FagSakEntitet fagsak) {
+    private static LocalDate sisteInnvilgedeTom(FagsakEntitet fagsak) {
         if (fagsak == null) {
             return null;
         }

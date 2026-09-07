@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
-import no.nav.ung.brukerdialog.sak.fagsak.FagSakEntitet;
+import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 
 import java.time.LocalDateTime;
@@ -40,7 +40,7 @@ public class SøknadHendelseEntitet extends BaseEntitet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mottatt_i_fagsak")
-    private FagSakEntitet mottattIFagsak;
+    private FagsakEntitet mottattIFagsak;
 
     protected SøknadHendelseEntitet() {
         // For JPA
@@ -81,11 +81,11 @@ public class SøknadHendelseEntitet extends BaseEntitet {
         return aktiv;
     }
 
-    public FagSakEntitet getMottattIFagsak() {
+    public FagsakEntitet getMottattIFagsak() {
         return mottattIFagsak;
     }
 
-    public void markerMottattIFagsak(FagSakEntitet fagsak) {
+    public void markerMottattIFagsak(FagsakEntitet fagsak) {
         this.mottattIFagsak = fagsak;
 
     }
