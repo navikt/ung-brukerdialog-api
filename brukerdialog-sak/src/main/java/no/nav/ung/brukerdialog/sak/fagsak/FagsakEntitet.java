@@ -31,7 +31,7 @@ public class FagsakEntitet extends BaseEntitet {
     @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", nullable = false, updatable = false)))
     private Saksnummer saksnummer;
 
-    @OneToMany(mappedBy = "fagsak", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fagsak", cascade = CascadeType.PERSIST)
     private List<VedtakPeriodeEntitet> perioder = new ArrayList<>();
 
     @Version
