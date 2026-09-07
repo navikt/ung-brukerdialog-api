@@ -35,7 +35,6 @@ create table BD_VEDTAK_PERIODE
 create index idx_bd_vedtak_periode_fagsak on BD_VEDTAK_PERIODE (fagsak_id) where aktiv;
 
 comment on table BD_VEDTAK_PERIODE is 'Perioder med vedtak.';
-comment on column BD_VEDTAK_PERIODE.resultat is 'INNVILGET eller AVSLÅTT.';
 
 alter table BD_SOEKNAD_HENDELSE
     add column mottatt_i_fagsak bigint references BD_FAGSAK (id);
