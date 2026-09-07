@@ -10,7 +10,7 @@ import no.nav.ung.brukerdialog.typer.Saksnummer;
 
 import java.util.List;
 
-public record FagsakRequest(
+public record MottaFagsakRequest(
 
     @NotNull
     @Valid

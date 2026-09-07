@@ -2,7 +2,7 @@ package no.nav.ung.brukerdialog.sak.fagsak;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.MottaFagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
@@ -29,7 +29,7 @@ public class FagsakTjeneste {
         this.søknadHendelseRepository = søknadHendelseRepository;
     }
 
-    public void motta(FagsakYtelseType ytelseType, FagsakRequest request) {
+    public void motta(FagsakYtelseType ytelseType, MottaFagsakRequest request) {
         Optional<FagsakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
         if (eksisterendeFagsak.isPresent() && !eksisterendeFagsak.get().getAktørId().equals(request.aktørId())) {
             throw new IllegalStateException("Saken tilhører en annen bruker. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
@@ -47,7 +47,7 @@ public class FagsakTjeneste {
             request.saksnummer().getVerdi(), request.vedtakPerioder().size());
     }
 
-    private void kobleSøknaderTilFagsak(FagsakRequest request, FagsakYtelseType ytelseType, FagsakEntitet fagsak) {
+    private void kobleSøknaderTilFagsak(MottaFagsakRequest request, FagsakYtelseType ytelseType, FagsakEntitet fagsak) {
         Set<UUID> mottatteSøknadIder = request.mottatteSøknader().stream()
             .map(MottattSøknadDto::søknadId)
             .collect(Collectors.toSet());

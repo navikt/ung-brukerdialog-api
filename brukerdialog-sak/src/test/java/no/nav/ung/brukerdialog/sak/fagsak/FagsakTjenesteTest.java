@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
-import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
+import no.nav.ung.brukerdialog.kontrakt.vedtak.MottaFagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
@@ -171,8 +171,8 @@ class FagsakTjenesteTest {
         return new MottattSøknadDto(søknadId, LocalDate.of(2025, 1, 2));
     }
 
-    private static FagsakRequest request(AktørId aktørId, Saksnummer saksnummer,
-                                         List<VedtakPeriodeDto> perioder, List<MottattSøknadDto> mottatteSøknader) {
-        return new FagsakRequest(aktørId, saksnummer, perioder, mottatteSøknader);
+    private static MottaFagsakRequest request(AktørId aktørId, Saksnummer saksnummer,
+                                              List<VedtakPeriodeDto> perioder, List<MottattSøknadDto> mottatteSøknader) {
+        return new MottaFagsakRequest(aktørId, saksnummer, perioder, mottatteSøknader);
     }
 }
