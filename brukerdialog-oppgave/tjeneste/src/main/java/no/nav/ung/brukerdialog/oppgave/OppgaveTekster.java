@@ -32,6 +32,36 @@ public final class OppgaveTekster {
     private OppgaveTekster() {
     }
 
+    /** Delt, generisk PDF-/dokumenttittel for alle oppgavetyper - se {@code OppgaveInnholdUtleder#tittel}. */
+    public static final String VARSEL_OM_NYE_OPPLYSNINGER_TITTEL = "Varsel om nye opplysninger";
+
+    /**
+     * Ytelsesnavn i tittelcase, til bruk i PDF-headeren (over selve tittelen) - i motsetning til
+     * {@link #ytelseNavn}/{@link #ytelsePreposisjonsfrase}, som gir småbokstavsformer til løpende
+     * tekst.
+     */
+    public static String ytelseTitelcase(OppgaveYtelsetype ytelsetype) {
+        return switch (ytelsetype) {
+            case UNGDOMSYTELSE -> "Ungdomsprogramytelsen";
+            case AKTIVITETSPENGER -> "Aktivitetspenger";
+        };
+    }
+
+    /**
+     * Delt seksjon lagt til i halen av {@code OppgaveInnholdUtleder#tekster} (se
+     * {@code omVarselSeksjonAktivert}) - forklarer hensikten med varselet. Vises i PDF-en og i
+     * {@code tekster}-feltet på {@code BrukerdialogOppgaveDto}.
+     */
+    public static List<OppgaveTekst> omVarselSeksjon() {
+        List<OppgaveTekst> tekster = new ArrayList<>();
+        tekster.add(new OppgaveAvsnitt(
+            "Om «%s»".formatted(VARSEL_OM_NYE_OPPLYSNINGER_TITTEL),
+            "Dette varselet sendes ut slik at brukeren har mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.",
+            false));
+        tekster.add(new OppgaveAvsnitt("Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes."));
+        return tekster;
+    }
+
     /** Suffiks til titler uten et innbakt ytelsesnavn, f.eks. «... endret startdato i ungdomsprogrammet». */
     public static String ytelsePreposisjonsfrase(OppgaveYtelsetype ytelsetype) {
         return switch (ytelsetype) {
@@ -53,8 +83,8 @@ public final class OppgaveTekster {
         return forrigeSluttdato == null;
     }
 
-    public static String endretStartdatoTittel(OppgaveYtelsetype ytelsetype) {
-        return "Tilbakemelding på endret startdato " + ytelsePreposisjonsfrase(ytelsetype);
+    public static String endretStartdatoTittel() {
+        return "Endret startdato";
     }
 
     /** Delt av {@code EndretStartdatoOppgaveInnholdUtleder} og {@code EndretPeriodeOppgaveInnholdUtleder} (gren {@code ENDRET_STARTDATO}). */
@@ -70,9 +100,8 @@ public final class OppgaveTekster {
         return tekster;
     }
 
-    public static String endretSluttdatoTittel(OppgaveYtelsetype ytelsetype, boolean erMeldtUt) {
-        String base = erMeldtUt ? "Tilbakemelding på sluttdato" : "Tilbakemelding på endret sluttdato";
-        return base + " " + ytelsePreposisjonsfrase(ytelsetype);
+    public static String endretSluttdatoTittel(boolean erMeldtUt) {
+        return erMeldtUt ? "Sluttdato" : "Endret sluttdato";
     }
 
     /** Delt av {@code EndretSluttdatoOppgaveInnholdUtleder} og {@code EndretPeriodeOppgaveInnholdUtleder} (gren {@code ENDRET_SLUTTDATO}). */
@@ -92,8 +121,8 @@ public final class OppgaveTekster {
         return tekster;
     }
 
-    public static String fjernetPeriodeTittel(OppgaveYtelsetype ytelsetype) {
-        return "Tilbakemelding på stans av " + ytelseNavn(ytelsetype);
+    public static String fjernetPeriodeTittel() {
+        return "Stans";
     }
 
     /**
@@ -114,13 +143,12 @@ public final class OppgaveTekster {
             case AKTIVITETSPENGER -> "Du kan bare få aktivitetspenger hvis du deltar, og derfor stopper vi utbetalingen. Du svarer på Min side på nav.no.";
         }));
         tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din."));
         leggTilSvarfrist(tekster, fristTid, "svare", null);
         return tekster;
     }
 
-    public static String endretStartOgSluttdatoTittel(OppgaveYtelsetype ytelsetype) {
-        return "Tilbakemelding på ny start- og sluttdato for " + ytelseNavn(ytelsetype);
+    public static String endretStartOgSluttdatoTittel() {
+        return "Ny start- og sluttdato";
     }
 
     /**
@@ -136,7 +164,6 @@ public final class OppgaveTekster {
         tekster.add(new OppgaveAvsnitt("Du vil nå få %s i perioden %s til %s.".formatted(
             ytelseNavn(ytelsetype), NorskDatoFormat.datoLang(nyFom), NorskDatoFormat.datoLang(nyTom)), true));
         tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på perioden. Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din."));
         tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
         leggTilSvarfrist(tekster, fristTid, "svare",
             "Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi perioden %s til %s når vi behandler saken din."
@@ -145,8 +172,8 @@ public final class OppgaveTekster {
         return tekster;
     }
 
-    public static String ukjentPeriodeendringTittel(OppgaveYtelsetype ytelsetype) {
-        return "Tilbakemelding på endring i perioden " + ytelsePreposisjonsfrase(ytelsetype);
+    public static String ukjentPeriodeendringTittel() {
+        return "Endring i perioden";
     }
 
     /**
@@ -172,7 +199,6 @@ public final class OppgaveTekster {
         boolean harDato = nyFom != null || nyTom != null;
         tekster.add(new OppgaveAvsnitt(setning.toString(), harDato));
         tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på endringen. Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din."));
         tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
         leggTilSvarfrist(tekster, fristTid, "svare", null);
         return tekster;
@@ -180,13 +206,11 @@ public final class OppgaveTekster {
 
     /**
      * De to setningene delt av flere narrativer om "endret dato" ("Du får denne meldingen ...",
-     * "Ingen tilbakemelding? ...", "Har du en tilbakemelding? ..."). Trekt ut for å unngå
-     * risikoen for at de tre drifter fra hverandre på tvers av {@link #endretStartdatoInnhold} og
-     * {@link #endretSluttdatoInnhold}.
+     * "Har du en tilbakemelding? ..."). Trekt ut for å unngå risikoen for at de to drifter fra
+     * hverandre på tvers av {@link #endretStartdatoInnhold} og {@link #endretSluttdatoInnhold}.
      */
     private static void leggTilStandardSvarSetninger(List<OppgaveTekst> tekster) {
         tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din."));
         tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
     }
 
@@ -225,25 +249,59 @@ public final class OppgaveTekster {
     }
 
     /**
-     * Nye visningstekster uten frontend-forelegg ({@code BostedVilkarOppgavePanelOppgavetekst.tsx}
-     * viser ikke årsaken i dag). {@code null} for {@code UDEFINERT} (vilkåret er oppfylt) - skal
-     * da ikke vises.
+     * Ny, tabellstyrt varselsetning for BEKREFT_BOSTED/BEKREFT_BOSTED_OPPHØR - kombinerer årsak og
+     * tidsrom i én hovedsetning (se plansporet for kilde-tabellen fra fagsiden).
+     * {@code tom == null} betyr opphør ({@code BEKREFT_BOSTED_OPPHØR}, kun {@code fom}), ellers
+     * bundet periode ({@code BEKREFT_BOSTED}, {@code fom}-{@code tom}).
+     * <p>
+     * <b>Kjent hull:</b> tabellen dekker kun "Opphør/avslag"-scenarioet, ikke
+     * {@code UDEFINERT} (vilkåret er oppfylt) - nøytral fallback brukt inntil videre, se
+     * Fase 3-review i plansporet.
      */
-    public static String bostedIkkeOppfyltForklaring(BostedsvilkårIkkeOppfyltÅrsak årsak, String fritekstbeskrivelse) {
+    public static String bostedVarselTekst(BostedsvilkårIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom) {
+        String tidsrom = tom != null
+            ? "i perioden %s til %s ikke".formatted(NorskDatoFormat.datoLang(fom), NorskDatoFormat.datoLang(tom))
+            : "fra %s ikke lenger".formatted(NorskDatoFormat.datoLang(fom));
+
         return switch (årsak) {
-            case IKKE_BOSATTADRESSE_I_TRONDHEIM -> "Du er ikke registrert med bostedsadresse i Trondheim.";
-            case IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM -> "Du er verken bostedsregistrert eller folkeregistrert i Trondheim.";
-            case STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM -> "Studiestedet eller arbeidsstedet ditt er utenfor Trondheim.";
-            case ANNET -> (fritekstbeskrivelse != null && !fritekstbeskrivelse.isBlank()) ? fritekstbeskrivelse : "Annet.";
-            case UDEFINERT -> null;
+            case IKKE_BOSATTADRESSE_I_TRONDHEIM -> "Vi har fått opplysninger om at du %s bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."
+                .formatted(tidsrom);
+            case IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM -> "Vi har fått opplysninger om at du %s bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."
+                .formatted(tidsrom);
+            case STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM -> "Vi har fått opplysninger om at du %s har studie- eller arbeidssted i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."
+                .formatted(tidsrom);
+            case ANNET, UDEFINERT -> "Vi har fått opplysninger om at du %s bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."
+                .formatted(tidsrom);
         };
     }
 
-    public static String bostedKildeForklaring(BostedsavklaringKildeType kilde, String kildeFritekst) {
+    /**
+     * Fritekst-avsnitt for årsak=ANNET, lagt til som eget avsnitt etter hovedsetningen fra
+     * {@link #bostedVarselTekst} - speiler hvordan tidligere {@code bostedIkkeOppfyltForklaring}
+     * håndterte ANNET. {@code null} for alle andre årsaker (ikke noe ekstra avsnitt skal legges
+     * til).
+     */
+    public static String bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak årsak, String fritekstbeskrivelse) {
+        if (årsak != BostedsvilkårIkkeOppfyltÅrsak.ANNET) {
+            return null;
+        }
+        return (fritekstbeskrivelse != null && !fritekstbeskrivelse.isBlank()) ? fritekstbeskrivelse : "Annet.";
+    }
+
+    /**
+     * Kort kilde-etikett (ikke en full setning) til bruk i {@link #bostedKildeAvsnitt} - dynamisk
+     * fra {@link BostedsavklaringKildeType}, aldri en hardkodet institusjon.
+     */
+    public static String bostedKildeLabel(BostedsavklaringKildeType kilde, String kildeFritekst) {
         return switch (kilde) {
-            case BRUKER -> "Vi har fått opplysninger om dette fra deg.";
-            case FOLKEREGISTER -> "Vi har fått opplysninger om dette fra Folkeregisteret.";
-            case ANNET -> "Vi har fått opplysninger om dette fra " + kildeFritekst + ".";
+            case BRUKER -> "Deg";
+            case FOLKEREGISTER -> "Folkeregisteret";
+            case ANNET -> kildeFritekst;
         };
+    }
+
+    /** Titlet avsnitt ("Hvor har vi fått opplysningene fra?" + kort kilde-etikett) for bosted-varselet. */
+    public static OppgaveAvsnitt bostedKildeAvsnitt(BostedsavklaringKildeType kilde, String kildeFritekst) {
+        return new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", bostedKildeLabel(kilde, kildeFritekst), false);
     }
 }

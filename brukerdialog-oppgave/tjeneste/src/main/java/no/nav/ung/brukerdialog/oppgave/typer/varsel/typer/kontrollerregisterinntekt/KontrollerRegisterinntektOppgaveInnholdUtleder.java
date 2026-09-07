@@ -58,15 +58,13 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
         KontrollerRegisterinntektOppgavetypeDataDto dto = hentDto(oppgave);
-        return "Tilbakemelding på inntekt i %s \u2013 %s".formatted(
-            NorskDatoFormat.månedÅr(dto.fraOgMed()),
-            OppgaveTekster.ytelsePreposisjonsfrase(oppgave.getYtelsetype()));
+        return "Inntekt i %s".formatted(NorskDatoFormat.månedÅr(dto.fraOgMed()));
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         KontrollerRegisterinntektOppgavetypeDataDto dto = hentDto(oppgave);
         RegisterinntektDTO registerinntekt = dto.registerinntekt();
         List<ArbeidOgFrilansRegisterInntektDTO> arbeid = registerinntekt.arbeidOgFrilansInntekter() != null
@@ -116,10 +114,6 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
                 .formatted(rapporteringsmåned)));
         }
 
-        tekster.add(new OppgaveListe(List.of(
-            "Hvis inntekten stemmer, krysser du av for Ja, inntekten stemmer.",
-            "Hvis du mener at inntekten er feil, krysser du av på Nei, inntekten stemmer ikke og sender en tilbakemelding til oss om det."
-        ), true));
         tekster.add(new OppgaveAvsnitt("Du svarer på Min side på nav.no."));
         tekster.add(new OppgaveAvsnitt("Jo fortere du svarer, jo fortere får du pengene utbetalt."));
         OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare", harKunYtelseInntekt

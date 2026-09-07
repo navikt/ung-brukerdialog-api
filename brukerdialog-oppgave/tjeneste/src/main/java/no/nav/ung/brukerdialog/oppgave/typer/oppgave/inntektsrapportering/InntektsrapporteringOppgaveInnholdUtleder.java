@@ -50,15 +50,19 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
         InntektsrapporteringOppgavetypeDataDto dto = hentDto(oppgave);
-        return "Inntekt i %s \u2013 %s".formatted(
-            NorskDatoFormat.månedÅr(dto.fraOgMed()),
-            OppgaveTekster.ytelsePreposisjonsfrase(oppgave.getYtelsetype()));
+        return "Inntekt i %s".formatted(NorskDatoFormat.månedÅr(dto.fraOgMed()));
+    }
+
+    /** Ikke et varsel om caseworker-satte opplysninger til motsigelse - brukeren rapporterer selv. */
+    @Override
+    public boolean omVarselSeksjonAktivert() {
+        return false;
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         InntektsrapporteringOppgavetypeDataDto dto = hentDto(oppgave);
         String måned = NorskDatoFormat.måned(dto.fraOgMed());
         String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
@@ -82,8 +86,6 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
         )));
         tekster.add(new OppgaveAvsnitt("Du kan lese mer om hva som regnes som inntekt i skatteloven §§ 5.10 til 5.15."));
         tekster.add(new OppgaveAvsnitt("Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Hvis du hadde inntekt, krysser du av for Ja.", true));
-        tekster.add(new OppgaveAvsnitt("Hvis du ikke hadde inntekt, krysser du av på Nei eller lar være å svare.", true));
         OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare", null);
         return tekster;
     }

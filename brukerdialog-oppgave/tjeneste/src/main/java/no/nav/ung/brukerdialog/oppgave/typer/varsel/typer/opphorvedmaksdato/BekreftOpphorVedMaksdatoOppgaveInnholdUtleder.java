@@ -48,12 +48,12 @@ public class BekreftOpphorVedMaksdatoOppgaveInnholdUtleder implements OppgaveInn
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
-        return "Tilbakemelding på sluttdato " + OppgaveTekster.ytelsePreposisjonsfrase(oppgave.getYtelsetype());
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
+        return "Sluttdato";
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         BekreftOpphorVedMaksdatoOppgavetypeDataDto dto = hentDto(oppgave);
         String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
         String sluttdato = NorskDatoFormat.datoLang(dto.sluttdato());
@@ -62,7 +62,6 @@ public class BekreftOpphorVedMaksdatoOppgaveInnholdUtleder implements OppgaveInn
         tekster.add(new OppgaveAvsnitt("Din siste dag med %s er %s. Det er fordi du har brukt opp dagene du kan motta %s."
             .formatted(ytelseNavn, sluttdato, ytelseNavn), true));
         tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt."));
         OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare",
             "Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi %s som siste dag med ytelsen når vi behandler saken din."
                 .formatted(sluttdato));

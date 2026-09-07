@@ -60,20 +60,19 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
         Gren gren = bestemGren(hentDto(oppgave));
-        OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();
         return switch (gren.type()) {
-            case STARTDATO -> OppgaveTekster.endretStartdatoTittel(ytelsetype);
-            case SLUTTDATO -> OppgaveTekster.endretSluttdatoTittel(ytelsetype, gren.erMeldtUt());
-            case FJERNET -> OppgaveTekster.fjernetPeriodeTittel(ytelsetype);
-            case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoTittel(ytelsetype);
-            case UKJENT -> OppgaveTekster.ukjentPeriodeendringTittel(ytelsetype);
+            case STARTDATO -> OppgaveTekster.endretStartdatoTittel();
+            case SLUTTDATO -> OppgaveTekster.endretSluttdatoTittel(gren.erMeldtUt());
+            case FJERNET -> OppgaveTekster.fjernetPeriodeTittel();
+            case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoTittel();
+            case UKJENT -> OppgaveTekster.ukjentPeriodeendringTittel();
         };
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         EndretPeriodeDataDto dto = hentDto(oppgave);
         Gren gren = bestemGren(dto);
         OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();

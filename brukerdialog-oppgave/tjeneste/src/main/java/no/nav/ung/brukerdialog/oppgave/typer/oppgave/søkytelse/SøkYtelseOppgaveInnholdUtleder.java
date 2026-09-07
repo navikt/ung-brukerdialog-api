@@ -51,15 +51,18 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
-        return switch (oppgave.getYtelsetype()) {
-            case UNGDOMSYTELSE -> "Søknad for ungdomsprogramytelsen";
-            case AKTIVITETSPENGER -> "Søknad om aktivitetspenger";
-        };
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
+        return "Søknad";
+    }
+
+    /** Ikke et varsel om caseworker-satte opplysninger til motsigelse - brukeren søker selv. */
+    @Override
+    public boolean omVarselSeksjonAktivert() {
+        return false;
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         SøkYtelseOppgavetypeDataDto dto = hentDto(oppgave);
 
         List<OppgaveTekst> tekster = new ArrayList<>();

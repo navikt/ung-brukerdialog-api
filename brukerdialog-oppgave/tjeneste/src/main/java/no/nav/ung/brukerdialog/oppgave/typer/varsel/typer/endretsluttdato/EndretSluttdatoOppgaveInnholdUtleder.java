@@ -45,14 +45,14 @@ public class EndretSluttdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
         EndretSluttdatoDataDto dto = hentDto(oppgave);
         boolean erMeldtUt = OppgaveTekster.erMeldtUt(dto.forrigeSluttdato());
-        return OppgaveTekster.endretSluttdatoTittel(oppgave.getYtelsetype(), erMeldtUt);
+        return OppgaveTekster.endretSluttdatoTittel(erMeldtUt);
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         EndretSluttdatoDataDto dto = hentDto(oppgave);
         return OppgaveTekster.endretSluttdatoInnhold(
             dto.nySluttdato(), dto.forrigeSluttdato(), oppgave.getYtelsetype(), oppgave.getFristTid());

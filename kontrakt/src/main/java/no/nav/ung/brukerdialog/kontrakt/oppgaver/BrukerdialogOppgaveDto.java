@@ -61,7 +61,15 @@ public record BrukerdialogOppgaveDto(
      */
     @JsonProperty(value = "tekster", required = true)
     @NotNull
-    List<OppgaveTekst> tekster
+    List<OppgaveTekst> tekster,
+
+    /**
+     * Kort, oppgavetype-spesifikk undertittel/tema (f.eks. «Bostedsadresse»), samme verdi som
+     * vises under tittelen i PDF-dokumentet - se {@code OppgaveInnholdUtleder#undertittel}.
+     * {@code null} dersom den ikke kunne utledes (samme degraderingsstrategi som {@link #tekster}).
+     */
+    @JsonProperty(value = "undertittel")
+    String undertittel
 ) {
 }
 

@@ -230,14 +230,14 @@ class OppgaveInnholdUtlederRenderingTest {
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,
                     "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 2, 1, 0, 0)),
-                "1. januar 2025", "31. januar 2025", "Bor i Trondheim: Ja", "Bor midlertidig i utlandet", "en veileder hos Nav",
+                "1. januar 2025", "31. januar 2025", "Bor midlertidig i utlandet", "en veileder hos Nav",
                 "Fristen for å svare er senest 1. februar 2025.")),
 
             Arguments.of(scenario("bosted - opphør, UDEFINERT-årsak, ingen svarfrist",
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
                     LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null),
-                "Dette gjelder fra og med", "1. mars 2025", "Bor i Trondheim: Nei")),
+                "1. mars 2025", "Folkeregisteret")),
 
             // --- endret-startdato ---
             Arguments.of(scenario("endret startdato - ungdomsytelse, svarfrist",
@@ -414,6 +414,8 @@ class OppgaveInnholdUtlederRenderingTest {
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("tittel", utleder.tittel(oppgave));
+        data.put("undertittel", utleder.undertittel(oppgave));
+        data.put("ytelse", OppgaveTekster.ytelseTitelcase(oppgave.getYtelsetype()));
         data.put("opprettetDato", "2025-01-15");
         data.put("navn", "Kari Nordmann");
         data.put("fødselsnummer", "01019099999");

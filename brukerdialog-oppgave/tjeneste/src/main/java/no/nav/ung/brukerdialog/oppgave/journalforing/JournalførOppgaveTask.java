@@ -38,6 +38,7 @@ import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.typer.JournalpostId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 import org.slf4j.Logger;
@@ -130,10 +131,13 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
 
         OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());
         String dokumentTittel = innholdUtleder.tittel(oppgave);
+        String undertittel = innholdUtleder.undertittel(oppgave);
         List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgave);
 
         String opprettetDato = oppgave.getOpprettetTidspunkt().toLocalDate().toString();
-        Map<String, Object> pdfData = byggPdfData(dokumentTittel, opprettetDato, tekster, oppgave.getOppgavereferanse().toString(), person);
+        String ytelse = OppgaveTekster.ytelseTitelcase(oppgave.getYtelsetype());
+        Map<String, Object> pdfData = byggPdfData(dokumentTittel, undertittel, ytelse, opprettetDato, tekster,
+            oppgave.getOppgavereferanse().toString(), person);
         byte[] pdf = pdfGenerator.genererPdf(new PdfDokument(MALNAVN, pdfData));
 
         JournalføringParametre parametre = JournalføringParametre.utled(oppgave.getYtelsetype());
@@ -216,14 +220,16 @@ public class JournalførOppgaveTask implements ProsessTaskHandler {
      * i {@code {{#each oppgave.tekster}}}) og {@code oppgaveReferanse} (brukt av
      * {@code partial/footer.hbs}).
      */
-    private Map<String, Object> byggPdfData(String tittel, String opprettetDato, List<OppgaveTekst> tekster,
-                                             String oppgaveReferanse, PersonInfo person) {
+    private Map<String, Object> byggPdfData(String tittel, String undertittel, String ytelse, String opprettetDato,
+                                             List<OppgaveTekst> tekster, String oppgaveReferanse, PersonInfo person) {
         Map<String, Object> oppgaveData = new LinkedHashMap<>();
         oppgaveData.put("tekster", tekster);
         oppgaveData.put("oppgaveReferanse", oppgaveReferanse);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("tittel", tittel);
+        data.put("undertittel", undertittel);
+        data.put("ytelse", ytelse);
         data.put("opprettetDato", opprettetDato);
         data.put("navn", person.navn());
         data.put("fødselsnummer", person.fødselsnummer());

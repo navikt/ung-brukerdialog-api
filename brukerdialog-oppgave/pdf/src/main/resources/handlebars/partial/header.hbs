@@ -4,5 +4,9 @@
         <img src="classpath:handlebars/images/NAV_logo_digital_Red.png" alt="Nav"/>
         <div class="opprettet-dato">{{datoLang opprettetDato}}</div>
     </div>
-    <h1 id="header">{{tittel}}</h1>
+    <div id="header">
+        <div class="ytelse">{{ytelse}}</div>
+        <h1>{{tittel}}</h1>
+        {{#isNotNull undertittel}}<div class="undertittel">{{undertittel}}</div>{{/isNotNull}}
+    </div>
 </div>

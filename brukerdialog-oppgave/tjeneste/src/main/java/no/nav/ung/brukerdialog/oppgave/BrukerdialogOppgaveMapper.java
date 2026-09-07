@@ -36,6 +36,7 @@ public class BrukerdialogOppgaveMapper {
     public BrukerdialogOppgaveDto tilDto(BrukerdialogOppgaveEntitet oppgave) {
         var oppgavetypeData = OppgaveDataMapperFraEntitetTilDto.finnTjeneste(mappere, oppgave.getOppgaveType())
             .tilDto(oppgave.getOppgaveData());
+        OppgaveInnhold innhold = innhold(oppgave);
 
         return new BrukerdialogOppgaveDto(
             oppgave.getOppgavereferanse(),
@@ -47,23 +48,28 @@ public class BrukerdialogOppgaveMapper {
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
             toZonedDateTime(oppgave.getFristTid()),
-            tekster(oppgave)
+            innhold.tekster(),
+            innhold.undertittel()
         );
     }
 
+    private record OppgaveInnhold(List<OppgaveTekst> tekster, String undertittel) {
+    }
+
     /**
-     * Degraderer til tom liste ved feil, i stedet for å la hele {@code GET /oppgave/hent/alle}
-     * feile pga. én oppgave med f.eks. korrupt oppgavedata - se Fase 3-review i plansporet for
-     * denne endringen. Loggmeldingen inneholder bevisst verken fnr/navn eller annet
-     * oppgaveinnhold, kun oppgavetype og -referanse.
+     * Degraderer til tom tekstliste/{@code null}-undertittel ved feil, i stedet for å la hele
+     * {@code GET /oppgave/hent/alle} feile pga. én oppgave med f.eks. korrupt oppgavedata - se
+     * Fase 3-review i plansporet for denne endringen. Loggmeldingen inneholder bevisst verken
+     * fnr/navn eller annet oppgaveinnhold, kun oppgavetype og -referanse.
      */
-    private List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    private OppgaveInnhold innhold(BrukerdialogOppgaveEntitet oppgave) {
         try {
-            return OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType()).tekster(oppgave);
+            OppgaveInnholdUtleder utleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());
+            return new OppgaveInnhold(utleder.tekster(oppgave), utleder.undertittel(oppgave));
         } catch (RuntimeException e) {
-            log.warn("Klarte ikke å utlede tekster for oppgave (oppgaveType={}, oppgaveReferanse={}) - returnerer tom liste",
+            log.warn("Klarte ikke å utlede tekster/undertittel for oppgave (oppgaveType={}, oppgaveReferanse={}) - returnerer tom liste/null",
                 oppgave.getOppgaveType(), oppgave.getOppgavereferanse(), e);
-            return List.of();
+            return new OppgaveInnhold(List.of(), null);
         }
     }
 

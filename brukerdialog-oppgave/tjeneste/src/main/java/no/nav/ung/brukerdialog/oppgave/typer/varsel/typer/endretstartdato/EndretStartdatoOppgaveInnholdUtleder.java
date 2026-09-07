@@ -44,12 +44,12 @@ public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
-        return OppgaveTekster.endretStartdatoTittel(oppgave.getYtelsetype());
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
+        return OppgaveTekster.endretStartdatoTittel();
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         EndretStartdatoDataDto dto = hentDto(oppgave);
         return OppgaveTekster.endretStartdatoInnhold(
             dto.nyStartdato(), dto.forrigeStartdato(), oppgave.getYtelsetype(), oppgave.getFristTid());

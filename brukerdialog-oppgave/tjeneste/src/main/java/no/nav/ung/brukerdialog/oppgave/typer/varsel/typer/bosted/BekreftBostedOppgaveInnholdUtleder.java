@@ -18,20 +18,19 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
-import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Kilde: {@code sif-brukerdialog/.../oppgavepaneler/bostedsvilkar/i18n/nb.ts}. Ingen
- * ytelseskvalifikator - gjelder alltid aktivitetspenger.
+ * Kilde: fagside-levert tekst-/formateringstabell (se plansporet), erstatter tidligere
+ * frontend-avledet tekst (ingen forelegg i {@code sif-brukerdialog}). Ingen ytelseskvalifikator -
+ * gjelder alltid aktivitetspenger.
  * <p>
- * To DTO-varianter fra vår mapper: bundet periode ({@link BekreftBostedOppgavetypeDataDto}) og
- * åpen/opphørt periode ({@link BekreftBostedOpphørOppgavetypeDataDto}, uten {@code tom}).
- * Frontend har ingen tekst for opphør-varianten - «Dette gjelder fra og med ...»-formen under er
- * nytt formuleringsarbeid, ikke hentet fra kilden.
+ * To DTO-varianter fra vår mapper: bundet periode ({@link BekreftBostedOppgavetypeDataDto},
+ * {@code fom}-{@code tom}) og åpen/opphørt periode ({@link BekreftBostedOpphørOppgavetypeDataDto},
+ * kun {@code fom}) - se {@link OppgaveTekster#bostedVarselTekst}.
  */
 @OppgaveTypeRef(OppgaveType.BEKREFT_BOSTED)
 @ApplicationScoped
@@ -54,19 +53,18 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     }
 
     @Override
-    public String tittel(BrukerdialogOppgaveEntitet oppgave) {
-        return "Bekrefte bosted for aktivitetspenger";
+    public String undertittel(BrukerdialogOppgaveEntitet oppgave) {
+        return "Bostedsadresse";
     }
 
     @Override
-    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
         OppgavetypeDataDto dto = OppgaveDataMapperFraEntitetTilDto
             .finnTjeneste(mappere, oppgave.getOppgaveType())
             .tilDto(oppgave.getOppgaveData());
 
         LocalDate fom;
         LocalDate tom;
-        boolean erBosattITrondheim;
         String fritekst;
         BostedsvilkårIkkeOppfyltÅrsak årsak;
         BostedsavklaringKildeType kilde;
@@ -76,7 +74,6 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case BekreftBostedOppgavetypeDataDto bundet -> {
                 fom = bundet.fom();
                 tom = bundet.tom();
-                erBosattITrondheim = bundet.erBosattITrondheim();
                 fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 årsak = bundet.ikkeOppfyltÅrsak();
                 kilde = bundet.kilde();
@@ -85,7 +82,6 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case BekreftBostedOpphørOppgavetypeDataDto opphør -> {
                 fom = opphør.fom();
                 tom = null;
-                erBosattITrondheim = opphør.erBosattITrondheim();
                 fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 årsak = opphør.ikkeOppfyltÅrsak();
                 kilde = opphør.kilde();
@@ -96,19 +92,12 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
         }
 
         List<OppgaveTekst> tekster = new ArrayList<>();
-        tekster.add(new OppgaveAvsnitt("Du har fått en oppgave om å bekrefte bosted for aktivitetspenger."));
-        tekster.add(new OppgaveAvsnitt(tom != null
-            ? "Periode: %s til %s.".formatted(NorskDatoFormat.datoLang(fom), NorskDatoFormat.datoLang(tom))
-            : "Dette gjelder fra og med %s.".formatted(NorskDatoFormat.datoLang(fom)), true));
-        tekster.add(new OppgaveAvsnitt("Bor i Trondheim: " + (erBosattITrondheim ? "Ja" : "Nei")));
-        String forklaring = OppgaveTekster.bostedIkkeOppfyltForklaring(årsak, fritekst);
-        if (forklaring != null) {
-            tekster.add(new OppgaveAvsnitt(forklaring));
+        tekster.add(new OppgaveAvsnitt(OppgaveTekster.bostedVarselTekst(årsak, fom, tom)));
+        String annetFritekst = OppgaveTekster.bostedAnnetFritekst(årsak, fritekst);
+        if (annetFritekst != null) {
+            tekster.add(new OppgaveAvsnitt(annetFritekst));
         }
-        tekster.add(new OppgaveAvsnitt(OppgaveTekster.bostedKildeForklaring(kilde, kildeFritekst)));
-        tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på dette. Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din."));
-        tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
+        tekster.add(OppgaveTekster.bostedKildeAvsnitt(kilde, kildeFritekst));
         OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare",
             "Hvis vi ikke hører fra deg innen svarfristen har gått ut, legger vi de registrerte opplysningene til grunn når vi behandler saken din.");
         return tekster;

@@ -43,6 +43,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -82,31 +83,78 @@ class OppgaveInnholdUtlederInnholdTest {
 
     @ParameterizedTest
     @EnumSource(OppgaveType.class)
-    void utleder_gir_forventet_tittel_tekster_og_varselLenke(OppgaveType oppgaveType) {
+    void utleder_gir_forventet_undertittel_egneTekster_og_varselLenke(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
         BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        OppgaveInnholdUtleder utleder = scenario.utleder();
 
-        String tittel = scenario.utleder().tittel(oppgave);
-        List<OppgaveTekst> tekster = scenario.utleder().tekster(oppgave);
-        String varselLenke = scenario.utleder().varselLenke(oppgave);
+        String tittel = utleder.tittel(oppgave);
+        String undertittel = utleder.undertittel(oppgave);
+        List<OppgaveTekst> egneTekster = utleder.egneTekster(oppgave);
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        String varselLenke = utleder.varselLenke(oppgave);
 
-        assertThat(tittel).as("tittel for %s", oppgaveType).isEqualTo(scenario.forventetTittel());
-        assertThat(tekster.get(0)).as("første tekstblokk skal være et avsnitt (varselteksten) for %s", oppgaveType)
+        assertThat(tittel).as("tittel skal være generisk for alle oppgavetyper (%s)", oppgaveType)
+            .isEqualTo(OppgaveTekster.VARSEL_OM_NYE_OPPLYSNINGER_TITTEL);
+        assertThat(undertittel).as("undertittel for %s", oppgaveType).isEqualTo(scenario.forventetUndertittel());
+        assertThat(egneTekster.get(0)).as("første tekstblokk skal være et avsnitt (varselteksten) for %s", oppgaveType)
             .isInstanceOf(OppgaveAvsnitt.class);
-        assertThat(tekster).as("tekster for %s", oppgaveType).containsExactlyElementsOf(scenario.forventetTekster());
+        assertThat(egneTekster).as("egne tekster for %s", oppgaveType).containsExactlyElementsOf(scenario.forventetTekster());
+
+        List<OppgaveTekst> forventetTekster = new ArrayList<>(scenario.forventetTekster());
+        if (utleder.omVarselSeksjonAktivert()) {
+            forventetTekster.addAll(OppgaveTekster.omVarselSeksjon());
+        }
+        assertThat(tekster).as("tekster (inkl. delt «Om varsel»-hale) for %s", oppgaveType)
+            .containsExactlyElementsOf(forventetTekster);
+
         assertThat(varselLenke).as("varselLenke for %s", oppgaveType).isEqualTo(scenario.varselLenkeHarOppgavereferanseSuffiks()
             ? scenario.forventetVarselLenkeBaseUrl() + "/oppgave" + oppgave.getOppgavereferanse()
             : scenario.forventetVarselLenkeBaseUrl());
     }
 
-    private record Scenario(OppgaveInnholdUtleder utleder, String forventetTittel, List<OppgaveTekst> forventetTekster,
+    /**
+     * Dedikert, isolert innholdssjekk av {@link OppgaveTekster#omVarselSeksjon()} mot en literal
+     * fasit. Sveipetesten over bygger sin forventede "hale" ved å kalle {@code omVarselSeksjon()}
+     * direkte, noe som kun verifiserer *at* halen legges til (strukturelt), ikke at *innholdet* i
+     * halen er riktig. Denne testen tetter det hullet - uavhengig av alle andre tester.
+     */
+    @Test
+    void omVarselSeksjon_har_forventet_ordlyd() {
+        assertThat(OppgaveTekster.omVarselSeksjon()).containsExactly(
+            new OppgaveAvsnitt("Om «Varsel om nye opplysninger»",
+                "Dette varselet sendes ut slik at brukeren har mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.",
+                false),
+            new OppgaveAvsnitt("Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes."));
+    }
+
+    /**
+     * Låser fast at fristen faktisk vises i PDF-en/{@code tekster()} når {@code fristTid} er satt
+     * - for **alle** 8 oppgavetyper, ikke bare {@code EndretStartdato} (som allerede er dekket av
+     * {@link #svarfrist_tas_med_når_satt_og_utelates_når_null}). Sjekker kun at frist-frasen er
+     * til stede (ikke full tekstlikhet), siden handlingsverb og konsekvenssetning legitimt
+     * varierer per type og allerede er dekket av andre, mer spesifikke tester.
+     */
+    @ParameterizedTest
+    @EnumSource(OppgaveType.class)
+    void frist_vises_i_tekster_for_alle_oppgavetyper_når_satt(OppgaveType oppgaveType) {
+        LocalDateTime fristTid = LocalDateTime.of(2025, 3, 15, 12, 0);
+        Scenario scenario = scenarioFor(oppgaveType);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, fristTid);
+
+        List<OppgaveTekst> egneTekster = scenario.utleder().egneTekster(oppgave);
+
+        assertThat(egneTekster)
+            .as("egneTekster for %s skal inneholde frist-frasen når fristTid er satt", oppgaveType)
+            .anyMatch(tekst -> tekst instanceof OppgaveAvsnitt avsnitt && avsnitt.innhold().contains("er senest 15. mars 2025."));
+    }
+
+    private record Scenario(OppgaveInnholdUtleder utleder, String forventetUndertittel, List<OppgaveTekst> forventetTekster,
                              String forventetVarselLenkeBaseUrl, boolean varselLenkeHarOppgavereferanseSuffiks) {
     }
 
     private static final String STANDARD_SVAR_SETNING_1 =
         "Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no.";
-    private static final String STANDARD_SVAR_SETNING_2 =
-        "Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt. Jo fortere du svarer, jo fortere får vi behandlet saken din.";
     private static final String STANDARD_SVAR_SETNING_3 =
         "Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt.";
 
@@ -116,37 +164,30 @@ class OppgaveInnholdUtlederInnholdTest {
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null,
                     BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL),
-                "Bekrefte bosted for aktivitetspenger",
+                "Bostedsadresse",
                 List.of(
-                    new OppgaveAvsnitt("Du har fått en oppgave om å bekrefte bosted for aktivitetspenger."),
-                    new OppgaveAvsnitt("Periode: 1. januar 2025 til 31. januar 2025.", true),
-                    new OppgaveAvsnitt("Bor i Trondheim: Ja"),
+                    new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
                     new OppgaveAvsnitt("Annet."),
-                    new OppgaveAvsnitt("Vi har fått opplysninger om dette fra deg."),
-                    new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på dette. Du svarer på Min side på nav.no."),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3)),
+                    new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg", false)),
                 AKTIVITETSPENGER_BASE_URL, true);
 
             case BEKREFT_ENDRET_STARTDATO -> new Scenario(
                 new EndretStartdatoOppgaveInnholdUtleder(mappereSomGir(
                     new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
-                "Tilbakemelding på endret startdato i ungdomsprogrammet",
+                "Endret startdato",
                 List.of(
                     new OppgaveAvsnitt("Veilederen din har endret startdatoen din i ungdomsprogrammet til 1. februar 2025.", true),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_1),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3)),
                 UNGDOMSPROGRAM_BASE_URL, true);
 
             case BEKREFT_ENDRET_SLUTTDATO -> new Scenario(
                 new EndretSluttdatoOppgaveInnholdUtleder(mappereSomGir(
                     new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 5, 31))), UNGDOMSPROGRAM_BASE_URL),
-                "Tilbakemelding på endret sluttdato i ungdomsprogrammet",
+                "Endret sluttdato",
                 List.of(
                     new OppgaveAvsnitt("Veilederen din har endret sluttdatoen din i ungdomsprogrammet til 30. juni 2025.", true),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_1),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3)),
                 UNGDOMSPROGRAM_BASE_URL, true);
 
@@ -155,11 +196,10 @@ class OppgaveInnholdUtlederInnholdTest {
                     new PeriodeDTO(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 28)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
                     Set.of(PeriodeEndringType.ENDRET_STARTDATO))), UNGDOMSPROGRAM_BASE_URL),
-                "Tilbakemelding på endret startdato i ungdomsprogrammet",
+                "Endret startdato",
                 List.of(
                     new OppgaveAvsnitt("Veilederen din har endret startdatoen din i ungdomsprogrammet til 1. februar 2025.", true),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_1),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
                     new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3)),
                 UNGDOMSPROGRAM_BASE_URL, true);
 
@@ -167,14 +207,10 @@ class OppgaveInnholdUtlederInnholdTest {
                 new KontrollerRegisterinntektOppgaveInnholdUtleder(mappereSomGir(
                     new KontrollerRegisterinntektOppgavetypeDataDto(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31),
                         new RegisterinntektDTO(List.of(), List.of()), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
-                "Tilbakemelding på inntekt i januar 2025 \u2013 i ungdomsprogrammet",
+                "Inntekt i januar 2025",
                 List.of(
                     new OppgaveAvsnitt("Du har gitt oss beskjed om at du hadde inntekt i januar, men vi har ikke fått inn opplysninger fra arbeidsgiver om at du hadde inntekt i januar."),
                     new OppgaveAvsnitt("Vi bruker opplysningene fra arbeidsgiver når vi vurderer hvor mye du får utbetalt. Når vi ikke har mottatt noe fra arbeidsgiver, vil vi basere oss på at du ikke hadde inntekt i januar."),
-                    new OppgaveListe(List.of(
-                        "Hvis inntekten stemmer, krysser du av for Ja, inntekten stemmer.",
-                        "Hvis du mener at inntekten er feil, krysser du av på Nei, inntekten stemmer ikke og sender en tilbakemelding til oss om det."
-                    ), true),
                     new OppgaveAvsnitt("Du svarer på Min side på nav.no."),
                     new OppgaveAvsnitt("Jo fortere du svarer, jo fortere får du pengene utbetalt.")),
                 UNGDOMSPROGRAM_BASE_URL, true);
@@ -183,7 +219,7 @@ class OppgaveInnholdUtlederInnholdTest {
                 new InntektsrapporteringOppgaveInnholdUtleder(mappereSomGir(
                     new InntektsrapporteringOppgavetypeDataDto(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), false)),
                     UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
-                "Inntekt i januar 2025 \u2013 i ungdomsprogrammet",
+                "Inntekt i januar 2025",
                 List.of(
                     new OppgaveAvsnitt("Gi oss beskjed hvis du hadde inntekt i januar. Inntekt er lønn, men det kan også være for eksempel etterbetaling, feriepenger, overtid og tillegg for ubekvem arbeidstid."),
                     new OppgaveAvsnitt("Inntekt er som regel lønnen du får fra en arbeidsgiver, men det kan være mange andre ting også. De vanligste formene for inntekt utenom lønn, er:"),
@@ -192,15 +228,13 @@ class OppgaveInnholdUtlederInnholdTest {
                         "tillegg for kveld, natt, helg og helligdag (ubekvem arbeidstid)",
                         "tips", "frilansinntekt", "inntekt fra aksjeselskap (AS)")),
                     new OppgaveAvsnitt("Du kan lese mer om hva som regnes som inntekt i skatteloven §§ 5.10 til 5.15."),
-                    new OppgaveAvsnitt("Du svarer på Min side på nav.no."),
-                    new OppgaveAvsnitt("Hvis du hadde inntekt, krysser du av for Ja.", true),
-                    new OppgaveAvsnitt("Hvis du ikke hadde inntekt, krysser du av på Nei eller lar være å svare.", true)),
+                    new OppgaveAvsnitt("Du svarer på Min side på nav.no.")),
                 UNGDOMSPROGRAM_BASE_URL, true);
 
             case SØK_YTELSE -> new Scenario(
                 new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
                     new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
-                "Søknad for ungdomsprogramytelsen",
+                "Søknad",
                 List.of(
                     new OppgaveAvsnitt("Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen."),
                     new OppgaveAvsnitt("Startdato: 1. januar 2025", true),
@@ -211,11 +245,10 @@ class OppgaveInnholdUtlederInnholdTest {
             case BEKREFT_OPPHOR_VED_MAKSDATO -> new Scenario(
                 new BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))), UNGDOMSPROGRAM_BASE_URL),
-                "Tilbakemelding på sluttdato i ungdomsprogrammet",
+                "Sluttdato",
                 List.of(
                     new OppgaveAvsnitt("Din siste dag med ungdomsprogramytelsen er 30. juni 2025. Det er fordi du har brukt opp dagene du kan motta ungdomsprogramytelsen.", true),
-                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_1),
-                    new OppgaveAvsnitt("Ingen tilbakemelding? Kryss av på \"Nei\" med en gang og send inn svaret ditt.")),
+                    new OppgaveAvsnitt(STANDARD_SVAR_SETNING_1)),
                 UNGDOMSPROGRAM_BASE_URL, true);
         };
     }
@@ -226,11 +259,11 @@ class OppgaveInnholdUtlederInnholdTest {
 
     @ParameterizedTest
     @MethodSource("endretPeriodeScenarioer")
-    void endretPeriode_velger_riktig_gren(EndretPeriodeDataDto dto, String forventetTittel, OppgaveAvsnitt forventetFørsteTekst) {
+    void endretPeriode_velger_riktig_gren(EndretPeriodeDataDto dto, String forventetUndertittel, OppgaveAvsnitt forventetFørsteTekst) {
         var utleder = new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(dto), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
-        assertThat(utleder.tittel(oppgave)).isEqualTo(forventetTittel);
+        assertThat(utleder.undertittel(oppgave)).isEqualTo(forventetUndertittel);
         assertThat(utleder.tekster(oppgave).get(0)).isEqualTo(forventetFørsteTekst);
     }
 
@@ -241,42 +274,42 @@ class OppgaveInnholdUtlederInnholdTest {
                     new PeriodeDTO(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 12, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
                     Set.of(PeriodeEndringType.ENDRET_STARTDATO)),
-                "Tilbakemelding på endret startdato i ungdomsprogrammet",
+                "Endret startdato",
                 new OppgaveAvsnitt("Veilederen din har endret startdatoen din i ungdomsprogrammet til 1. februar 2025.", true)),
             Arguments.of(
                 new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 5, 31)),
                     Set.of(PeriodeEndringType.ENDRET_SLUTTDATO)),
-                "Tilbakemelding på endret sluttdato i ungdomsprogrammet",
+                "Endret sluttdato",
                 new OppgaveAvsnitt("Veilederen din har endret sluttdatoen din i ungdomsprogrammet til 30. juni 2025.", true)),
             Arguments.of(
                 new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     null,
                     Set.of(PeriodeEndringType.ENDRET_SLUTTDATO)),
-                "Tilbakemelding på sluttdato i ungdomsprogrammet",
+                "Sluttdato",
                 new OppgaveAvsnitt("Veilederen din har meldt deg ut i ungdomsprogrammet med sluttdato 30. juni 2025.", true)),
             Arguments.of(
                 new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
                     Set.of(PeriodeEndringType.FJERNET_PERIODE)),
-                "Tilbakemelding på stans av ungdomsprogramytelsen",
+                "Stans",
                 new OppgaveAvsnitt("Veilederen din har meldt deg ut av ungdomsprogrammet fordi du ikke skal delta i programmet likevel.")),
             Arguments.of(
                 new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 8, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     Set.of(PeriodeEndringType.ENDRET_STARTDATO, PeriodeEndringType.ENDRET_SLUTTDATO)),
-                "Tilbakemelding på ny start- og sluttdato for ungdomsprogramytelsen",
+                "Ny start- og sluttdato",
                 new OppgaveAvsnitt("Veilederen din har endret start- og sluttdatoen din i ungdomsprogrammet. Vi vil derfor endre start- og sluttdatoen for ungdomsprogramytelsen også.")),
             Arguments.of(
                 new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
                     null,
                     Set.of(PeriodeEndringType.ANDRE_ENDRINGER)),
-                "Tilbakemelding på endring i perioden i ungdomsprogrammet",
+                "Endring i perioden",
                 new OppgaveAvsnitt("Det er gjort en endring i perioden din i ungdomsprogrammet, med virkning fra 1. januar 2025 til 31. januar 2025.", true))
         );
     }
@@ -291,7 +324,7 @@ class OppgaveInnholdUtlederInnholdTest {
             new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
-        assertThat(periodeUtleder.tittel(oppgave)).isEqualTo(dedikertUtleder.tittel(oppgave));
+        assertThat(periodeUtleder.undertittel(oppgave)).isEqualTo(dedikertUtleder.undertittel(oppgave));
         assertThat(periodeUtleder.tekster(oppgave)).isEqualTo(dedikertUtleder.tekster(oppgave));
     }
 
@@ -305,7 +338,7 @@ class OppgaveInnholdUtlederInnholdTest {
             new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 5, 31))), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
-        assertThat(periodeUtleder.tittel(oppgave)).isEqualTo(dedikertUtleder.tittel(oppgave));
+        assertThat(periodeUtleder.undertittel(oppgave)).isEqualTo(dedikertUtleder.undertittel(oppgave));
         assertThat(periodeUtleder.tekster(oppgave)).isEqualTo(dedikertUtleder.tekster(oppgave));
     }
 
@@ -319,7 +352,7 @@ class OppgaveInnholdUtlederInnholdTest {
             new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), null)), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ENDRET_SLUTTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
-        assertThat(utleder.tittel(oppgave)).isEqualTo("Tilbakemelding på sluttdato i ungdomsprogrammet");
+        assertThat(utleder.undertittel(oppgave)).isEqualTo("Sluttdato");
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster.get(0)).isEqualTo(
             new OppgaveAvsnitt("Veilederen din har meldt deg ut i ungdomsprogrammet med sluttdato 30. juni 2025.", true));
@@ -338,14 +371,13 @@ class OppgaveInnholdUtlederInnholdTest {
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
-            new OppgaveAvsnitt("Du har fått en oppgave om å bekrefte bosted for aktivitetspenger."),
-            new OppgaveAvsnitt("Periode: 1. januar 2025 til 31. januar 2025.", true),
-            new OppgaveAvsnitt("Bor i Trondheim: Ja"),
-            // Ingen ikkeOppfyltForklaring-avsnitt her - UDEFINERT gir null, se bostedIkkeOppfyltForklaring_dekker_alle_årsaker.
-            new OppgaveAvsnitt("Vi har fått opplysninger om dette fra deg."),
-            new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på dette. Du svarer på Min side på nav.no."),
-            new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
-            new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3));
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            // Ingen fritekst-avsnitt her - UDEFINERT er ikke ANNET, se bostedAnnetFritekst_kun_for_årsak_annet.
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg", false),
+            new OppgaveAvsnitt("Om «Varsel om nye opplysninger»",
+                "Dette varselet sendes ut slik at brukeren har mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.",
+                false),
+            new OppgaveAvsnitt("Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes."));
     }
 
     @Test
@@ -357,54 +389,85 @@ class OppgaveInnholdUtlederInnholdTest {
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
-            new OppgaveAvsnitt("Du har fått en oppgave om å bekrefte bosted for aktivitetspenger."),
-            new OppgaveAvsnitt("Dette gjelder fra og med 1. januar 2025.", true),
-            new OppgaveAvsnitt("Bor i Trondheim: Nei"),
-            new OppgaveAvsnitt("Du er ikke registrert med bostedsadresse i Trondheim."),
-            new OppgaveAvsnitt("Vi har fått opplysninger om dette fra deg."),
-            new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på dette. Du svarer på Min side på nav.no."),
-            new OppgaveAvsnitt(STANDARD_SVAR_SETNING_2),
-            new OppgaveAvsnitt(STANDARD_SVAR_SETNING_3));
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg", false),
+            new OppgaveAvsnitt("Om «Varsel om nye opplysninger»",
+                "Dette varselet sendes ut slik at brukeren har mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.",
+                false),
+            new OppgaveAvsnitt("Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes."));
     }
 
     @Test
-    void bekreftBosted_tittel_er_uavhengig_av_ytelsetype() {
+    void bekreftBosted_tittel_og_undertittel_er_uavhengig_av_ytelsetype() {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
             LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT,
             BostedsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL);
 
-        assertThat(utleder.tittel(oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null)))
-            .isEqualTo("Bekrefte bosted for aktivitetspenger");
-        assertThat(utleder.tittel(oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null)))
-            .isEqualTo("Bekrefte bosted for aktivitetspenger");
+        BrukerdialogOppgaveEntitet ungdomsytelse = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet aktivitetspenger = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        assertThat(utleder.tittel(ungdomsytelse)).isEqualTo(OppgaveTekster.VARSEL_OM_NYE_OPPLYSNINGER_TITTEL);
+        assertThat(utleder.tittel(aktivitetspenger)).isEqualTo(OppgaveTekster.VARSEL_OM_NYE_OPPLYSNINGER_TITTEL);
+        assertThat(utleder.undertittel(ungdomsytelse)).isEqualTo("Bostedsadresse");
+        assertThat(utleder.undertittel(aktivitetspenger)).isEqualTo("Bostedsadresse");
     }
 
+    /**
+     * Låser fast eksakt ordlyd for alle 5 årsaker × opphør/periode (10 kombinasjoner) mot
+     * literal-tekster - ikke bare en delstreng-sjekk av datoformateringen. Sikrer at en
+     * utilsiktet endring/ombytting av årsaks-setningene (f.eks. "folkeregistrert" vs.
+     * "studie- eller arbeidssted") faktisk blir fanget opp.
+     */
     @ParameterizedTest
-    @EnumSource(BostedsvilkårIkkeOppfyltÅrsak.class)
-    void bostedIkkeOppfyltForklaring_dekker_alle_årsaker(BostedsvilkårIkkeOppfyltÅrsak årsak) {
-        String forklaring = OppgaveTekster.bostedIkkeOppfyltForklaring(årsak, "min fritekst");
-        switch (årsak) {
-            case UDEFINERT -> assertThat(forklaring).isNull();
-            case ANNET -> assertThat(forklaring).isEqualTo("min fritekst");
-            default -> assertThat(forklaring).isNotBlank();
-        }
+    @MethodSource("bostedVarselTekstForventetOrdlyd")
+    void bostedVarselTekst_dekker_alle_årsaker_for_opphør_og_periode(
+        BostedsvilkårIkkeOppfyltÅrsak årsak, String forventetOpphørTekst, String forventetPeriodeTekst) {
+        String opphørTekst = OppgaveTekster.bostedVarselTekst(årsak, LocalDate.of(2025, 1, 1), null);
+        String periodeTekst = OppgaveTekster.bostedVarselTekst(årsak, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31));
+
+        assertThat(opphørTekst).as("opphørtekst for %s", årsak).isEqualTo(forventetOpphørTekst);
+        assertThat(periodeTekst).as("periodetekst for %s", årsak).isEqualTo(forventetPeriodeTekst);
+    }
+
+    private static Stream<Arguments> bostedVarselTekstForventetOrdlyd() {
+        return Stream.of(
+            Arguments.of(BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSATTADRESSE_I_TRONDHEIM,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger.",
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of(BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger.",
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of(BostedsvilkårIkkeOppfyltÅrsak.STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger har studie- eller arbeidssted i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger.",
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke har studie- eller arbeidssted i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of(BostedsvilkårIkkeOppfyltÅrsak.ANNET,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger.",
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of(BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger.",
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger.")
+        );
     }
 
     @Test
-    void bostedIkkeOppfyltForklaring_annet_uten_fritekst_faller_tilbake_til_generisk_tekst() {
-        assertThat(OppgaveTekster.bostedIkkeOppfyltForklaring(BostedsvilkårIkkeOppfyltÅrsak.ANNET, null))
-            .isEqualTo("Annet.");
-        assertThat(OppgaveTekster.bostedIkkeOppfyltForklaring(BostedsvilkårIkkeOppfyltÅrsak.ANNET, "   "))
-            .isEqualTo("Annet.");
+    void bostedAnnetFritekst_kun_for_årsak_annet() {
+        assertThat(OppgaveTekster.bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak.ANNET, "min fritekst"))
+            .isEqualTo("min fritekst");
+        assertThat(OppgaveTekster.bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak.ANNET, null)).isEqualTo("Annet.");
+        assertThat(OppgaveTekster.bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak.ANNET, "   ")).isEqualTo("Annet.");
+        assertThat(OppgaveTekster.bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSATTADRESSE_I_TRONDHEIM, "noe"))
+            .isNull();
+        assertThat(OppgaveTekster.bostedAnnetFritekst(BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, "noe")).isNull();
     }
 
     @ParameterizedTest
     @EnumSource(BostedsavklaringKildeType.class)
-    void bostedKildeForklaring_dekker_alle_kildetyper(BostedsavklaringKildeType kilde) {
-        String forklaring = OppgaveTekster.bostedKildeForklaring(kilde, "en veileder hos Nav");
-        assertThat(forklaring).isNotBlank();
-        if (kilde == BostedsavklaringKildeType.ANNET) {
-            assertThat(forklaring).contains("en veileder hos Nav");
+    void bostedKildeLabel_dekker_alle_kildetyper(BostedsavklaringKildeType kilde) {
+        String label = OppgaveTekster.bostedKildeLabel(kilde, "en veileder hos Nav");
+        switch (kilde) {
+            case BRUKER -> assertThat(label).isEqualTo("Deg");
+            case FOLKEREGISTER -> assertThat(label).isEqualTo("Folkeregisteret");
+            case ANNET -> assertThat(label).isEqualTo("en veileder hos Nav");
         }
     }
 
@@ -521,12 +584,12 @@ class OppgaveInnholdUtlederInnholdTest {
     // ---------------------------------------------------------------------------------------
 
     @Test
-    void søkYtelse_aktivitetspenger_gir_egen_tittel_og_infotekst() {
+    void søkYtelse_aktivitetspenger_gir_riktig_infotekst() {
         var utleder = new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
             new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 3, 1))), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
-        assertThat(utleder.tittel(oppgave)).isEqualTo("Søknad om aktivitetspenger");
+        assertThat(utleder.undertittel(oppgave)).isEqualTo("Søknad");
         assertThat(avsnitt(utleder.tekster(oppgave), 0).innhold()).isEqualTo("Du har søkt om aktivitetspenger.");
     }
 
@@ -536,7 +599,7 @@ class OppgaveInnholdUtlederInnholdTest {
             new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
-        assertThat(utleder.tittel(oppgave)).isEqualTo("Tilbakemelding på endret startdato for aktivitetspenger");
+        assertThat(utleder.undertittel(oppgave)).isEqualTo("Endret startdato");
         assertThat(avsnitt(utleder.tekster(oppgave), 0)).isEqualTo(
             new OppgaveAvsnitt("Veilederen din har endret startdatoen din for aktivitetspenger til 1. februar 2025.", true));
     }
@@ -548,15 +611,17 @@ class OppgaveInnholdUtlederInnholdTest {
 
         BrukerdialogOppgaveEntitet medFrist = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE,
             LocalDateTime.of(2025, 2, 15, 12, 0));
-        List<OppgaveTekst> teksterMedFrist = utleder.tekster(medFrist);
-        assertThat(teksterMedFrist).hasSize(6);
-        assertThat(avsnitt(teksterMedFrist, 4)).isEqualTo(
+        // Bruker egneTekster() her - frist-logikken er en del av typens eget innhold, uavhengig
+        // av den delte «Om varsel»-halen fra default-metoden tekster().
+        List<OppgaveTekst> teksterMedFrist = utleder.egneTekster(medFrist);
+        assertThat(teksterMedFrist).hasSize(5);
+        assertThat(avsnitt(teksterMedFrist, 3)).isEqualTo(
             new OppgaveAvsnitt("Fristen for å svare er senest 15. februar 2025.", true));
-        assertThat(avsnitt(teksterMedFrist, 5).innhold()).isEqualTo(
+        assertThat(avsnitt(teksterMedFrist, 4).innhold()).isEqualTo(
             "Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi 1. februar 2025 som startdato når vi behandler saken din.");
 
         BrukerdialogOppgaveEntitet utenFrist = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, null);
-        assertThat(utleder.tekster(utenFrist)).hasSize(4);
+        assertThat(utleder.egneTekster(utenFrist)).hasSize(3);
     }
 
     // ---------------------------------------------------------------------------------------
