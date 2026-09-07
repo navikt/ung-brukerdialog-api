@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import no.nav.k9.felles.jpa.HibernateVerktøy;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 

@@ -18,7 +18,7 @@ import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.k9.sikkerhet.context.SubjectHandler;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;

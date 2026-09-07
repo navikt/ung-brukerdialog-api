@@ -3,7 +3,7 @@ package no.nav.ung.brukerdialog.sak.fagsak;
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
 

@@ -4,7 +4,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

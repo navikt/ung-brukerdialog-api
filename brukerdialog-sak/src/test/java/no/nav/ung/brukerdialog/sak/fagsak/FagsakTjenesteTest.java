@@ -8,7 +8,7 @@ import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.MottattSøknadDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
 import no.nav.ung.brukerdialog.tid.DatoIntervallEntitet;

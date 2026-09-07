@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import jakarta.persistence.*;
 import no.nav.ung.brukerdialog.BaseEntitet;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.typer.AktørId;
 

@@ -18,8 +18,8 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.FagsakRequest;
+import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakTjeneste;
-import no.nav.ung.brukerdialog.sak.soknad.FagsakYtelseType;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtSupplier;
 
 @Path(AktivitetspengerFagsakRestTjeneste.BASE_PATH)
