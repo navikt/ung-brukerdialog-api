@@ -1,5 +1,8 @@
 package no.nav.ung.brukerdialog.sak.soknad;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
@@ -12,15 +15,22 @@ import java.time.Period;
 import java.util.Comparator;
 import java.util.List;
 
-class TilgjengeligSøknadUtleder {
+@Dependent
+public class TilgjengeligSøknadUtleder {
 
-    static final Period VINDU_ÅPNER_FØR_TOM = Period.ofWeeks(4);
+    private final Period vinduÅpnerFørTom;
+    private final Period vinduLukkerEtterTom;
 
-    static final Period VINDU_LUKKER_ETTER_TOM = Period.ofWeeks(52);
+    @Inject
+    TilgjengeligSøknadUtleder(@KonfigVerdi(value = "SOKNADSVINDU_APNER_FOR_TOM", defaultVerdi = "P4W") Period vinduÅpnerFørTom,
+                              @KonfigVerdi(value = "SOKNADSVINDU_LUKKER_ETTER_TOM", defaultVerdi = "P52W") Period vinduLukkerEtterTom) {
+        this.vinduÅpnerFørTom = vinduÅpnerFørTom;
+        this.vinduLukkerEtterTom = vinduLukkerEtterTom;
+    }
 
-    static TilgjengeligSøknadResponse utled(LocalDate iDag,
-                                            List<SøknadHendelseEntitet> søknader,
-                                            FagsakEntitet fagsak) {
+    TilgjengeligSøknadResponse utled(LocalDate iDag,
+                                     List<SøknadHendelseEntitet> søknader,
+                                     FagsakEntitet fagsak) {
 
 
         var sisteInnvilgedeTom = sisteInnvilgedeTom(fagsak);
@@ -40,8 +50,8 @@ class TilgjengeligSøknadUtleder {
 
         // Har minst en innvilget periode
 
-        LocalDate vinduÅpner = sisteInnvilgedeTom.minus(VINDU_ÅPNER_FØR_TOM);
-        LocalDate vinduLukker = sisteInnvilgedeTom.plus(VINDU_LUKKER_ETTER_TOM);
+        LocalDate vinduÅpner = sisteInnvilgedeTom.minus(vinduÅpnerFørTom);
+        LocalDate vinduLukker = sisteInnvilgedeTom.plus(vinduLukkerEtterTom);
 
         if (iDag.isBefore(vinduÅpner)) {
             return new TilgjengeligSøknadResponse(TilgjengeligSøknadType.INGEN, false, true);

@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +27,9 @@ class TilgjengeligSøknadUtlederTest {
     private static final LocalDate VINDU_ÅPNER_2juni2025 = _30juni2025.minusWeeks(4);
     private static final LocalDate VINDU_LUKKER_30juni2026 = _30juni2025.plusWeeks(52);
     private static final FagsakYtelseType YTELSE = FagsakYtelseType.AKTIVITETSPENGER;
+
+    private static final TilgjengeligSøknadUtleder UTLEDER =
+        new TilgjengeligSøknadUtleder(Period.ofWeeks(4), Period.ofWeeks(52));
 
     @Test
     void ingen_søknad_og_ingen_sak_gir_førstegangssøknad() {
@@ -154,7 +158,7 @@ class TilgjengeligSøknadUtlederTest {
     }
 
     private static TilgjengeligSøknadResponse utled(LocalDate iDag, List<SøknadHendelseEntitet> hendelser, FagsakEntitet fagsak) {
-        return TilgjengeligSøknadUtleder.utled(iDag, hendelser, fagsak);
+        return UTLEDER.utled(iDag, hendelser, fagsak);
     }
 
     private static SøknadHendelseEntitet ubehandletSøknad() {
@@ -180,8 +184,6 @@ class TilgjengeligSøknadUtlederTest {
     }
 
     private static FagsakEntitet fagsak(VedtakPeriodeDto... perioder) {
-        var entitet = new FagsakEntitet(AktørId.dummy(), YTELSE, new Saksnummer("SAK123"));
-        entitet.erstattPerioder(List.of(perioder));
-        return entitet;
+        return new FagsakEntitet(AktørId.dummy(), YTELSE, new Saksnummer("SAK123"), List.of(perioder));
     }
 }

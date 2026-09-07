@@ -9,7 +9,6 @@ import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,39 +29,15 @@ public class FagsakTjeneste {
     }
 
     public void motta(FagsakYtelseType ytelseType, MottaFagsakRequest request) {
-        Optional<FagsakEntitet> eksisterendeFagsak = fagsakRepository.hentForSaksnummer(request.saksnummer());
-        if (eksisterendeFagsak.isPresent() && !eksisterendeFagsak.get().getAktørId().equals(request.aktørId())) {
-            throw new IllegalStateException("Saken tilhører en annen bruker. Saksnummer " + eksisterendeFagsak.get().getSaksnummer());
-        }
+        FagsakEntitet fagsak = fagsakRepository.lagreFagsak(request.aktørId(), ytelseType, request.saksnummer(), request.vedtakPerioder());
 
-        FagsakEntitet fagsak = eksisterendeFagsak
-            .orElseGet(() -> new FagsakEntitet(request.aktørId(), ytelseType, request.saksnummer()));
-
-        fagsak.erstattPerioder(request.vedtakPerioder());
-        fagsakRepository.lagre(fagsak);
-
-        kobleSøknaderTilFagsak(request, ytelseType, fagsak);
-
-        log.info("Mottok fagsakinfo for saksnummer={} med {} perioder.",
-            request.saksnummer().getVerdi(), request.vedtakPerioder().size());
-    }
-
-    private void kobleSøknaderTilFagsak(MottaFagsakRequest request, FagsakYtelseType ytelseType, FagsakEntitet fagsak) {
         Set<UUID> mottatteSøknadIder = request.mottatteSøknader().stream()
             .map(MottattSøknadDto::søknadId)
             .collect(Collectors.toSet());
-        if (mottatteSøknadIder.isEmpty()) {
-            return;
-        }
+        søknadHendelseRepository.markerMottattIFagsak(request.aktørId(), ytelseType, fagsak, mottatteSøknadIder);
 
-        søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(request.aktørId(), ytelseType).stream()
-            .filter(søknad -> søknad.getMottattIFagsak() == null)
-            .filter(søknad -> mottatteSøknadIder.contains(søknad.getSøknadId()))
-            .forEach(søknad -> {
-                søknad.markerMottattIFagsak(fagsak);
-                //flushes etter transaksjonen
-                log.info("Markert søknad med id {} mottatt {} som mottatt av fagsak {}",  søknad.getId(), søknad.getMottatt(), fagsak.getSaksnummer().getVerdi());
-            });
+        log.info("Mottok fagsakinfo for saksnummer={} med {} perioder.",
+            request.saksnummer().getVerdi(), request.vedtakPerioder().size());
     }
 
 }

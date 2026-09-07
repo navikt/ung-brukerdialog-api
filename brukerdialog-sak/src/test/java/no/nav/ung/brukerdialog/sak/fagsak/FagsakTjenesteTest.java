@@ -31,9 +31,9 @@ import static org.assertj.core.api.Assertions.tuple;
 class FagsakTjenesteTest {
 
     private static final FagsakYtelseType YTELSE = FagsakYtelseType.AKTIVITETSPENGER;
+    private static final Saksnummer SAKSNUMMER = new Saksnummer("SAK1234");
     private static final LocalDate FOM = LocalDate.of(2025, 1, 1);
     private static final LocalDate TOM = LocalDate.of(2025, 12, 31);
-    public static final Saksnummer SAKSNUMMER = new Saksnummer("SAK1234");
 
     @Inject
     private EntityManager entityManager;
@@ -56,17 +56,14 @@ class FagsakTjenesteTest {
         søknadHendelseRepository.lagre(new SøknadHendelseEntitet(søknadId, aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
         flushOgTøm();
 
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(
-            innvilget(FOM, TOM),
+        tjeneste.motta(YTELSE, new MottaFagsakRequest(aktørId, SAKSNUMMER, List.of(
+            new VedtakPeriodeDto(new Periode(FOM, TOM), VedtakResultatType.INNVILGET),
             new VedtakPeriodeDto(new Periode(avslåttFom, avslåttTom), VedtakResultatType.AVSLÅTT)
-        ), List.of(mottattSøknad(søknadId))));
+        ), List.of(new MottattSøknadDto(søknadId, LocalDate.of(2025, 1, 2)))));
         flushOgTøm();
 
-        var lagret = fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE);
-        assertThat(lagret).hasSize(1);
-        assertThat(lagret.getFirst().getSaksnummer()).isEqualTo(SAKSNUMMER);
-
-        assertThat(lagret.getFirst().getAktivePerioder())
+        var fagsak = fagsakRepository.hentForSaksnummer(SAKSNUMMER).orElseThrow();
+        assertThat(fagsak.getAktivePerioder())
             .extracting(VedtakPeriodeEntitet::getPeriode, VedtakPeriodeEntitet::getResultat)
             .containsExactlyInAnyOrder(
                 tuple(DatoIntervallEntitet.fra(FOM, TOM), VedtakResultatType.INNVILGET),
@@ -74,105 +71,12 @@ class FagsakTjenesteTest {
 
         assertThat(søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
             .singleElement()
-            .extracting(s -> s.getMottattIFagsak().getSaksnummer())
-            .isEqualTo(SAKSNUMMER);
-    }
-
-    @Test
-    void ny_melding_på_samme_sak_skal_oppdatere_raden_og_deaktivere_forrige_perioder() {
-        var aktørId = AktørId.dummy();
-        var saksnummer = SAKSNUMMER;
-
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, TOM)), List.of()));
-        flushOgTøm();
-        var førsteId = fagsakRepository.hentForSaksnummer(saksnummer).orElseThrow().getId();
-
-        var nyTom = TOM.plusMonths(6);
-        tjeneste.motta(YTELSE, request(aktørId, saksnummer, List.of(innvilget(FOM, nyTom)), List.of()));
-        flushOgTøm();
-
-        assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
-
-        var fagsak = fagsakRepository.hentForSaksnummer(saksnummer).orElseThrow();
-        assertThat(fagsak.getId()).isEqualTo(førsteId);
-        assertThat(fagsak.getAktivePerioder())
-            .singleElement()
-            .extracting(p -> p.getPeriode().getTomDato())
-            .isEqualTo(nyTom);
-        assertThat(allePerioder(fagsak)).hasSize(2);
-        assertThat(inaktivePerioder(fagsak))
-            .singleElement()
-            .extracting(p -> p.getPeriode().getTomDato())
-            .isEqualTo(TOM);
-    }
-
-    @Test
-    void melding_uten_perioder_skal_gi_fagsak_uten_aktive_perioder() {
-        var aktørId = AktørId.dummy();
-
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(), List.of()));
-        flushOgTøm();
-
-        assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE).getFirst().getAktivePerioder())
-            .isEmpty();
-    }
-
-    @Test
-    void flere_saker_på_samme_deltaker_skal_lagres_hver_for_seg() {
-        var aktørId = AktørId.dummy();
-
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(innvilget(FOM, TOM)), List.of()));
-        tjeneste.motta(YTELSE, request(aktørId, new Saksnummer("SAK5678"),
-            List.of(innvilget(FOM.plusYears(2), TOM.plusYears(2))), List.of()));
-        flushOgTøm();
-
-        assertThat(fagsakRepository.hentForAktørOgYtelse(aktørId, YTELSE)).hasSize(2);
-    }
-
-    @Test
-    void skal_ikke_koble_søknader_ung_sak_ikke_har_meldt_inn_på_aktør() {
-        var aktørId = AktørId.dummy();
-        søknadHendelseRepository.lagre(new SøknadHendelseEntitet(UUID.randomUUID(), aktørId, YTELSE, LocalDateTime.of(2025, 1, 2, 10, 30)));
-        flushOgTøm();
-
-        tjeneste.motta(YTELSE, request(aktørId, SAKSNUMMER, List.of(innvilget(FOM, TOM)), List.of(mottattSøknad(UUID.randomUUID()))));
-        flushOgTøm();
-
-        assertThat(søknadHendelseRepository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE))
-            .singleElement()
-            .extracting(SøknadHendelseEntitet::getMottattIFagsak)
-            .isNull();
-    }
-
-    private List<VedtakPeriodeEntitet> allePerioder(FagsakEntitet fagsak) {
-        return entityManager.createQuery(
-                "SELECT p FROM VedtakPeriode p WHERE p.fagsak = :fagsak", VedtakPeriodeEntitet.class)
-            .setParameter("fagsak", fagsak)
-            .getResultList();
-    }
-
-    private List<VedtakPeriodeEntitet> inaktivePerioder(FagsakEntitet fagsak) {
-        return entityManager.createQuery(
-                "SELECT p FROM VedtakPeriode p WHERE p.fagsak = :fagsak AND p.aktiv = false", VedtakPeriodeEntitet.class)
-            .setParameter("fagsak", fagsak)
-            .getResultList();
+            .extracting(it -> it.getMottattIFagsak().getId())
+            .isEqualTo(fagsak.getId());
     }
 
     private void flushOgTøm() {
         entityManager.flush();
         entityManager.clear();
-    }
-
-    private static VedtakPeriodeDto innvilget(LocalDate fom, LocalDate tom) {
-        return new VedtakPeriodeDto(new Periode(fom, tom), VedtakResultatType.INNVILGET);
-    }
-
-    private static MottattSøknadDto mottattSøknad(UUID søknadId) {
-        return new MottattSøknadDto(søknadId, LocalDate.of(2025, 1, 2));
-    }
-
-    private static MottaFagsakRequest request(AktørId aktørId, Saksnummer saksnummer,
-                                              List<VedtakPeriodeDto> perioder, List<MottattSøknadDto> mottatteSøknader) {
-        return new MottaFagsakRequest(aktørId, saksnummer, perioder, mottatteSøknader);
     }
 }

@@ -48,6 +48,20 @@ public class FagsakEntitet extends BaseEntitet {
         this.saksnummer = Objects.requireNonNull(saksnummer, "saksnummer");
     }
 
+    public FagsakEntitet(AktørId aktørId, FagsakYtelseType fagsakYtelseType, Saksnummer saksnummer, List<VedtakPeriodeDto> perioder) {
+        this(aktørId, fagsakYtelseType, saksnummer);
+        Objects.requireNonNull(perioder, "perioder");
+        perioder.forEach(dto -> this.perioder.add(map(dto)));
+    }
+
+    private VedtakPeriodeEntitet map(VedtakPeriodeDto dto) {
+        return new VedtakPeriodeEntitet(
+            this,
+            dto.periode().getFom(),
+            dto.periode().getTom(),
+            dto.vedtakResultatType());
+    }
+
     public Long getId() {
         return id;
     }
@@ -68,13 +82,9 @@ public class FagsakEntitet extends BaseEntitet {
         return perioder.stream().filter(VedtakPeriodeEntitet::isAktiv).toList();
     }
 
-    public void erstattPerioder(List<VedtakPeriodeDto> nyePerioder) {
+    void erstattPerioder(List<VedtakPeriodeDto> nyePerioder) {
         Objects.requireNonNull(nyePerioder, "nyePerioder");
         perioder.forEach(VedtakPeriodeEntitet::deaktiver);
-        nyePerioder.forEach(dto -> perioder.add(new VedtakPeriodeEntitet(
-            this,
-            dto.periode().getFom(),
-            dto.periode().getTom(),
-            dto.vedtakResultatType())));
+        nyePerioder.forEach(dto -> perioder.add(map(dto)));
     }
 }

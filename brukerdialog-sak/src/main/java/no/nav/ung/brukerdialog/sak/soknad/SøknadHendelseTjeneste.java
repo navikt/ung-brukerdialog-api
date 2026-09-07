@@ -22,12 +22,15 @@ public class SøknadHendelseTjeneste {
 
     private final SøknadHendelseRepository repository;
     private final FagsakRepository fagsakRepository;
-
+    private final TilgjengeligSøknadUtleder tilgjengeligSøknadUtleder;
 
     @Inject
-    public SøknadHendelseTjeneste(SøknadHendelseRepository repository, FagsakRepository fagsakRepository) {
+    public SøknadHendelseTjeneste(SøknadHendelseRepository repository,
+                                  FagsakRepository fagsakRepository,
+                                  TilgjengeligSøknadUtleder tilgjengeligSøknadUtleder) {
         this.repository = repository;
         this.fagsakRepository = fagsakRepository;
+        this.tilgjengeligSøknadUtleder = tilgjengeligSøknadUtleder;
     }
 
     public void registrer(AktørId aktørId, FagsakYtelseType ytelseType, OpprettSøknadHendelseRequest request) {
@@ -53,11 +56,11 @@ public class SøknadHendelseTjeneste {
 
     public TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId, FagsakYtelseType ytelseType) {
         List<SøknadHendelseEntitet> søknader = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType);
-        return TilgjengeligSøknadUtleder.utled(LocalDate.now(), søknader, finnFagsak(aktørId, ytelseType));
+        return tilgjengeligSøknadUtleder.utled(LocalDate.now(), søknader, finnFagsak(aktørId, ytelseType));
     }
 
     private TilgjengeligSøknadResponse utled(List<SøknadHendelseEntitet> søknader, AktørId aktørId, FagsakYtelseType ytelseType) {
-        return TilgjengeligSøknadUtleder.utled(
+        return tilgjengeligSøknadUtleder.utled(
             LocalDate.now(),
             søknader,
             finnFagsak(aktørId, ytelseType));
