@@ -21,7 +21,7 @@ public record DiagnostikkSakRequestDto(
     Saksnummer saksnummer,
 
     @NotNull
-    @Size(max = 4000)
+    @Size(min = 3, max = 4000)
     @Pattern(regexp = "^[\\p{Graph}\\p{IsWhite_Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$")
     String begrunnelse
 ) {
