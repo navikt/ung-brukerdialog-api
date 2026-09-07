@@ -34,6 +34,10 @@ public class VedtakPeriodeEntitet extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
+
     protected VedtakPeriodeEntitet() {
         // For JPA
     }

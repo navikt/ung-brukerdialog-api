@@ -26,13 +26,14 @@ create table BD_VEDTAK_PERIODE
     periode       daterange    not null,
     resultat      varchar(20)  not null,
     aktiv         boolean      not null default true,
+    versjon       bigint       not null default 0,
     opprettet_av  varchar(20)  not null default 'VL',
     opprettet_tid timestamp(3) not null default current_timestamp,
     endret_av     varchar(20),
     endret_tid    timestamp(3)
 );
 
-create index idx_bd_vedtak_periode_fagsak on BD_VEDTAK_PERIODE (fagsak_id) where aktiv;
+create index idx_bd_vedtak_periode_fagsak on BD_VEDTAK_PERIODE (fagsak_id);
 
 comment on table BD_VEDTAK_PERIODE is 'Perioder med vedtak.';
 
