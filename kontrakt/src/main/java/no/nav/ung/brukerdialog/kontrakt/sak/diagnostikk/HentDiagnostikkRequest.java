@@ -12,7 +12,7 @@ import no.nav.ung.brukerdialog.typer.Saksnummer;
 
 import java.util.Optional;
 
-public record DiagnostikkSakRequestDto(
+public record HentDiagnostikkRequest(
 
     @Valid
     AktørId aktørId,

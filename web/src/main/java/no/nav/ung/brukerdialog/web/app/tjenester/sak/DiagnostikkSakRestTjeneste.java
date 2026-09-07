@@ -18,7 +18,7 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursActionType;
 import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.DiagnostikkSakRequestDto;
+import no.nav.ung.brukerdialog.kontrakt.sak.diagnostikk.HentDiagnostikkRequest;
 import no.nav.ung.brukerdialog.sak.diagnostikk.DiagnostikkSakLogg;
 import no.nav.ung.brukerdialog.sak.diagnostikk.DiagnostikkSakTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
@@ -58,7 +58,7 @@ public class DiagnostikkSakRestTjeneste {
     public Response hentDiagnostikk(
         @Valid
         @NotNull
-        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) DiagnostikkSakRequestDto requestDto) {
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) HentDiagnostikkRequest requestDto) {
 
         Optional<AktørId> aktørId = requestDto.aktørId() != null
             ? Optional.of(requestDto.aktørId())
