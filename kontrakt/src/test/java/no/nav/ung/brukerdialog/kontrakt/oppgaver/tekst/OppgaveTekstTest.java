@@ -46,7 +46,7 @@ class OppgaveTekstTest {
         String json = JsonObjectMapper.getJson(original);
         OppgaveTekst deserialisert = JsonObjectMapper.fromJson(json, OppgaveTekst.class);
 
-        assertThat(json).contains("\"type\" : \"LISTE\"");
+        assertThat(json).contains("\"type\" : \"PUNKT_LISTE\"");
         assertThat(deserialisert).isEqualTo(original);
         assertThat(((OppgavePunktliste) deserialisert).punkter()).containsExactly("Punkt 1", "Punkt 2");
     }
@@ -90,7 +90,7 @@ class OppgaveTekstTest {
             .readerFor(new TypeReference<List<OppgaveTekst>>() {})
             .readValue(json);
 
-        assertThat(json).contains("\"type\":\"AVSNITT\"", "\"type\":\"LISTE\"", "\"type\":\"TABELL\"");
+        assertThat(json).contains("\"type\":\"AVSNITT\"", "\"type\":\"PUNKT_LISTE\"", "\"type\":\"TABELL\"");
         assertThat(deserialisert).containsExactlyElementsOf(original);
     }
 }
