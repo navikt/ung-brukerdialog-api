@@ -16,8 +16,8 @@ import no.nav.k9.felles.sikkerhet.abac.BeskyttetRessursResourceType;
 import no.nav.k9.felles.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.k9.sikkerhet.context.SubjectHandler;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.LøsOppgaveRequest;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.oppgave.brukerdialog.BrukerdialogOppgaveTjeneste;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.web.server.abac.AbacAttributtEmptySupplier;
@@ -53,6 +53,7 @@ public class BrukerOppgaveRestTjeneste {
     public List<BrukerdialogOppgaveDto> hentAlleOppgaver(
         @QueryParam("ytelsetype")
         @Parameter(description = "Filtrer oppgaver på ytelsetype")
+        @TilpassetAbacAttributt(supplierClass = AbacAttributtEmptySupplier.class)
         OppgaveYtelsetype ytelsetype
     ) {
         return oppgaveTjeneste.hentAlleOppgaverForAktør(finnAktørId(), ytelsetype);

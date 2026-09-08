@@ -116,6 +116,10 @@
             <groupId>no.nav.ung.brukerdialog</groupId>
             <artifactId>brukerdialog-oppgave-min-side-varsel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.ung.brukerdialog</groupId>
+            <artifactId>brukerdialog-sak</artifactId>
+        </dependency>
 
         <!-- integrasjon-->
         <dependency>

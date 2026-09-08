@@ -1,5 +1,11 @@
 package no.nav.ung.brukerdialog.web.app.konfig;
 
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import no.nav.ung.brukerdialog.web.app.EksternApiConfig;
+import no.nav.ung.brukerdialog.web.app.InternApiConfig;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -7,12 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Application;
-
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import no.nav.ung.brukerdialog.web.app.InternApiConfig;
 
 public class RestApiTester {
 
@@ -36,6 +36,7 @@ public class RestApiTester {
         List<Class<?>> klasser = new ArrayList<>();
 
         klasser.addAll(finnAlleRestTjenester(new InternApiConfig()));
+        klasser.addAll(finnAlleRestTjenester(new EksternApiConfig()));
         return klasser;
     }
 

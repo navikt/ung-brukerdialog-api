@@ -20,6 +20,10 @@
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.k9.felles</groupId>
+            <artifactId>k9-felles-db</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.k9.felles.oidc-token</groupId>
             <artifactId>k9-sikkerhet-api</artifactId>
         </dependency>

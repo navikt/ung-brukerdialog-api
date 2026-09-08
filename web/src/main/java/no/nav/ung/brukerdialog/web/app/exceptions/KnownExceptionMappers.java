@@ -8,6 +8,7 @@ import no.nav.k9.felles.exception.ManglerTilgangException;
 import no.nav.k9.felles.exception.VLException;
 import no.nav.k9.felles.jpa.TomtResultatException;
 import no.nav.ung.brukerdialog.oppgave.UgyldigOppgaveStatusendringException;
+import no.nav.ung.brukerdialog.sak.soknad.SøknadIkkeTilgjengeligException;
 import no.nav.ung.brukerdialog.web.server.abac.UkjentAbacVerdiException;
 
 import java.util.Collection;
@@ -28,6 +29,7 @@ public class KnownExceptionMappers {
         register(ManglerTilgangException.class, new ManglerTilgangExceptionMapper());
         register(TomtResultatException.class, new TomtResultatExceptionMapper());
         register(UgyldigOppgaveStatusendringException.class, new UgyldigOppgaveStatusendringExceptionMapper());
+        register(SøknadIkkeTilgjengeligException.class, new SøknadIkkeTilgjengeligExceptionMapper());
         register(UnsupportedOperationException.class, new UnsupportedOperationExceptionMapper());
         register(VLException.class, new VLExceptionMapper());
         register(UkjentAbacVerdiException.class, new UkjentAbacVerdiExceptionMapper());
