@@ -7,7 +7,6 @@ import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakPeriodeDto;
 import no.nav.ung.brukerdialog.kontrakt.vedtak.VedtakResultatType;
 import no.nav.ung.brukerdialog.sak.FagsakYtelseType;
-import no.nav.ung.brukerdialog.sak.fagsak.FagsakEntitet;
 import no.nav.ung.brukerdialog.sak.fagsak.FagsakRepository;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseEntitet;
 import no.nav.ung.brukerdialog.sak.soknad.SøknadHendelseRepository;
@@ -47,13 +46,14 @@ class DiagnostikkSakTjenesteTest {
     @Test
     void dumper_også_deaktiverte_vedtaksperioder() {
         var aktørId = AktørId.dummy();
-        var fagsak = new FagsakEntitet(aktørId, YTELSE, nyttSaksnummer());
-        fagsak.erstattPerioder(List.of(new VedtakPeriodeDto(new Periode(FOM, TOM), VedtakResultatType.INNVILGET)));
-        fagsakRepository.lagre(fagsak);
+        var saksnummer = nyttSaksnummer();
+        fagsakRepository.lagreFagsak(aktørId, YTELSE, saksnummer,
+            List.of(new VedtakPeriodeDto(new Periode(FOM, TOM), VedtakResultatType.INNVILGET)));
+        entityManager.flush();
+        entityManager.clear();
 
-        var oppdatert = fagsakRepository.hentForSaksnummer(fagsak.getSaksnummer()).orElseThrow();
-        oppdatert.erstattPerioder(List.of(new VedtakPeriodeDto(new Periode(FOM, TOM.plusMonths(1)), VedtakResultatType.AVSLÅTT)));
-        fagsakRepository.lagre(oppdatert);
+        fagsakRepository.lagreFagsak(aktørId, YTELSE, saksnummer,
+            List.of(new VedtakPeriodeDto(new Periode(FOM, TOM.plusMonths(1)), VedtakResultatType.AVSLÅTT)));
         entityManager.flush();
         entityManager.clear();
 
@@ -96,7 +96,7 @@ class DiagnostikkSakTjenesteTest {
     void finner_aktør_for_saksnummer() {
         var aktørId = AktørId.dummy();
         var saksnummer = nyttSaksnummer();
-        fagsakRepository.lagre(new FagsakEntitet(aktørId, YTELSE, saksnummer));
+        fagsakRepository.lagreFagsak(aktørId, YTELSE, saksnummer, List.of());
         entityManager.flush();
         entityManager.clear();
 
