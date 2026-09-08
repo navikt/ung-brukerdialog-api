@@ -33,6 +33,7 @@ class OppgaveTekstTest {
         String json = JsonObjectMapper.getJson(original);
         OppgaveTekst deserialisert = JsonObjectMapper.fromJson(json, OppgaveTekst.class);
 
+        assertThat(json).contains("\"tittel\" : null");
         assertThat(deserialisert).isEqualTo(original);
         assertThat(((OppgaveAvsnitt) deserialisert).tittel()).isNull();
         assertThat(deserialisert.fet()).isFalse();
