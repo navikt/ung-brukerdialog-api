@@ -35,6 +35,5 @@ public sealed interface OppgaveTekst permits OppgaveAvsnitt, OppgaveListe, Oppga
      */
     String tittel();
 
-    /** Sant dersom hele blokkens innhold skal vises i fet skrift. */
     boolean fet();
 }
