@@ -11,7 +11,6 @@ public record OppgaveListe(
     @JsonProperty(value = "fet", required = true) boolean fet
 ) implements OppgaveTekst {
 
-    /** Vanlig tilfelle: verken egen tittel eller fet skrift. */
     public OppgaveListe(List<String> punkter) {
         this(null, punkter, false);
     }
