@@ -1,7 +1,5 @@
 package no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 /**
@@ -13,10 +11,10 @@ import java.util.List;
  * kommer til senere.
  */
 public record OppgaveTabell(
-    @JsonProperty("tittel") String tittel,
-    @JsonProperty(value = "kolonneOverskrifter", required = true) List<String> kolonneOverskrifter,
-    @JsonProperty(value = "rader", required = true) List<List<String>> rader,
-    @JsonProperty(value = "fet", required = true) boolean fet
+    String tittel,
+    List<String> kolonneOverskrifter,
+    List<List<String>> rader,
+    boolean fet
 ) implements OppgaveTekst {
 
     public OppgaveTabell(List<String> kolonneOverskrifter, List<List<String>> rader) {
