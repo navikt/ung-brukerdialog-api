@@ -30,7 +30,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPe
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -323,14 +323,14 @@ class OppgaveInnholdUtlederRenderingTest {
 
             // --- bekreft-opphor-ved-maksdato ---
             Arguments.of(scenario("opphør ved maksdato - ungdomsytelse, svarfrist",
-                new BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
+                new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))), UNGDOMSPROGRAM_BASE_URL),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 7, 1, 0, 0)),
                 "Din siste dag med ungdomsprogramytelsen er", "30. juni 2025",
                 "Fristen for å svare er senest 1. juli 2025.")),
 
             Arguments.of(scenario("opphør ved maksdato - aktivitetspenger, ingen svarfrist",
-                new BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
+                new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 8, 31), LocalDate.of(2025, 8, 31))), UNGDOMSPROGRAM_BASE_URL),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "Din siste dag med aktivitetspenger er", "31. august 2025"))

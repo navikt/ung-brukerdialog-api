@@ -31,7 +31,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPe
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -147,7 +147,7 @@ class OppgaveInnholdUtlederPiiTest {
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("bekreft opphør ved maksdato",
-                new BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
+                new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))),
                     UNGDOMSPROGRAM_BASE_URL),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.UNGDOMSYTELSE)),

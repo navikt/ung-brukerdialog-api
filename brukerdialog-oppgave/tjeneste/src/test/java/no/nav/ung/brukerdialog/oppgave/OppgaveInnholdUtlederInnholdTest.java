@@ -33,7 +33,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPe
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -240,7 +240,7 @@ class OppgaveInnholdUtlederInnholdTest {
                 UNGDOMSPROGRAM_BASE_URL, false);
 
             case BEKREFT_OPPHOR_VED_MAKSDATO -> new Scenario(
-                new BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
+                new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))), UNGDOMSPROGRAM_BASE_URL),
                 "Sluttdato",
                 List.of(

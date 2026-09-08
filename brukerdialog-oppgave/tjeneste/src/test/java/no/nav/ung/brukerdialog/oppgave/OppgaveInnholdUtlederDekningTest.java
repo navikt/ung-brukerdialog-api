@@ -9,7 +9,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPe
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
-import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
@@ -22,7 +22,7 @@ class OppgaveInnholdUtlederDekningTest {
 
     private static final List<Class<? extends OppgaveInnholdUtleder>> IMPLEMENTASJONER = List.of(
         BekreftBostedOppgaveInnholdUtleder.class,
-        BekreftOpphorVedMaksdatoOppgaveInnholdUtleder.class,
+        BekreftOpphørVedMaksdatoOppgaveInnholdUtleder.class,
         EndretPeriodeOppgaveInnholdUtleder.class,
         EndretSluttdatoOppgaveInnholdUtleder.class,
         EndretStartdatoOppgaveInnholdUtleder.class,

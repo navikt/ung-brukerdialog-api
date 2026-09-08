@@ -21,17 +21,17 @@ import java.util.List;
 
 @OppgaveTypeRef(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO)
 @ApplicationScoped
-public class BekreftOpphorVedMaksdatoOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
+public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
 
-    BekreftOpphorVedMaksdatoOppgaveInnholdUtleder() {
+    BekreftOpphørVedMaksdatoOppgaveInnholdUtleder() {
         // for CDI proxy
     }
 
     @Inject
-    public BekreftOpphorVedMaksdatoOppgaveInnholdUtleder(
+    public BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
         @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
     ) {
