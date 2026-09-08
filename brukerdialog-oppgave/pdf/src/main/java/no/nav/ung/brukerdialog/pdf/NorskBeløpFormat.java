@@ -11,7 +11,7 @@ public final class NorskBeløpFormat {
     private NorskBeløpFormat() {
     }
 
-    /** F.eks. «12 345 kr» - tusenskilletegn og fortegn følger {@code NumberFormat} for norsk locale, ingen desimaler (beløp er alltid hele kroner). */
+    /** F.eks. «12 345 kr» - tusenskilletegn og fortegn følger {@code NumberFormat} for norsk locale. */
     public static String kroner(long beløp) {
         return HELE_KRONER.format(beløp) + " kr";
     }
