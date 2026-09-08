@@ -156,9 +156,6 @@ public final class OppgaveTekster {
             setning.append(" til ").append(NorskDatoFormat.datoLang(nyTom));
         }
         setning.append(".");
-        // Fet kun når minst én dato faktisk er med - originalen fetter kun selve
-        // <strong>{{dato}}</strong>-fragmentene, som begge er betinget av isNotNull. Uten noen
-        // dato er hele setningen vanlig skrift i originalen.
         boolean harDato = nyFom != null || nyTom != null;
         tekster.add(new OppgaveAvsnitt(setning.toString(), harDato));
         tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på endringen. Du svarer på Min side på nav.no."));
