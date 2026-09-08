@@ -462,7 +462,7 @@ class OppgaveInnholdUtlederInnholdTest {
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Arbeidsgiver", "Inntekt før skatt");
-        assertThat(tabell.rader()).containsExactly(List.of("Bedriften AS", "25\u00A0000 kr"), List.of("Totalt", "25\u00A0000 kr"));
+        assertThat(tabell.rader()).containsExactly(List.of("Bedriften AS", "25 000 kr"), List.of("Totalt", "25 000 kr"));
         assertThat(avsnitt(tekster, 2).innhold())
             .isEqualTo("Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.");
     }
@@ -476,7 +476,7 @@ class OppgaveInnholdUtlederInnholdTest {
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         OppgaveTabell tabell = tabell(utleder.tekster(oppgave), 1);
-        assertThat(tabell.rader()).contains(List.of("999999999", "10\u00A0000 kr"));
+        assertThat(tabell.rader()).contains(List.of("999999999", "10 000 kr"));
     }
 
     @Test
@@ -490,7 +490,7 @@ class OppgaveInnholdUtlederInnholdTest {
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Nav-ytelse", "Inntekt før skatt");
-        assertThat(tabell.rader()).containsExactly(List.of("Dagpenger", "5\u00A0000 kr"), List.of("Totalt", "5\u00A0000 kr"));
+        assertThat(tabell.rader()).containsExactly(List.of("Dagpenger", "5 000 kr"), List.of("Totalt", "5 000 kr"));
         // gjelderDelerAvMåned=true har forrang foran harKunYtelseInntekt - se if/else-rekkefølgen i utlederen.
         assertThat(avsnitt(tekster, 2).innhold()).isEqualTo(
             "Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde ungdomsprogramytelsen hele måneden.");
@@ -509,9 +509,9 @@ class OppgaveInnholdUtlederInnholdTest {
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Arbeidsgiver/Nav-ytelse", "Inntekt før skatt");
         assertThat(tabell.rader()).containsExactly(
-            List.of("Bedriften AS", "20\u00A0000 kr"),
-            List.of("Arbeidsavklaringspenger", "5\u00A0000 kr"),
-            List.of("Totalt", "25\u00A0000 kr"));
+            List.of("Bedriften AS", "20 000 kr"),
+            List.of("Arbeidsavklaringspenger", "5 000 kr"),
+            List.of("Totalt", "25 000 kr"));
         assertThat(avsnitt(tekster, 2).innhold())
             .isEqualTo("Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.");
     }
