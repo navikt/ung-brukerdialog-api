@@ -113,7 +113,7 @@ public final class OppgaveTekster {
         }));
         tekster.add(new OppgaveAvsnitt(switch (ytelsetype) {
             case UNGDOMSYTELSE -> "Du kan bare få ungdomsprogramytelsen hvis du deltar i programmet, og derfor stopper vi den. Du svarer på Min side på nav.no.";
-            case AKTIVITETSPENGER -> "Du kan bare få aktivitetspenger hvis du deltar, og derfor stopper vi utbetalingen. Du svarer på Min side på nav.no.";
+            case AKTIVITETSPENGER -> "Du kan bare få aktivitetspenger hvis du opprettholder aktiviteten Nav har bestemt for deg, og derfor stopper vi utbetalingen. Du svarer på Min side på nav.no.";
         }));
         tekster.add(new OppgaveAvsnitt("Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt."));
         leggTilSvarfrist(tekster, fristTid, "svare", null);
