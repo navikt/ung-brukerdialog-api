@@ -18,16 +18,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Verifiserer at det finnes nøyaktig én {@link OppgaveInnholdUtleder}-implementasjon per
- * {@link OppgaveType} - samme hensikt som den uttømmende switch-en i
- * {@code JournalføringParametre#utled}, men håndhevet ved refleksjon siden koblingen her skjer
- * via CDI-qualifier ({@link OppgaveTypeRef}) og ikke fanges av kompilatoren. Fanger opp en ny
- * {@code OppgaveType} som mangler tilhørende innholdsutleder.
- * <p>
- * Grønn sone - tester kun at stillaset er komplett og riktig koblet, ikke innholdet i
- * implementasjonene (se {@link OppgaveInnholdUtlederInnholdTest} for det).
- */
 class OppgaveInnholdUtlederDekningTest {
 
     private static final List<Class<? extends OppgaveInnholdUtleder>> IMPLEMENTASJONER = List.of(
