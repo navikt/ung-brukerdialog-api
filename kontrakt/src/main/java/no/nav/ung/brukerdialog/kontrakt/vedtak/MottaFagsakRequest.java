@@ -16,7 +16,6 @@ public record MottaFagsakRequest(
     @Valid
     AktørId aktørId,
 
-    @StandardAbacAttributt(value = StandardAbacAttributtType.SAKSNUMMER)
     @NotNull
     @Valid
     Saksnummer saksnummer,
@@ -33,6 +32,11 @@ public record MottaFagsakRequest(
     @StandardAbacAttributt(value = StandardAbacAttributtType.AKTØR_ID)
     public String getAktørIdAsString() {
         return aktørId.getId();
+    }
+
+    @StandardAbacAttributt(value = StandardAbacAttributtType.SAKSNUMMER)
+    public String getSaksnummerAsString() {
+        return saksnummer.getVerdi();
     }
 
 }
