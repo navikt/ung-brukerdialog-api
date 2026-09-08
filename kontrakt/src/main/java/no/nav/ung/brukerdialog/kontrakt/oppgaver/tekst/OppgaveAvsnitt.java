@@ -12,12 +12,10 @@ public record OppgaveAvsnitt(
     @JsonProperty(value = "fet", required = true) boolean fet
 ) implements OppgaveTekst {
 
-    /** Vanlig tilfelle: verken egen tittel eller fet skrift. */
     public OppgaveAvsnitt(String innhold) {
         this(null, innhold, false);
     }
 
-    /** Avsnitt uten egen tittel, men med eksplisitt fet-verdi (f.eks. den innledende svarfrist-setningen). */
     public OppgaveAvsnitt(String innhold, boolean fet) {
         this(null, innhold, fet);
     }

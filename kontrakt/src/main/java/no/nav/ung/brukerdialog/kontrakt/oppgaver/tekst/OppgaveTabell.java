@@ -19,7 +19,6 @@ public record OppgaveTabell(
     @JsonProperty(value = "fet", required = true) boolean fet
 ) implements OppgaveTekst {
 
-    /** Vanlig tilfelle: verken egen tittel eller fet skrift. */
     public OppgaveTabell(List<String> kolonneOverskrifter, List<List<String>> rader) {
         this(null, kolonneOverskrifter, rader, false);
     }
