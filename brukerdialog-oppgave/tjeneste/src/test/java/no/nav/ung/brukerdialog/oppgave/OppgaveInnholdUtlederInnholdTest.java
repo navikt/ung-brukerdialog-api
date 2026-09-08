@@ -50,6 +50,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -116,6 +117,33 @@ class OppgaveInnholdUtlederInnholdTest {
         assertThat(egneTekster)
             .as("egneTekster for %s skal inneholde frist-frasen når fristTid er satt", oppgaveType)
             .anyMatch(tekst -> tekst instanceof OppgaveAvsnitt avsnitt && avsnitt.innhold().contains("er senest 15. mars 2025."));
+    }
+
+    @ParameterizedTest
+    @EnumSource(OppgaveType.class)
+    void min_side_varseltekst_er_innenfor_500_tegns_grensen_for_alle_typer(OppgaveType oppgaveType) {
+        Scenario scenario = scenarioFor(oppgaveType);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+
+        String varselTekst = ((OppgaveAvsnitt) scenario.utleder().egneTekster(oppgave).getFirst()).innhold();
+
+        assertThat(varselTekst.length())
+            .as("min-side-varselteksten (%s) er %d tegn, må være maks 500", oppgaveType, varselTekst.length())
+            .isLessThanOrEqualTo(500);
+    }
+
+    @Test
+    void validerVarselTekstLengde_godtar_500_tegn_men_kaster_ved_501() {
+        String femHundreTegn = "x".repeat(500);
+        String femHundreOgÉnTegn = "x".repeat(501);
+
+        OppgaveTekster.validerVarselTekstLengde(femHundreTegn, OppgaveType.SØK_YTELSE);
+
+        assertThatIllegalStateException()
+            .isThrownBy(() -> OppgaveTekster.validerVarselTekstLengde(femHundreOgÉnTegn, OppgaveType.SØK_YTELSE))
+            .withMessageContaining("501")
+            .withMessageContaining("500")
+            .withMessageContaining("SØK_YTELSE");
     }
 
     private record Scenario(OppgaveInnholdUtleder utleder, String forventetUndertittel, List<OppgaveTekst> forventetTekster,

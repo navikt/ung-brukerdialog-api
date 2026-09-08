@@ -1,5 +1,6 @@
 package no.nav.ung.brukerdialog.oppgave;
 
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
@@ -18,6 +19,16 @@ public final class OppgaveTekster {
     }
 
     public static final String VARSEL_OM_NYE_OPPLYSNINGER_TITTEL = "Varsel om nye opplysninger";
+
+    private static final int MAKS_LENGDE_VARSELTEKST_OPPGAVE = 500;
+
+    public static void validerVarselTekstLengde(String varselTekst, OppgaveType oppgaveType) {
+        if (varselTekst.length() > MAKS_LENGDE_VARSELTEKST_OPPGAVE) {
+            throw new IllegalStateException(
+                "Varseltekst for min-side-oppgave er %d tegn, maks er %d (oppgaveType=%s). Korriger teksten i OppgaveInnholdUtleder for denne typen."
+                    .formatted(varselTekst.length(), MAKS_LENGDE_VARSELTEKST_OPPGAVE, oppgaveType));
+        }
+    }
 
     public static String ytelseTitelcase(OppgaveYtelsetype ytelsetype) {
         return switch (ytelsetype) {

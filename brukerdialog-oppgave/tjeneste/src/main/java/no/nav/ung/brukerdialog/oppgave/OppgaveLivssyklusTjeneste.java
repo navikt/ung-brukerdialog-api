@@ -134,6 +134,7 @@ public class OppgaveLivssyklusTjeneste {
         OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgaveEntitet.getOppgaveType());
         List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgaveEntitet);
         String varselTekst = ((OppgaveAvsnitt) tekster.getFirst()).innhold();
+        OppgaveTekster.validerVarselTekstLengde(varselTekst, oppgaveEntitet.getOppgaveType());
 
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(PubliserMinSideVarselTask.class);
         prosessTaskData.setProperty(PubliserMinSideVarselTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
