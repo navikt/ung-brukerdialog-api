@@ -145,7 +145,7 @@ class OppgaveInnholdUtlederRenderingTest {
     void svarfrist_utelates_når_fristTid_mangler_søk_ytelse() {
         var utleder = new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
             new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL);
-        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
 
@@ -313,19 +313,13 @@ class OppgaveInnholdUtlederRenderingTest {
                 oppgave(OppgaveType.RAPPORTER_INNTEKT, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "Gi oss beskjed hvis du hadde inntekt i mai")),
 
-            // --- sok-ytelse: ungdomsytelse/aktivitetspenger ---
+            // --- sok-ytelse (gjelder kun ungdomsytelse - se SøkYtelseOppgaveInnholdUtleder) ---
             Arguments.of(scenario("søk ytelse - ungdomsytelse, svarfrist",
                 new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
                     new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
                 oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 1, 10, 0, 0)),
                 "Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen.", "1. januar 2025",
                 "Fristen for å søke er senest 10. januar 2025.")),
-
-            Arguments.of(scenario("søk ytelse - aktivitetspenger, ingen svarfrist",
-                new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
-                    new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL),
-                oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.AKTIVITETSPENGER, null),
-                "Du har søkt om aktivitetspenger.", "1. februar 2025")),
 
             // --- bekreft-opphor-ved-maksdato ---
             Arguments.of(scenario("opphør ved maksdato - ungdomsytelse, svarfrist",

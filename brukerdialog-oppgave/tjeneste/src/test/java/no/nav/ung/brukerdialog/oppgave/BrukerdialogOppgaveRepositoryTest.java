@@ -261,7 +261,7 @@ class BrukerdialogOppgaveRepositoryTest {
     void skal_filtrere_oppgaver_på_ytelsetype() {
         // Arrange
         opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
-        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
+        opprettOppgave(aktørId, OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, lagKontrollerInntektOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
         opprettOppgave(aktørId, OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, lagKontrollerInntektOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
 
         entityManager.flush();
@@ -282,7 +282,7 @@ class BrukerdialogOppgaveRepositoryTest {
     void skal_hente_alle_oppgaver_uavhengig_av_ytelsetype_når_ytelsetype_er_null() {
         // Arrange
         opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.UNGDOMSYTELSE);
-        opprettOppgave(aktørId, OppgaveType.SØK_YTELSE, lagSøkYtelseOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
+        opprettOppgave(aktørId, OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, lagKontrollerInntektOppgaveData(), OppgaveYtelsetype.AKTIVITETSPENGER);
 
         entityManager.flush();
         entityManager.clear();

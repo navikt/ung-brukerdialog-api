@@ -575,13 +575,16 @@ class OppgaveInnholdUtlederInnholdTest {
     // ---------------------------------------------------------------------------------------
 
     @Test
-    void søkYtelse_aktivitetspenger_gir_riktig_infotekst() {
+    void søkYtelse_aktivitetspenger_kaster_illegalstateexception() {
         var utleder = new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
             new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 3, 1))), UNGDOMSPROGRAM_BASE_URL);
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
-        assertThat(utleder.undertittel(oppgave)).isEqualTo("Søknad");
-        assertThat(avsnitt(utleder.tekster(oppgave), 0).innhold()).isEqualTo("Du har søkt om aktivitetspenger.");
+        assertThatIllegalStateException()
+            .isThrownBy(() -> utleder.tekster(oppgave))
+            .withMessageContaining("SØK_YTELSE")
+            .withMessageContaining("UNGDOMSYTELSE")
+            .withMessageContaining("AKTIVITETSPENGER");
     }
 
     @Test

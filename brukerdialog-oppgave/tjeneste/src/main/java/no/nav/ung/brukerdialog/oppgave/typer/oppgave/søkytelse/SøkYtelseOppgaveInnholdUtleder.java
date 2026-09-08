@@ -68,10 +68,11 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
     }
 
     private static String infotekst(OppgaveYtelsetype ytelsetype) {
-        return switch (ytelsetype) {
-            case UNGDOMSYTELSE -> "Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen.";
-            case AKTIVITETSPENGER -> "Du har søkt om aktivitetspenger.";
-        };
+        if (ytelsetype != OppgaveYtelsetype.UNGDOMSYTELSE) {
+            throw new IllegalStateException(
+                "SØK_YTELSE støtter kun UNGDOMSYTELSE, fikk ytelsetype=%s".formatted(ytelsetype));
+        }
+        return "Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen.";
     }
 
     private SøkYtelseOppgavetypeDataDto hentDto(BrukerdialogOppgaveEntitet oppgave) {
