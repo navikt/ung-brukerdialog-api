@@ -32,14 +32,14 @@ public class SøknadHendelseRepository {
         entityManager.flush();
     }
 
-    public void markerMottattIFagsak(AktørId aktørId, FagsakYtelseType ytelseType, FagsakEntitet fagsak, Set<UUID> søknadIder) {
-        if (søknadIder.isEmpty()) {
+    public void markerMottattIFagsak(AktørId aktørId, FagsakYtelseType ytelseType, FagsakEntitet fagsak, Set<UUID> mottattSøknadIder) {
+        if (mottattSøknadIder.isEmpty()) {
             return;
         }
 
         hentAktiveSøknaderForAktørOgYtelse(aktørId, ytelseType).stream()
             .filter(søknad -> søknad.getMottattIFagsak() == null)
-            .filter(søknad -> søknadIder.contains(søknad.getSøknadId()))
+            .filter(søknad -> mottattSøknadIder.contains(søknad.getSøknadId()))
             .forEach(søknad -> {
                 søknad.markerMottattIFagsak(fagsak);
                 log.info("Markert søknad med id {} mottatt {} som mottatt av fagsak {}",
