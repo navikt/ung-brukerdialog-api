@@ -33,7 +33,9 @@ public sealed interface OppgaveTekst permits OppgaveAvsnitt, OppgaveListe, Oppga
      * overskrift (det vanlige tilfellet - de fleste avsnitt i et oppgavebrev har ingen egen
      * tittel).
      */
-    String tittel();
+    default String tittel() {
+        return null;
+    }
 
     boolean fet();
 }
