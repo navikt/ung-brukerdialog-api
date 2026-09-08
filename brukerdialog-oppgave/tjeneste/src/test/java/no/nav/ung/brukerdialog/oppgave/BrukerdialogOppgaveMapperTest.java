@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
  * Verifiserer at {@link BrukerdialogOppgaveMapper#tilDto} kobler riktig {@code tekster()}-liste
  * inn på DTO-en (samme liste som {@link OppgaveInnholdUtleder} produserer for PDF/varsel - se
  * {@link OppgaveInnholdUtleder} sin klassejavadoc), og - viktigst - at try/catch-degraderingen
- * fra Fase 3-reviewet faktisk virker: én oppgave med f.eks. korrupt tilstand som får SPI-et til å
+ * faktisk virker: én oppgave med f.eks. korrupt tilstand som får SPI-et til å
  * kaste, skal degradere til tom tekstliste, ikke velte hele {@code GET /oppgave/hent/alle}.
  */
 class BrukerdialogOppgaveMapperTest {
