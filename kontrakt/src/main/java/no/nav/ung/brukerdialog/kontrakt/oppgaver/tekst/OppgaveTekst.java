@@ -14,8 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * elementet i listen alltid er en {@link OppgaveAvsnitt} (ren tekst, uten overskrift), siden dette
  * elementet også brukes som selve varselteksten på Min Side.
  * <p>
- * {@code fet} gjelder hele blokken (ikke enkeltord/delsetninger inni et avsnitt) - se
- * Fase 1-beslutning i plansporet for denne modellen.
+ * {@code fet} gjelder hele blokken (ikke enkeltord/delsetninger inni et avsnitt)
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
