@@ -4,6 +4,7 @@ import no.nav.k9.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.DiagnostikkBrukerdialogOppgaverRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.MigrerBrukerdialogOppgaverRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.OppgavebehandlingRestTjeneste;
+import no.nav.ung.brukerdialog.web.app.tjenester.sak.DiagnostikkSakRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.vedtak.AktivitetspengerFagsakRestTjeneste;
 
 import java.util.HashSet;
@@ -17,7 +18,8 @@ public class InternRestClasses implements RestClasses {
             MigrerBrukerdialogOppgaverRestTjeneste.class,
             DiagnostikkBrukerdialogOppgaverRestTjeneste.class,
             OppgavebehandlingRestTjeneste.class,
-            AktivitetspengerFagsakRestTjeneste.class));
+            AktivitetspengerFagsakRestTjeneste.class,
+            DiagnostikkSakRestTjeneste.class));
         return Set.copyOf(classes);
     }
 }
