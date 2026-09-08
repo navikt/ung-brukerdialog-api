@@ -133,8 +133,10 @@ public class OppgaveLivssyklusTjeneste {
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgaveEntitet.getOppgaveType());
         List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgaveEntitet);
-        String varselTekst = ((OppgaveAvsnitt) tekster.getFirst()).innhold();
-        OppgaveTekster.validerVarselTekstLengde(varselTekst, oppgaveEntitet.getOppgaveType());
+        if (tekster.isEmpty() || !(tekster.getFirst() instanceof OppgaveAvsnitt avsnitt)) {
+            throw new IllegalStateException("Første tekstblokk må være OppgaveAvsnitt (oppgaveType=%s)".formatted(oppgaveEntitet.getOppgaveType()));
+        }
+        String varselTekst = avsnitt.innhold();
 
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(PubliserMinSideVarselTask.class);
         prosessTaskData.setProperty(PubliserMinSideVarselTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());
