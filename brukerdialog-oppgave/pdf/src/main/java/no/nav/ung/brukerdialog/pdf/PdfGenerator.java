@@ -18,7 +18,7 @@ import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveListe;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
@@ -186,7 +186,7 @@ public class PdfGenerator {
         handlebars.registerHelper("isAvsnitt", (Helper<OppgaveTekst>) (tekst, options) ->
             tekst instanceof OppgaveAvsnitt ? options.fn() : options.inverse());
         handlebars.registerHelper("isListe", (Helper<OppgaveTekst>) (tekst, options) ->
-            tekst instanceof OppgaveListe ? options.fn() : options.inverse());
+            tekst instanceof OppgavePunktliste ? options.fn() : options.inverse());
         handlebars.registerHelper("isTabell", (Helper<OppgaveTekst>) (tekst, options) ->
             tekst instanceof OppgaveTabell ? options.fn() : options.inverse());
     }

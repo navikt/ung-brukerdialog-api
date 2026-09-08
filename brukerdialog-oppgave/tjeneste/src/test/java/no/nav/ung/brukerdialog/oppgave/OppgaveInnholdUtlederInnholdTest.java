@@ -6,7 +6,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveListe;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
@@ -220,7 +220,7 @@ class OppgaveInnholdUtlederInnholdTest {
                 List.of(
                     new OppgaveAvsnitt("Gi oss beskjed hvis du hadde inntekt i januar. Inntekt er lønn, men det kan også være for eksempel etterbetaling, feriepenger, overtid og tillegg for ubekvem arbeidstid."),
                     new OppgaveAvsnitt("Inntekt er som regel lønnen du får fra en arbeidsgiver, men det kan være mange andre ting også. De vanligste formene for inntekt utenom lønn, er:"),
-                    new OppgaveListe(List.of(
+                    new OppgavePunktliste(List.of(
                         "etterbetaling", "feriepenger", "overtid",
                         "tillegg for kveld, natt, helg og helligdag (ubekvem arbeidstid)",
                         "tips", "frilansinntekt", "inntekt fra aksjeselskap (AS)")),

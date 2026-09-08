@@ -41,14 +41,14 @@ class OppgaveTekstTest {
 
     @Test
     void liste_rundtrip_bevarer_punkter() throws Exception {
-        OppgaveTekst original = new OppgaveListe("Overskrift", List.of("Punkt 1", "Punkt 2"), false);
+        OppgaveTekst original = new OppgavePunktliste("Overskrift", List.of("Punkt 1", "Punkt 2"), false);
 
         String json = JsonObjectMapper.getJson(original);
         OppgaveTekst deserialisert = JsonObjectMapper.fromJson(json, OppgaveTekst.class);
 
         assertThat(json).contains("\"type\" : \"LISTE\"");
         assertThat(deserialisert).isEqualTo(original);
-        assertThat(((OppgaveListe) deserialisert).punkter()).containsExactly("Punkt 1", "Punkt 2");
+        assertThat(((OppgavePunktliste) deserialisert).punkter()).containsExactly("Punkt 1", "Punkt 2");
     }
 
     @Test
@@ -78,7 +78,7 @@ class OppgaveTekstTest {
     void heterogen_liste_av_tekstblokker_rundtripper_i_riktig_rekkefølge() throws Exception {
         List<OppgaveTekst> original = List.of(
             new OppgaveAvsnitt("Første avsnitt - dette er varselteksten"),
-            new OppgaveListe(List.of("Første punkt", "Andre punkt")),
+            new OppgavePunktliste(List.of("Første punkt", "Andre punkt")),
             new OppgaveTabell(List.of("Kolonne"), List.of(List.of("Verdi"))),
             new OppgaveAvsnitt("Fristen for å svare er senest 1. januar 2025.", true)
         );

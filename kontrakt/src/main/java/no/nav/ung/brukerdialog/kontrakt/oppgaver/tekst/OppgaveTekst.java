@@ -23,10 +23,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = OppgaveAvsnitt.class, name = "AVSNITT"),
-    @JsonSubTypes.Type(value = OppgaveListe.class, name = "LISTE"),
+    @JsonSubTypes.Type(value = OppgavePunktliste.class, name = "LISTE"),
     @JsonSubTypes.Type(value = OppgaveTabell.class, name = "TABELL")
 })
-public sealed interface OppgaveTekst permits OppgaveAvsnitt, OppgaveListe, OppgaveTabell {
+public sealed interface OppgaveTekst permits OppgaveAvsnitt, OppgavePunktliste, OppgaveTabell {
 
     /**
      * Valgfri overskrift for denne blokken alene. {@code null} når blokken ikke skal ha egen

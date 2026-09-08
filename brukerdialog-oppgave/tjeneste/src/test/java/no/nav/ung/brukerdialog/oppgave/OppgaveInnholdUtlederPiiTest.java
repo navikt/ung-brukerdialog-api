@@ -5,7 +5,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveListe;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
@@ -114,7 +114,7 @@ class OppgaveInnholdUtlederPiiTest {
     private static List<String> leaves(OppgaveTekst tekst) {
         return switch (tekst) {
             case OppgaveAvsnitt avsnitt -> ikkeNull(avsnitt.tittel(), avsnitt.innhold());
-            case OppgaveListe liste -> {
+            case OppgavePunktliste liste -> {
                 List<String> punkter = new ArrayList<>(ikkeNull(liste.tittel()));
                 punkter.addAll(liste.punkter());
                 yield punkter;

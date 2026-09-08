@@ -7,7 +7,7 @@ import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveListe;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.InntektsrapporteringOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -68,7 +68,7 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
                 .formatted(måned, ytelseNavn)));
         }
         tekster.add(new OppgaveAvsnitt("Inntekt er som regel lønnen du får fra en arbeidsgiver, men det kan være mange andre ting også. De vanligste formene for inntekt utenom lønn, er:"));
-        tekster.add(new OppgaveListe(List.of(
+        tekster.add(new OppgavePunktliste(List.of(
             "etterbetaling",
             "feriepenger",
             "overtid",
