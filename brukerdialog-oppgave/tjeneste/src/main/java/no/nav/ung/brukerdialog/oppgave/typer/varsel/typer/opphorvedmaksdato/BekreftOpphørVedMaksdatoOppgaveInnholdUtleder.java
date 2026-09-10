@@ -59,10 +59,9 @@ public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveIn
 
     private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         BekreftOpphorVedMaksdatoOppgavetypeDataDto dto = hentDto(oppgave);
-        String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
 
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("ytelseNavn", ytelseNavn);
+        data.put("ytelsetype", oppgave.getYtelsetype().name());
         data.put("sluttdato", dto.sluttdato().toString());
         data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
 

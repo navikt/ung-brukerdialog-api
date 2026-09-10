@@ -1,4 +1,4 @@
-{{#avsnitt data=true}}Din siste dag med {{ytelseNavn}} er {{#fet}}{{datoLang sluttdato}}{{/fet}}. Det er fordi du har brukt opp dagene du kan motta {{ytelseNavn}}.{{/avsnitt}}
+{{#avsnitt data=true}}Din siste dag med {{> partial/ytelse_navn}} er {{#fet}}{{datoLang sluttdato}}{{/fet}}. Det er fordi du har brukt opp dagene du kan motta {{> partial/ytelse_navn}}.{{/avsnitt}}
 {{#avsnitt}}Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no.{{/avsnitt}}
 {{> partial/om_varsel}}
 {{#if fristDato}}

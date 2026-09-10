@@ -37,20 +37,6 @@ public final class OppgaveTekster {
         return fristTid != null ? fristTid.toLocalDate().toString() : null;
     }
 
-    public static String ytelsePreposisjonsfrase(OppgaveYtelsetype ytelsetype) {
-        return switch (ytelsetype) {
-            case UNGDOMSYTELSE -> "i ungdomsprogrammet";
-            case AKTIVITETSPENGER -> "for aktivitetspenger";
-        };
-    }
-
-    public static String ytelseNavn(OppgaveYtelsetype ytelsetype) {
-        return switch (ytelsetype) {
-            case UNGDOMSYTELSE -> "ungdomsprogramytelsen";
-            case AKTIVITETSPENGER -> "aktivitetspenger";
-        };
-    }
-
     public static boolean erMeldtUt(LocalDate forrigeSluttdato) {
         return forrigeSluttdato == null;
     }
@@ -63,7 +49,7 @@ public final class OppgaveTekster {
                                                              LocalDate nyStartdato,
                                                              OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("ytelsePreposisjonsfrase", ytelsePreposisjonsfrase(ytelsetype));
+        data.put("ytelsetype", ytelsetype.name());
         data.put("nyStartdato", nyStartdato.toString());
         data.put("fristDato", fristDato(fristTid));
         return renderer.rendre("tekstfragmenter/periode/endret_startdato", data);
@@ -78,7 +64,7 @@ public final class OppgaveTekster {
                                                              OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("erMeldtUt", erMeldtUt(forrigeSluttdato));
-        data.put("ytelsePreposisjonsfrase", ytelsePreposisjonsfrase(ytelsetype));
+        data.put("ytelsetype", ytelsetype.name());
         data.put("nySluttdato", nySluttdato.toString());
         data.put("fristDato", fristDato(fristTid));
         return renderer.rendre("tekstfragmenter/periode/endret_sluttdato", data);
@@ -104,8 +90,7 @@ public final class OppgaveTekster {
                                                                     LocalDate nyFom, LocalDate nyTom,
                                                                     OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("ytelsePreposisjonsfrase", ytelsePreposisjonsfrase(ytelsetype));
-        data.put("ytelseNavn", ytelseNavn(ytelsetype));
+        data.put("ytelsetype", ytelsetype.name());
         data.put("nyFom", nyFom.toString());
         data.put("nyTom", nyTom.toString());
         data.put("fristDato", fristDato(fristTid));
@@ -120,7 +105,7 @@ public final class OppgaveTekster {
                                                                   LocalDate nyFom, LocalDate nyTom,
                                                                   OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("ytelsePreposisjonsfrase", ytelsePreposisjonsfrase(ytelsetype));
+        data.put("ytelsetype", ytelsetype.name());
         data.put("nyFom", nyFom != null ? nyFom.toString() : null);
         data.put("nyTom", nyTom != null ? nyTom.toString() : null);
         data.put("fristDato", fristDato(fristTid));

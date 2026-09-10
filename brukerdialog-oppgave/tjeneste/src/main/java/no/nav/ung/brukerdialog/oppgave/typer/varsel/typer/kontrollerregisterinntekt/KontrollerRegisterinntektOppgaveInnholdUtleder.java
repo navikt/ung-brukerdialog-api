@@ -81,7 +81,6 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
         boolean harInntekt = harArbeidsgiverInntekt || harYtelseInntekt;
         boolean harKunYtelseInntekt = harYtelseInntekt && !harArbeidsgiverInntekt;
         String rapporteringsmåned = NorskDatoFormat.måned(dto.fraOgMed());
-        String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
 
         String kildeHeader = harYtelseInntekt && harArbeidsgiverInntekt ? "Arbeidsgiver/Nav-ytelse"
             : harYtelseInntekt ? "Nav-ytelse" : "Arbeidsgiver";
@@ -101,7 +100,7 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
         data.put("harKunYtelseInntekt", harKunYtelseInntekt);
         data.put("gjelderDelerAvMåned", dto.gjelderDelerAvMåned());
         data.put("rapporteringsmåned", rapporteringsmåned);
-        data.put("ytelseNavn", ytelseNavn);
+        data.put("ytelsetype", oppgave.getYtelsetype().name());
         data.put("kildeHeader", kildeHeader);
         data.put("rader", rader);
         data.put("totalBeløp", NorskBeløpFormat.kroner(registerinntekt.totalInntekt()));

@@ -4,7 +4,7 @@
 {{#each rader}}{{rad kilde beløp}}{{/each}}
 {{rad "Totalt" totalBeløp}}
 {{/tabell}}
-{{#avsnitt}}{{#if gjelderDelerAvMåned}}Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde {{ytelseNavn}} hele måneden.{{else}}{{#if harKunYtelseInntekt}}Vi bruker denne inntekten til å vurdere hvor mye du får utbetalt.{{else}}Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.{{/if}}{{/if}}{{/avsnitt}}
+{{#avsnitt}}{{#if gjelderDelerAvMåned}}Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde {{> partial/ytelse_navn}} hele måneden.{{else}}{{#if harKunYtelseInntekt}}Vi bruker denne inntekten til å vurdere hvor mye du får utbetalt.{{else}}Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.{{/if}}{{/if}}{{/avsnitt}}
 {{else}}
 {{#avsnitt data=true}}Du har gitt oss beskjed om at du hadde inntekt i {{rapporteringsmåned}}, men vi har ikke fått inn opplysninger fra arbeidsgiver om at du hadde inntekt i {{rapporteringsmåned}}.{{/avsnitt}}
 {{#avsnitt}}Vi bruker opplysningene fra arbeidsgiver når vi vurderer hvor mye du får utbetalt. Når vi ikke har mottatt noe fra arbeidsgiver, vil vi basere oss på at du ikke hadde inntekt i {{rapporteringsmåned}}.{{/avsnitt}}

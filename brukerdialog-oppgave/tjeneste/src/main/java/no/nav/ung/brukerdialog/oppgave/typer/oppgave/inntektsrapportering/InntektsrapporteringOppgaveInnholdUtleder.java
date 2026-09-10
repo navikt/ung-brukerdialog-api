@@ -67,7 +67,7 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("månedNavn", NorskDatoFormat.måned(dto.fraOgMed()));
-        data.put("ytelseNavn", OppgaveTekster.ytelseNavn(oppgave.getYtelsetype()));
+        data.put("ytelsetype", oppgave.getYtelsetype().name());
         data.put("gjelderDelerAvMåned", dto.gjelderDelerAvMåned());
         data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
 
