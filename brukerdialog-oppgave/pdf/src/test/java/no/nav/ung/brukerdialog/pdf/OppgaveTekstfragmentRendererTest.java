@@ -23,9 +23,9 @@ class OppgaveTekstfragmentRendererTest {
 
     private static final OppgaveAvsnitt OM_VARSEL_1 = new OppgaveAvsnitt(
         "Om «Varsel om nye opplysninger»",
-        "Dette varselet sendes ut slik at brukeren har mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.");
+        "Dette varselet sendes ut slik at du får mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.");
     private static final OppgaveAvsnitt OM_VARSEL_2 = new OppgaveAvsnitt(
-        "Hvis vi ikke hører noe fra brukeren, bruker Nav opplysningene over når vedtaket fattes.");
+        "Hvis vi ikke hører noe fra deg, bruker Nav opplysningene over når vedtaket fattes.");
 
     private final OppgaveTekstfragmentRenderer renderer = new OppgaveTekstfragmentRenderer();
 
