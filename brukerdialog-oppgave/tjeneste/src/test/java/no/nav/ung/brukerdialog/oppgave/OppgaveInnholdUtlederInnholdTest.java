@@ -161,8 +161,6 @@ class OppgaveInnholdUtlederInnholdTest {
     private static final String STANDARD_SVAR_SETNING_3 =
         "Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt.";
 
-    // «Om varsel»-halen er nå inkludert direkte av malene selv (partial/om_varsel.hbs) - alle
-    // typer unntatt SØK_YTELSE/RAPPORTER_INNTEKT inkluderer den, se scenarioFor under.
     private static final OppgaveAvsnitt OM_VARSEL_1 = new OppgaveAvsnitt("Om «Varsel om nye opplysninger»",
         "Dette varselet sendes ut slik at du får mulighet til å komme med en tilbakemelding på opplysningene før Nav fatter vedtak. Tilbakemeldingen sendes inn via Min side på nav.no.");
     private static final OppgaveAvsnitt OM_VARSEL_2 =
