@@ -55,9 +55,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Regresjonstest mot personopplysningslekkasje. {@link OppgaveInnholdUtleder} sin kontrakt sier
- * eksplisitt (se klassejavadoc der) at ingen implementasjon skal legge fødselsnummer eller navn
- * inn i teksten - kalleren (kun aktuelt for PDF-en) flettter dette inn selv, kun i brevhodet.
+ * Regresjonstest mot personopplysningslekkasje.
  * <p>
  * Denne testen kjører alle 8 produksjonsimplementasjonene mot en datarik variant av sin DTO
  * (fritekst-forklaringer, arbeidsgivernavn, org.nr, beløp o.l. - de personopplysningene som
