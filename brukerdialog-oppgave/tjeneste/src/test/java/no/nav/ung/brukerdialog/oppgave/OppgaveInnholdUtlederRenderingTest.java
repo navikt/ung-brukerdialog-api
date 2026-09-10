@@ -31,6 +31,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.Endret
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -133,7 +134,8 @@ class OppgaveInnholdUtlederRenderingTest {
     void svarfrist_utelates_når_fristTid_mangler_bosted_opphør() {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(
             new BekreftBostedOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1), false, null,
-                BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL);
+                BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL,
+            new OppgaveTekstfragmentRenderer());
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
@@ -144,7 +146,7 @@ class OppgaveInnholdUtlederRenderingTest {
     @Test
     void svarfrist_utelates_når_fristTid_mangler_søk_ytelse() {
         var utleder = new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
-            new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL);
+            new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer());
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
@@ -175,42 +177,44 @@ class OppgaveInnholdUtlederRenderingTest {
             Arguments.of(scenario("bosted - bundet periode, ANNET-årsak, svarfrist",
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,
-                    "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL),
+                    "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL,
+                    new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 2, 1, 0, 0)),
                 "1. januar 2025", "31. januar 2025", "Bor midlertidig i utlandet", "en veileder hos Nav",
-                "Fristen for å svare er senest 1. februar 2025.")),
+                "Fristen for å svare er senest <b>1. februar 2025</b>.")),
 
             Arguments.of(scenario("bosted - opphør, UDEFINERT-årsak, ingen svarfrist",
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
-                    LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL),
+                    LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL,
+                    new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "1. mars 2025", "Folkeregisteret")),
 
             // --- endret-startdato ---
             Arguments.of(scenario("endret startdato - ungdomsytelse, svarfrist",
                 new EndretStartdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 1, 20, 0, 0)),
                 "endret startdatoen din i ungdomsprogrammet til", "1. februar 2025",
-                "Fristen for å svare er senest 20. januar 2025.")),
+                "Fristen for å svare er senest <b>20. januar 2025</b>.")),
 
             Arguments.of(scenario("endret startdato - aktivitetspenger, ingen svarfrist",
                 new EndretStartdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretStartdatoDataDto(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretStartdatoDataDto(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 2, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "endret startdatoen din for aktivitetspenger til", "1. mars 2025")),
 
             // --- endret-sluttdato: meldt-ut/endret ---
             Arguments.of(scenario("endret sluttdato - meldt ut, svarfrist",
                 new EndretSluttdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), null)), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), null)), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_SLUTTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 6, 1, 0, 0)),
                 "meldt deg ut i ungdomsprogrammet med sluttdato", "30. juni 2025",
-                "Fristen for å svare er senest 1. juni 2025.")),
+                "Fristen for å svare er senest <b>1. juni 2025</b>.")),
 
             Arguments.of(scenario("endret sluttdato - endret (ikke meldt ut), ingen svarfrist",
                 new EndretSluttdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 5, 31))), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 5, 31))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_SLUTTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "endret sluttdatoen din i ungdomsprogrammet til", "30. juni 2025")),
 
@@ -219,16 +223,16 @@ class OppgaveInnholdUtlederRenderingTest {
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 12, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
-                    Set.of(PeriodeEndringType.ENDRET_STARTDATO))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.ENDRET_STARTDATO))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 1, 15, 0, 0)),
                 "endret startdatoen din i ungdomsprogrammet til", "1. februar 2025",
-                "Fristen for å svare er senest 15. januar 2025.")),
+                "Fristen for å svare er senest <b>15. januar 2025</b>.")),
 
             Arguments.of(scenario("endret periode - gren SLUTTDATO (ikke meldt ut), ingen svarfrist",
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 5, 31)),
-                    Set.of(PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "endret sluttdatoen din i ungdomsprogrammet til", "30. juni 2025")),
 
@@ -236,16 +240,16 @@ class OppgaveInnholdUtlederRenderingTest {
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     null,
-                    Set.of(PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 5, 1, 0, 0)),
                 "meldt deg ut i ungdomsprogrammet med sluttdato", "30. juni 2025",
-                "Fristen for å svare er senest 1. mai 2025.")),
+                "Fristen for å svare er senest <b>1. mai 2025</b>.")),
 
             Arguments.of(scenario("endret periode - gren FJERNET, ingen svarfrist",
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)),
-                    Set.of(PeriodeEndringType.FJERNET_PERIODE))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.FJERNET_PERIODE))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Veilederen din har meldt deg ut av ungdomsprogrammet fordi du ikke skal delta i programmet likevel.",
                 "Du kan bare få ungdomsprogramytelsen hvis du deltar i programmet, og derfor stopper vi den.")),
@@ -254,16 +258,16 @@ class OppgaveInnholdUtlederRenderingTest {
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 8, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
-                    Set.of(PeriodeEndringType.ENDRET_STARTDATO, PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.ENDRET_STARTDATO, PeriodeEndringType.ENDRET_SLUTTDATO))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 2, 15, 0, 0)),
                 "ungdomsprogramytelsen i perioden", "1. mars 2025", "31. august 2025",
-                "Fristen for å svare er senest 15. februar 2025.")),
+                "Fristen for å svare er senest <b>15. februar 2025</b>.")),
 
             Arguments.of(scenario("endret periode - fallback (ANDRE_ENDRINGER), ingen svarfrist",
                 new EndretPeriodeOppgaveInnholdUtleder(mappereSomGir(new EndretPeriodeDataDto(
                     new PeriodeDTO(LocalDate.of(2025, 4, 1), LocalDate.of(2025, 4, 30)),
                     null,
-                    Set.of(PeriodeEndringType.ANDRE_ENDRINGER))), UNGDOMSPROGRAM_BASE_URL),
+                    Set.of(PeriodeEndringType.ANDRE_ENDRINGER))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Det er gjort en endring i perioden din i ungdomsprogrammet", "1. april 2025", "30. april 2025")),
 
@@ -271,7 +275,7 @@ class OppgaveInnholdUtlederRenderingTest {
             Arguments.of(scenario("avvik registerinntekt - ingen inntekt mottatt",
                 new KontrollerRegisterinntektOppgaveInnholdUtleder(mappereSomGir(
                     new KontrollerRegisterinntektOppgavetypeDataDto(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31),
-                        new RegisterinntektDTO(List.of(), List.of()), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                        new RegisterinntektDTO(List.of(), List.of()), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Du har gitt oss beskjed om at du hadde inntekt i januar, men vi har ikke fått inn opplysninger fra arbeidsgiver")),
 
@@ -279,10 +283,10 @@ class OppgaveInnholdUtlederRenderingTest {
                 new KontrollerRegisterinntektOppgaveInnholdUtleder(mappereSomGir(
                     new KontrollerRegisterinntektOppgavetypeDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 28),
                         new RegisterinntektDTO(List.of(), List.of(
-                            new YtelseRegisterInntektDTO(5000, YtelseType.DAGPENGER))), true)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                            new YtelseRegisterInntektDTO(5000, YtelseType.DAGPENGER))), true)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 3, 10, 0, 0)),
                 "Vi har fått disse opplysningene om ytelse fra Nav for februar", "Dagpenger", "5 000 kr",
-                "ikke hadde ungdomsprogramytelsen hele måneden", "Fristen for å svare er senest 10. mars 2025.",
+                "ikke hadde ungdomsprogramytelsen hele måneden", "Fristen for å svare er senest <b>10. mars 2025</b>.",
                 "bruker vi inntekten vi har fått oppgitt")),
 
             Arguments.of(scenario("avvik registerinntekt - arbeid og ytelse kombinert, hel måned, ingen svarfrist",
@@ -290,7 +294,7 @@ class OppgaveInnholdUtlederRenderingTest {
                     new KontrollerRegisterinntektOppgavetypeDataDto(LocalDate.of(2025, 4, 1), LocalDate.of(2025, 4, 30),
                         new RegisterinntektDTO(
                             List.of(new ArbeidOgFrilansRegisterInntektDTO(20000, "999999999", "Bedriften AS")),
-                            List.of(new YtelseRegisterInntektDTO(5000, YtelseType.AAP))), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                            List.of(new YtelseRegisterInntektDTO(5000, YtelseType.AAP))), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Vi har fått disse opplysningene fra arbeidsgiver om inntekten din for april", "Bedriften AS",
                 "20 000 kr", "Arbeidsavklaringspenger", "25 000 kr",
@@ -300,38 +304,38 @@ class OppgaveInnholdUtlederRenderingTest {
             Arguments.of(scenario("rapporter inntekt - deler av måned, svarfrist",
                 new InntektsrapporteringOppgaveInnholdUtleder(mappereSomGir(
                     new InntektsrapporteringOppgavetypeDataDto(LocalDate.of(2025, 4, 1), LocalDate.of(2025, 4, 30), true)),
-                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.RAPPORTER_INNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 5, 5, 0, 0)),
                 "Gi oss beskjed hvis du hadde inntekt i april",
                 "Du skal gi beskjed om hele inntekten du hadde i april, selv om du ikke hadde ungdomsprogramytelsen hele måneden.",
-                "Fristen for å svare er senest 5. mai 2025.")),
+                "Fristen for å svare er senest <b>5. mai 2025</b>.")),
 
             Arguments.of(scenario("rapporter inntekt - aktivitetspenger, hel måned, ingen svarfrist",
                 new InntektsrapporteringOppgaveInnholdUtleder(mappereSomGir(
                     new InntektsrapporteringOppgavetypeDataDto(LocalDate.of(2025, 5, 1), LocalDate.of(2025, 5, 31), false)),
-                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.RAPPORTER_INNTEKT, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "Gi oss beskjed hvis du hadde inntekt i mai")),
 
             // --- sok-ytelse (gjelder kun ungdomsytelse - se SøkYtelseOppgaveInnholdUtleder) ---
             Arguments.of(scenario("søk ytelse - ungdomsytelse, svarfrist",
                 new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
-                    new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
+                    new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 1, 10, 0, 0)),
                 "Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen.", "1. januar 2025",
-                "Fristen for å søke er senest 10. januar 2025.")),
+                "Fristen for å søke er senest <b>10. januar 2025</b>.")),
 
             // --- bekreft-opphor-ved-maksdato ---
             Arguments.of(scenario("opphør ved maksdato - ungdomsytelse, svarfrist",
                 new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))), UNGDOMSPROGRAM_BASE_URL),
+                    new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 7, 1, 0, 0)),
                 "Din siste dag med ungdomsprogramytelsen er", "30. juni 2025",
-                "Fristen for å svare er senest 1. juli 2025.")),
+                "Fristen for å svare er senest <b>1. juli 2025</b>.")),
 
             Arguments.of(scenario("opphør ved maksdato - aktivitetspenger, ingen svarfrist",
                 new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 8, 31), LocalDate.of(2025, 8, 31))), UNGDOMSPROGRAM_BASE_URL),
+                    new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 8, 31), LocalDate.of(2025, 8, 31))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "Din siste dag med aktivitetspenger er", "31. august 2025"))
         );

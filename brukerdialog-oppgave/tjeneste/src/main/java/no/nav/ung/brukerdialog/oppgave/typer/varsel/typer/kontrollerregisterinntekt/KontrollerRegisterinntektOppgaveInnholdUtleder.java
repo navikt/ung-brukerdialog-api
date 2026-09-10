@@ -6,8 +6,6 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.ArbeidOgFrilansRegisterInntektDTO;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgavetypeDataDto;
@@ -21,9 +19,12 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 import no.nav.ung.brukerdialog.pdf.NorskBeløpFormat;
 import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @OppgaveTypeRef(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT)
 @ApplicationScoped
@@ -32,6 +33,7 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
     private String aktivitetspengerInnsynBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     KontrollerRegisterinntektOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -41,11 +43,13 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
     public KontrollerRegisterinntektOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
         @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
-        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl
+        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
         this.aktivitetspengerInnsynBaseUrl = aktivitetspengerInnsynBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -55,7 +59,16 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
+    }
+
+    @Override
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
+
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         KontrollerRegisterinntektOppgavetypeDataDto dto = hentDto(oppgave);
         RegisterinntektDTO registerinntekt = dto.registerinntekt();
         List<ArbeidOgFrilansRegisterInntektDTO> arbeid = registerinntekt.arbeidOgFrilansInntekter() != null
@@ -70,47 +83,44 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
         String rapporteringsmåned = NorskDatoFormat.måned(dto.fraOgMed());
         String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
 
-        List<OppgaveTekst> tekster = new ArrayList<>();
-        if (harInntekt) {
-            tekster.add(new OppgaveAvsnitt(harKunYtelseInntekt
-                ? "Vi har fått disse opplysningene om ytelse fra Nav for %s:".formatted(rapporteringsmåned)
-                : "Vi har fått disse opplysningene fra arbeidsgiver om inntekten din for %s:".formatted(rapporteringsmåned)));
+        String kildeHeader = harYtelseInntekt && harArbeidsgiverInntekt ? "Arbeidsgiver/Nav-ytelse"
+            : harYtelseInntekt ? "Nav-ytelse" : "Arbeidsgiver";
 
-            String kildeHeader = harYtelseInntekt && harArbeidsgiverInntekt ? "Arbeidsgiver/Nav-ytelse"
-                : harYtelseInntekt ? "Nav-ytelse" : "Arbeidsgiver";
-            List<List<String>> rader = new ArrayList<>();
-            for (ArbeidOgFrilansRegisterInntektDTO i : arbeid) {
-                String kilde = (i.arbeidsgiverNavn() != null && !i.arbeidsgiverNavn().isBlank())
-                    ? i.arbeidsgiverNavn() : i.arbeidsgiverIdentifikator();
-                rader.add(List.of(kilde, NorskBeløpFormat.kroner(i.inntekt())));
-            }
-            for (YtelseRegisterInntektDTO i : ytelse) {
-                rader.add(List.of(ytelseTypeNavn(i.ytelsetype()), NorskBeløpFormat.kroner(i.inntekt())));
-            }
-            rader.add(List.of("Totalt", NorskBeløpFormat.kroner(registerinntekt.totalInntekt())));
-            tekster.add(new OppgaveTabell(List.of(kildeHeader, "Inntekt før skatt"), rader));
-
-            if (dto.gjelderDelerAvMåned()) {
-                tekster.add(new OppgaveAvsnitt("Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde %s hele måneden."
-                    .formatted(ytelseNavn)));
-            } else if (harKunYtelseInntekt) {
-                tekster.add(new OppgaveAvsnitt("Vi bruker denne inntekten til å vurdere hvor mye du får utbetalt."));
-            } else {
-                tekster.add(new OppgaveAvsnitt("Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt."));
-            }
-        } else {
-            tekster.add(new OppgaveAvsnitt("Du har gitt oss beskjed om at du hadde inntekt i %s, men vi har ikke fått inn opplysninger fra arbeidsgiver om at du hadde inntekt i %s."
-                .formatted(rapporteringsmåned, rapporteringsmåned)));
-            tekster.add(new OppgaveAvsnitt("Vi bruker opplysningene fra arbeidsgiver når vi vurderer hvor mye du får utbetalt. Når vi ikke har mottatt noe fra arbeidsgiver, vil vi basere oss på at du ikke hadde inntekt i %s."
-                .formatted(rapporteringsmåned)));
+        List<Map<String, Object>> rader = new ArrayList<>();
+        for (ArbeidOgFrilansRegisterInntektDTO i : arbeid) {
+            String kilde = (i.arbeidsgiverNavn() != null && !i.arbeidsgiverNavn().isBlank())
+                ? i.arbeidsgiverNavn() : i.arbeidsgiverIdentifikator();
+            rader.add(Map.of("kilde", kilde, "beløp", NorskBeløpFormat.kroner(i.inntekt())));
+        }
+        for (YtelseRegisterInntektDTO i : ytelse) {
+            rader.add(Map.of("kilde", ytelseTypeNavn(i.ytelsetype()), "beløp", NorskBeløpFormat.kroner(i.inntekt())));
         }
 
-        tekster.add(new OppgaveAvsnitt("Du svarer på Min side på nav.no."));
-        tekster.add(new OppgaveAvsnitt("Jo fortere du svarer, jo fortere får du pengene utbetalt."));
-        OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare", harKunYtelseInntekt
-            ? "Hvis vi ikke hører fra deg innen svarfristen, bruker vi inntekten vi har fått oppgitt."
-            : "Hvis vi ikke hører fra deg innen svarfristen, bruker vi inntekten som arbeidsgiver har oppgitt.");
-        return tekster;
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("harInntekt", harInntekt);
+        data.put("harKunYtelseInntekt", harKunYtelseInntekt);
+        data.put("gjelderDelerAvMåned", dto.gjelderDelerAvMåned());
+        data.put("rapporteringsmåned", rapporteringsmåned);
+        data.put("ytelseNavn", ytelseNavn);
+        data.put("kildeHeader", kildeHeader);
+        data.put("rader", rader);
+        data.put("totalBeløp", NorskBeløpFormat.kroner(registerinntekt.totalInntekt()));
+        data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
+
+        return renderer.rendre("tekstfragmenter/kontroller_registerinntekt/kontroller_registerinntekt", data);
+    }
+
+    private static String ytelseTypeNavn(YtelseType ytelsetype) {
+        return switch (ytelsetype) {
+            case DAGPENGER -> "Dagpenger";
+            case SYKEPENGER -> "Sykepenger";
+            case FORELDREPENGER -> "Foreldrepenger";
+            case PLEIEPENGER -> "Pleiepenger";
+            case OMSORGSPENGER -> "Omsorgspenger";
+            case OPPLÆRINGSPENGER -> "Opplæringspenger";
+            case AAP -> "Arbeidsavklaringspenger";
+            case ANNET -> "Annet";
+        };
     }
 
     @Override
@@ -125,18 +135,5 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
         return (KontrollerRegisterinntektOppgavetypeDataDto) OppgaveDataMapperFraEntitetTilDto
             .finnTjeneste(mappere, oppgave.getOppgaveType())
             .tilDto(oppgave.getOppgaveData());
-    }
-
-    private static String ytelseTypeNavn(YtelseType type) {
-        return switch (type) {
-            case DAGPENGER -> "Dagpenger";
-            case SYKEPENGER -> "Sykepenger";
-            case FORELDREPENGER -> "Foreldrepenger";
-            case PLEIEPENGER -> "Pleiepenger";
-            case OMSORGSPENGER -> "Omsorgspenger";
-            case OPPLÆRINGSPENGER -> "Opplæringspenger";
-            case AAP -> "Arbeidsavklaringspenger";
-            case ANNET -> "Annet";
-        };
     }
 }

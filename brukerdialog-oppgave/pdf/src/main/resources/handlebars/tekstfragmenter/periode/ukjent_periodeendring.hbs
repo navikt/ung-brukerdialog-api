@@ -1,0 +1,7 @@
+{{#avsnitt data=true}}Det er gjort en endring i perioden din {{ytelsePreposisjonsfrase}}{{#if nyFom}}, med virkning fra {{#fet}}{{datoLang nyFom}}{{/fet}}{{/if}}{{#if nyTom}} til {{#fet}}{{datoLang nyTom}}{{/fet}}{{/if}}.{{/avsnitt}}
+{{#avsnitt}}Du får denne meldingen slik at du kan komme med en tilbakemelding på endringen. Du svarer på Min side på nav.no.{{/avsnitt}}
+{{#avsnitt}}Har du en tilbakemelding? Ta kontakt med veilederen din først. Når dere har snakket sammen, sender du inn svaret ditt.{{/avsnitt}}
+{{> partial/om_varsel}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}

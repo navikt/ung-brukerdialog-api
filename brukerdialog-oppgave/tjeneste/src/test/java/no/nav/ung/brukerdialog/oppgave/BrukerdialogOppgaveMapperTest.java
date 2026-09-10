@@ -21,18 +21,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Verifiserer at {@link BrukerdialogOppgaveMapper#tilDto} kobler riktig {@code tekster()}-liste
- * inn på DTO-en (samme liste som {@link OppgaveInnholdUtleder} produserer for PDF/varsel - se
- * {@link OppgaveInnholdUtleder} sin klassejavadoc), og - viktigst - at try/catch-degraderingen
- * faktisk virker: én oppgave med f.eks. korrupt tilstand som får SPI-et til å
- * kaste, skal degradere til tom tekstliste, ikke velte hele {@code GET /oppgave/hent/alle}.
- */
 class BrukerdialogOppgaveMapperTest {
 
     @Test
     void tilDto_setter_tekster_fra_innholdUtleder() {
-        List<OppgaveTekst> tekster = List.of(new OppgaveAvsnitt("Du har søkt om noe", true));
+        List<OppgaveTekst> tekster = List.of(new OppgaveAvsnitt("Du har søkt om noe"));
         BrukerdialogOppgaveMapper mapper = mapper(
             mapperSomGir(new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))),
             innholdUtlederSomGir(tekster));
@@ -40,7 +33,7 @@ class BrukerdialogOppgaveMapperTest {
 
         var dto = mapper.tilDto(oppgave);
 
-        assertThat(dto.tekster()).isEqualTo(tekster);
+        assertThat(dto.varselInnhold()).isEqualTo(tekster);
         assertThat(dto.oppgaveReferanse()).isEqualTo(oppgave.getOppgavereferanse());
         assertThat(dto.oppgavetype()).isEqualTo(oppgave.getOppgaveType());
         assertThat(dto.ytelsetype()).isEqualTo(oppgave.getYtelsetype());
@@ -51,17 +44,17 @@ class BrukerdialogOppgaveMapperTest {
     @Test
     void tilDto_degraderer_til_tom_liste_når_innholdUtleder_kaster() {
         OppgaveInnholdUtleder utleder = mock(OppgaveInnholdUtleder.class);
-        when(utleder.tekster(any())).thenThrow(new IllegalStateException("simulert feil i tekstutledning"));
+        when(utleder.varselInnhold(any())).thenThrow(new IllegalStateException("simulert feil i tekstutledning"));
         BrukerdialogOppgaveMapper mapper = mapper(
             mapperSomGir(new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))),
             instansMed(utleder));
         BrukerdialogOppgaveEntitet oppgave = oppgave();
 
         // Skal ikke kaste selv om det underliggende SPI-et gjør det - se
-        // BrukerdialogOppgaveMapper#tekster sin javadoc.
+        // BrukerdialogOppgaveMapper#innhold sin try/catch-degradering.
         var dto = mapper.tilDto(oppgave);
 
-        assertThat(dto.tekster()).isEmpty();
+        assertThat(dto.varselInnhold()).isEmpty();
         // Resten av DTO-en skal fortsatt være korrekt utledet - kun tekster degraderes.
         assertThat(dto.oppgaveReferanse()).isEqualTo(oppgave.getOppgavereferanse());
         assertThat(dto.oppgavetypeData()).isNotNull();
@@ -85,7 +78,7 @@ class BrukerdialogOppgaveMapperTest {
 
     private static Instance<OppgaveInnholdUtleder> innholdUtlederSomGir(List<OppgaveTekst> tekster) {
         OppgaveInnholdUtleder utleder = mock(OppgaveInnholdUtleder.class);
-        when(utleder.tekster(any())).thenReturn(tekster);
+        when(utleder.varselInnhold(any())).thenReturn(tekster);
         return instansMed(utleder);
     }
 

@@ -7,7 +7,6 @@ import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -15,10 +14,11 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
-import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @OppgaveTypeRef(OppgaveType.SØK_YTELSE)
 @ApplicationScoped
@@ -26,6 +26,7 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     SøkYtelseOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -34,10 +35,12 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
     @Inject
     public SøkYtelseOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -46,20 +49,24 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
     }
 
     @Override
-    public boolean omVarselSeksjonAktivert() {
-        return false;
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
-        SøkYtelseOppgavetypeDataDto dto = hentDto(oppgave);
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
 
-        List<OppgaveTekst> tekster = new ArrayList<>();
-        tekster.add(new OppgaveAvsnitt(infotekst(oppgave.getYtelsetype())));
-        tekster.add(new OppgaveAvsnitt("Startdato: " + NorskDatoFormat.datoLang(dto.fomDato()), true));
-        tekster.add(new OppgaveAvsnitt("Du finner søknaden på Min side på nav.no."));
-        OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "søke", null);
-        return tekster;
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
+        SøkYtelseOppgavetypeDataDto dto = hentDto(oppgave);
+        validerYtelsetype(oppgave.getYtelsetype());
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("fomDato", dto.fomDato().toString());
+        data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
+
+        return renderer.rendre("tekstfragmenter/sok_ytelse/sok_ytelse", data);
     }
 
     @Override
@@ -67,12 +74,11 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
         return ungdomsprogramytelsenDeltakerBaseUrl;
     }
 
-    private static String infotekst(OppgaveYtelsetype ytelsetype) {
+    private static void validerYtelsetype(OppgaveYtelsetype ytelsetype) {
         if (ytelsetype != OppgaveYtelsetype.UNGDOMSYTELSE) {
             throw new IllegalStateException(
                 "SØK_YTELSE støtter kun UNGDOMSYTELSE, fikk ytelsetype=%s".formatted(ytelsetype));
         }
-        return "Du er meldt inn i ungdomsprogrammet. Nå kan du søke om ungdomsprogramytelsen.";
     }
 
     private SøkYtelseOppgavetypeDataDto hentDto(BrukerdialogOppgaveEntitet oppgave) {

@@ -6,7 +6,6 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -14,10 +13,11 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
-import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @OppgaveTypeRef(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO)
 @ApplicationScoped
@@ -25,6 +25,7 @@ public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveIn
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     BekreftOpphørVedMaksdatoOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -33,10 +34,12 @@ public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveIn
     @Inject
     public BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -45,19 +48,25 @@ public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveIn
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
+    }
+
+    @Override
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
+
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         BekreftOpphorVedMaksdatoOppgavetypeDataDto dto = hentDto(oppgave);
         String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
-        String sluttdato = NorskDatoFormat.datoLang(dto.sluttdato());
 
-        List<OppgaveTekst> tekster = new ArrayList<>();
-        tekster.add(new OppgaveAvsnitt("Din siste dag med %s er %s. Det er fordi du har brukt opp dagene du kan motta %s."
-            .formatted(ytelseNavn, sluttdato, ytelseNavn), true));
-        tekster.add(new OppgaveAvsnitt("Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no."));
-        OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare",
-            "Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi %s som siste dag med ytelsen når vi behandler saken din."
-                .formatted(sluttdato));
-        return tekster;
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("ytelseNavn", ytelseNavn);
+        data.put("sluttdato", dto.sluttdato().toString());
+        data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
+
+        return renderer.rendre("tekstfragmenter/opphor_ved_maksdato/opphor_ved_maksdato", data);
     }
 
     @Override

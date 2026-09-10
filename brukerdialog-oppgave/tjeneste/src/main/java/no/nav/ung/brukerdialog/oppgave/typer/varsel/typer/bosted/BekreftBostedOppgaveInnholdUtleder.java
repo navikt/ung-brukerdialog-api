@@ -7,7 +7,6 @@ import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
@@ -18,10 +17,13 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @OppgaveTypeRef(OppgaveType.BEKREFT_BOSTED)
 @ApplicationScoped
@@ -29,6 +31,7 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String aktivitetspengerInnsynBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     BekreftBostedOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -37,10 +40,12 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     @Inject
     public BekreftBostedOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
-        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl
+        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.aktivitetspengerInnsynBaseUrl = aktivitetspengerInnsynBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -49,7 +54,16 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
+    }
+
+    @Override
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
+
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         OppgavetypeDataDto dto = OppgaveDataMapperFraEntitetTilDto
             .finnTjeneste(mappere, oppgave.getOppgaveType())
             .tilDto(oppgave.getOppgaveData());
@@ -82,16 +96,26 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
                 "Ikke støttet oppgavedata for " + OppgaveType.BEKREFT_BOSTED + ": " + dto.getClass().getName());
         }
 
-        List<OppgaveTekst> tekster = new ArrayList<>();
-        tekster.add(new OppgaveAvsnitt(OppgaveTekster.bostedVarselTekst(årsak, fom, tom)));
-        String annetFritekst = OppgaveTekster.bostedAnnetFritekst(årsak, fritekst);
-        if (annetFritekst != null) {
-            tekster.add(new OppgaveAvsnitt(annetFritekst));
-        }
-        tekster.add(OppgaveTekster.bostedKildeAvsnitt(kilde, kildeFritekst));
-        OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare",
-            "Hvis vi ikke hører fra deg innen svarfristen har gått ut, legger vi de registrerte opplysningene til grunn når vi behandler saken din.");
-        return tekster;
+        return renderer.rendre("tekstfragmenter/bosted/bekreft_bosted",
+            byggData(årsak, fom, tom, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
+    }
+
+    private static Map<String, Object> byggData(
+        BostedsvilkårIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, String fritekst,
+        BostedsavklaringKildeType kilde, String kildeFritekst, LocalDateTime fristTid
+    ) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("årsak", årsak.name());
+        data.put("erPeriode", tom != null);
+        data.put("fom", fom.toString());
+        data.put("tom", tom != null ? tom.toString() : null);
+        data.put("annetFritekst", årsak == BostedsvilkårIkkeOppfyltÅrsak.ANNET
+            ? (fritekst != null && !fritekst.isBlank() ? fritekst : "Annet.")
+            : null);
+        data.put("kilde", kilde.name());
+        data.put("kildeFritekst", kildeFritekst);
+        data.put("fristDato", OppgaveTekster.fristDato(fristTid));
+        return data;
     }
 
     @Override

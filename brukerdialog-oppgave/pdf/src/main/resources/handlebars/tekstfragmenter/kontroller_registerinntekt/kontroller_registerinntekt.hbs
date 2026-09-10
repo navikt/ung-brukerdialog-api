@@ -1,0 +1,18 @@
+{{#if harInntekt}}
+{{#avsnitt data=true}}{{#if harKunYtelseInntekt}}Vi har fått disse opplysningene om ytelse fra Nav for {{rapporteringsmåned}}:{{else}}Vi har fått disse opplysningene fra arbeidsgiver om inntekten din for {{rapporteringsmåned}}:{{/if}}{{/avsnitt}}
+{{#tabell overskrift1=kildeHeader overskrift2="Inntekt før skatt" data=true}}
+{{#each rader}}{{rad kilde beløp}}{{/each}}
+{{rad "Totalt" totalBeløp}}
+{{/tabell}}
+{{#avsnitt}}{{#if gjelderDelerAvMåned}}Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde {{ytelseNavn}} hele måneden.{{else}}{{#if harKunYtelseInntekt}}Vi bruker denne inntekten til å vurdere hvor mye du får utbetalt.{{else}}Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.{{/if}}{{/if}}{{/avsnitt}}
+{{else}}
+{{#avsnitt data=true}}Du har gitt oss beskjed om at du hadde inntekt i {{rapporteringsmåned}}, men vi har ikke fått inn opplysninger fra arbeidsgiver om at du hadde inntekt i {{rapporteringsmåned}}.{{/avsnitt}}
+{{#avsnitt}}Vi bruker opplysningene fra arbeidsgiver når vi vurderer hvor mye du får utbetalt. Når vi ikke har mottatt noe fra arbeidsgiver, vil vi basere oss på at du ikke hadde inntekt i {{rapporteringsmåned}}.{{/avsnitt}}
+{{/if}}
+{{#avsnitt}}Du svarer på Min side på nav.no.{{/avsnitt}}
+{{#avsnitt}}Jo fortere du svarer, jo fortere får du pengene utbetalt.{{/avsnitt}}
+{{> partial/om_varsel}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{#avsnitt}}{{#if harKunYtelseInntekt}}Hvis vi ikke hører fra deg innen svarfristen, bruker vi inntekten vi har fått oppgitt.{{else}}Hvis vi ikke hører fra deg innen svarfristen, bruker vi inntekten som arbeidsgiver har oppgitt.{{/if}}{{/avsnitt}}
+{{/if}}

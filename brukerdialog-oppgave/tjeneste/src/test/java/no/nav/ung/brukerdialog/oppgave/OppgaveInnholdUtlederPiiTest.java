@@ -32,6 +32,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.Endret
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -143,13 +144,14 @@ class OppgaveInnholdUtlederPiiTest {
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,
                     "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET,
-                    BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL),
+                    BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL,
+                    new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("bekreft opphør ved maksdato",
                 new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(
                     new BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate.of(2025, 6, 30), LocalDate.of(2025, 6, 30))),
-                    UNGDOMSPROGRAM_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("endret periode - START_OG_SLUTT",
@@ -157,17 +159,17 @@ class OppgaveInnholdUtlederPiiTest {
                     new PeriodeDTO(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 8, 31)),
                     new PeriodeDTO(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 30)),
                     Set.of(PeriodeEndringType.ENDRET_STARTDATO, PeriodeEndringType.ENDRET_SLUTTDATO))),
-                    UNGDOMSPROGRAM_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_PERIODE, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("endret sluttdato - meldt ut",
                 new EndretSluttdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), null)), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretSluttdatoDataDto(LocalDate.of(2025, 6, 30), null)), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_SLUTTDATO, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("endret startdato",
                 new EndretStartdatoOppgaveInnholdUtleder(mappereSomGir(
-                    new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
+                    new EndretStartdatoDataDto(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("kontroller registerinntekt - arbeid og ytelse kombinert",
@@ -176,18 +178,18 @@ class OppgaveInnholdUtlederPiiTest {
                         new RegisterinntektDTO(
                             List.of(new ArbeidOgFrilansRegisterInntektDTO(20000, "999999999", "Bedriften AS")),
                             List.of(new YtelseRegisterInntektDTO(5000, YtelseType.AAP))), false)),
-                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("rapporter inntekt",
                 new InntektsrapporteringOppgaveInnholdUtleder(mappereSomGir(
                     new InntektsrapporteringOppgavetypeDataDto(LocalDate.of(2025, 4, 1), LocalDate.of(2025, 4, 30), true)),
-                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL),
+                    UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.RAPPORTER_INNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE)),
 
             Arguments.of("søk ytelse",
                 new SøkYtelseOppgaveInnholdUtleder(mappereSomGir(
-                    new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL),
+                    new SøkYtelseOppgavetypeDataDto(LocalDate.of(2025, 1, 1))), UNGDOMSPROGRAM_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.SØK_YTELSE, OppgaveYtelsetype.UNGDOMSYTELSE))
         );
     }

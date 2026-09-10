@@ -1,0 +1,10 @@
+{{#avsnitt data=true}}Vi har fått opplysninger om at du {{#if erPeriode}}i perioden {{datoLang fom}} til {{datoLang tom}} ikke{{else}}fra {{datoLang fom}} ikke lenger{{/if}} {{#switch årsak}}{{#case "STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM"}}har studie- eller arbeidssted{{/case}}{{#default}}bor{{/default}}{{/switch}} i Trondheim kommune{{#eq årsak "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"}}, og at du heller ikke er folkeregistrert der{{/eq}}. Du må {{#switch årsak}}{{#case "IKKE_BOSATTADRESSE_I_TRONDHEIM"}}ha bostedsadresse{{/case}}{{#case "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"}}ha bostedsadresse{{/case}}{{#default}}bo{{/default}}{{/switch}} i Trondheim kommune for å få aktivitetspenger.{{/avsnitt}}
+{{#eq årsak "ANNET"}}
+{{#avsnitt data=true}}{{annetFritekst}}{{/avsnitt}}
+{{/eq}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?" data=true}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#case "FOLKEREGISTER"}}Folkeregisteret{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{> partial/om_varsel}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{#avsnitt}}Hvis vi ikke hører fra deg innen svarfristen har gått ut, legger vi de registrerte opplysningene til grunn når vi behandler saken din.{{/avsnitt}}
+{{/if}}

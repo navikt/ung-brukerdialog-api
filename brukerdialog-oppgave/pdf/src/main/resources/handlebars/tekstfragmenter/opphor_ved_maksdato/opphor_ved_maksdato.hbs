@@ -1,0 +1,7 @@
+{{#avsnitt data=true}}Din siste dag med {{ytelseNavn}} er {{#fet}}{{datoLang sluttdato}}{{/fet}}. Det er fordi du har brukt opp dagene du kan motta {{ytelseNavn}}.{{/avsnitt}}
+{{#avsnitt}}Du får denne meldingen slik at du kan komme med en tilbakemelding på datoen. Du svarer på Min side på nav.no.{{/avsnitt}}
+{{> partial/om_varsel}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{#avsnitt}}Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi {{datoLang sluttdato}} som siste dag med ytelsen når vi behandler saken din.{{/avsnitt}}
+{{/if}}

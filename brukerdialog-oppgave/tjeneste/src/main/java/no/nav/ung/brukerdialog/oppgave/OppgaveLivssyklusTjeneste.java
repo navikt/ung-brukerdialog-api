@@ -128,7 +128,7 @@ public class OppgaveLivssyklusTjeneste {
     /**
      * Varselteksten på Min Side er alltid {@link OppgaveInnholdUtleder}s FØRSTE tekstblokk (se
      * kontrakten på {@link OppgaveInnholdUtleder#tekster}) - samme tekst som første avsnitt i
-     * PDF-brevet og første element i {@code BrukerdialogOppgaveDto.tekster()}.
+     * PDF-brevet og første element i {@code BrukerdialogOppgaveDto.varselInnhold()}.
      */
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgaveEntitet.getOppgaveType());

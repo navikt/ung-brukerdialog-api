@@ -10,14 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifiserer JSON-kontrakten til {@link OppgaveTekst}-hierarkiet - dette er formen frontend på
- * sikt skal konsumere direkte fra {@code tekster}-feltet på {@code BrukerdialogOppgaveDto}, så et
+ * sikt skal konsumere direkte fra {@code varselInnhold}-feltet på {@code BrukerdialogOppgaveDto}, så et
  * brudd her er et kontraktsbrudd, ikke bare en intern datamodell-endring.
  */
 class OppgaveTekstTest {
 
     @Test
     void avsnitt_rundtrip_bevarer_alle_felter() throws Exception {
-        OppgaveTekst original = new OppgaveAvsnitt("En tittel", "Noe innhold", true);
+        OppgaveTekst original = new OppgaveAvsnitt("En tittel", "Noe <b>innhold</b>");
 
         String json = JsonObjectMapper.getJson(original);
         OppgaveTekst deserialisert = JsonObjectMapper.fromJson(json, OppgaveTekst.class);
@@ -69,7 +69,7 @@ class OppgaveTekstTest {
 
     /**
      * Realistisk brukstilfelle: en heterogen liste, slik den faktisk vil forekomme i
-     * {@code tekster}-feltet på {@code BrukerdialogOppgaveDto}. Serialiserer via en eksplisitt
+     * {@code varselInnhold}-feltet på {@code BrukerdialogOppgaveDto}. Serialiserer via en eksplisitt
      * {@link TypeReference} (i stedet for {@link JsonObjectMapper#getJson}, som tar imot
      * {@code Object} og dermed sletter generisk typeinfo) - speiler hvordan Jackson faktisk
      * serialiserer et {@code List<OppgaveTekst>}-record-felt, der den statiske typen er kjent.
@@ -80,7 +80,7 @@ class OppgaveTekstTest {
             new OppgaveAvsnitt("Første avsnitt - dette er varselteksten"),
             new OppgavePunktliste(List.of("Første punkt", "Andre punkt")),
             new OppgaveTabell(List.of("Kolonne"), List.of(List.of("Verdi"))),
-            new OppgaveAvsnitt("Fristen for å svare er senest 1. januar 2025.", true)
+            new OppgaveAvsnitt("Fristen for å svare er senest <b>1. januar 2025</b>.")
         );
 
         String json = JsonObjectMapper.getMapper()

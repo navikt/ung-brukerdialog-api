@@ -3,10 +3,8 @@ package no.nav.ung.brukerdialog.oppgave;
 import jakarta.enterprise.inject.Instance;
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface OppgaveInnholdUtleder {
@@ -22,19 +20,9 @@ public interface OppgaveInnholdUtleder {
 
     String undertittel(BrukerdialogOppgaveEntitet oppgave);
 
-    List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave);
+    List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave);
 
-    default boolean omVarselSeksjonAktivert() {
-        return true;
-    }
-
-    default List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        List<OppgaveTekst> tekster = new ArrayList<>(egneTekster(oppgave));
-        if (omVarselSeksjonAktivert()) {
-            tekster.addAll(OppgaveTekster.omVarselSeksjon());
-        }
-        return tekster;
-    }
+    List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave);
 
     String varselLenke(BrukerdialogOppgaveEntitet oppgave);
 }

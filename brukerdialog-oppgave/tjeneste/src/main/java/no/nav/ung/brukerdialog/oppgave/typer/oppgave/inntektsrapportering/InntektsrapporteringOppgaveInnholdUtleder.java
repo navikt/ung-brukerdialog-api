@@ -6,8 +6,6 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.inntektsrapportering.InntektsrapporteringOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
@@ -16,9 +14,11 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
 import no.nav.ung.brukerdialog.pdf.NorskDatoFormat;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @OppgaveTypeRef(OppgaveType.RAPPORTER_INNTEKT)
 @ApplicationScoped
@@ -27,6 +27,7 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
     private String aktivitetspengerInnsynBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     InntektsrapporteringOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -36,11 +37,13 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
     public InntektsrapporteringOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
         @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
-        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl
+        @KonfigVerdi(value = "AKTIVITETSPENGER_INNSYN_BASE_URL") String aktivitetspengerInnsynBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
         this.aktivitetspengerInnsynBaseUrl = aktivitetspengerInnsynBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -50,37 +53,25 @@ public class InntektsrapporteringOppgaveInnholdUtleder implements OppgaveInnhold
     }
 
     @Override
-    public boolean omVarselSeksjonAktivert() {
-        return false;
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
-        InntektsrapporteringOppgavetypeDataDto dto = hentDto(oppgave);
-        String måned = NorskDatoFormat.måned(dto.fraOgMed());
-        String ytelseNavn = OppgaveTekster.ytelseNavn(oppgave.getYtelsetype());
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
 
-        List<OppgaveTekst> tekster = new ArrayList<>();
-        tekster.add(new OppgaveAvsnitt("Gi oss beskjed hvis du hadde inntekt i %s. Inntekt er lønn, men det kan også være for eksempel etterbetaling, feriepenger, overtid og tillegg for ubekvem arbeidstid."
-            .formatted(måned)));
-        if (dto.gjelderDelerAvMåned()) {
-            tekster.add(new OppgaveAvsnitt("Du skal gi beskjed om hele inntekten du hadde i %s, selv om du ikke hadde %s hele måneden."
-                .formatted(måned, ytelseNavn)));
-        }
-        tekster.add(new OppgaveAvsnitt("Inntekt er som regel lønnen du får fra en arbeidsgiver, men det kan være mange andre ting også. De vanligste formene for inntekt utenom lønn, er:"));
-        tekster.add(new OppgavePunktliste(List.of(
-            "etterbetaling",
-            "feriepenger",
-            "overtid",
-            "tillegg for kveld, natt, helg og helligdag (ubekvem arbeidstid)",
-            "tips",
-            "frilansinntekt",
-            "inntekt fra aksjeselskap (AS)"
-        )));
-        tekster.add(new OppgaveAvsnitt("Du kan lese mer om hva som regnes som inntekt i skatteloven §§ 5.10 til 5.15."));
-        tekster.add(new OppgaveAvsnitt("Du svarer på Min side på nav.no."));
-        OppgaveTekster.leggTilSvarfrist(tekster, oppgave.getFristTid(), "svare", null);
-        return tekster;
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
+        InntektsrapporteringOppgavetypeDataDto dto = hentDto(oppgave);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("månedNavn", NorskDatoFormat.måned(dto.fraOgMed()));
+        data.put("ytelseNavn", OppgaveTekster.ytelseNavn(oppgave.getYtelsetype()));
+        data.put("gjelderDelerAvMåned", dto.gjelderDelerAvMåned());
+        data.put("fristDato", OppgaveTekster.fristDato(oppgave.getFristTid()));
+
+        return renderer.rendre("tekstfragmenter/inntektsrapportering/inntektsrapportering", data);
     }
 
     @Override

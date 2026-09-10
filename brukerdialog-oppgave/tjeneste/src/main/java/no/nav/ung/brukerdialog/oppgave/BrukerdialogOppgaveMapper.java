@@ -48,18 +48,18 @@ public class BrukerdialogOppgaveMapper {
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
             toZonedDateTime(oppgave.getFristTid()),
-            innhold.tekster(),
+            innhold.varselInnhold(),
             innhold.undertittel()
         );
     }
 
-    private record OppgaveInnhold(List<OppgaveTekst> tekster, String undertittel) {
+    private record OppgaveInnhold(List<OppgaveTekst> varselInnhold, String undertittel) {
     }
 
     private OppgaveInnhold innhold(BrukerdialogOppgaveEntitet oppgave) {
         try {
             OppgaveInnholdUtleder utleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());
-            return new OppgaveInnhold(utleder.tekster(oppgave), utleder.undertittel(oppgave));
+            return new OppgaveInnhold(utleder.varselInnhold(oppgave), utleder.undertittel(oppgave));
         } catch (RuntimeException e) {
             log.warn("Klarte ikke å utlede tekster/undertittel for oppgave (oppgaveType={}, oppgaveReferanse={}) - returnerer tom liste/null",
                 oppgave.getOppgaveType(), oppgave.getOppgavereferanse(), e);

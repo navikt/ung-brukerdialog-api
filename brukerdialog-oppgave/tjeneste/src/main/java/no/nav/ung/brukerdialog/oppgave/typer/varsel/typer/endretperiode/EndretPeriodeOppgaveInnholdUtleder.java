@@ -16,6 +16,7 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,7 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     EndretPeriodeOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -40,10 +42,12 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     @Inject
     public EndretPeriodeOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -59,7 +63,16 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
+    }
+
+    @Override
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
+
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         EndretPeriodeDataDto dto = hentDto(oppgave);
         Gren gren = bestemGren(dto);
         OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();
@@ -69,14 +82,14 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
 
         return switch (gren.type()) {
             case STARTDATO -> OppgaveTekster.endretStartdatoInnhold(
-                ny.getFomDato(), forrige.getFomDato(), ytelsetype, fristTid);
+                renderer, ny.getFomDato(), ytelsetype, fristTid);
             case SLUTTDATO -> OppgaveTekster.endretSluttdatoInnhold(
-                ny.getTomDato(), forrige != null ? forrige.getTomDato() : null, ytelsetype, fristTid);
-            case FJERNET -> OppgaveTekster.fjernetPeriodeInnhold(ytelsetype, fristTid);
+                renderer, ny.getTomDato(), forrige != null ? forrige.getTomDato() : null, ytelsetype, fristTid);
+            case FJERNET -> OppgaveTekster.fjernetPeriodeInnhold(renderer, ytelsetype, fristTid);
             case START_OG_SLUTT -> OppgaveTekster.endretStartOgSluttdatoInnhold(
-                ny.getFomDato(), ny.getTomDato(), ytelsetype, fristTid);
+                renderer, ny.getFomDato(), ny.getTomDato(), ytelsetype, fristTid);
             case FALLBACK_UKJENT_KOMBINASJON -> OppgaveTekster.ukjentPeriodeendringInnhold(
-                ny != null ? ny.getFomDato() : null, ny != null ? ny.getTomDato() : null, ytelsetype, fristTid);
+                renderer, ny != null ? ny.getFomDato() : null, ny != null ? ny.getTomDato() : null, ytelsetype, fristTid);
         };
     }
 

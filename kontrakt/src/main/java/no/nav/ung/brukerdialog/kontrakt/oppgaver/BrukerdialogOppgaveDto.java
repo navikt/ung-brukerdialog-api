@@ -50,9 +50,9 @@ public record BrukerdialogOppgaveDto(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     ZonedDateTime frist,
 
-    @JsonProperty(value = "tekster", required = true)
+    @JsonProperty(value = "varselInnhold", required = true)
     @NotNull
-    List<OppgaveTekst> tekster,
+    List<OppgaveTekst> varselInnhold,
 
     @JsonProperty(value = "undertittel")
     String undertittel

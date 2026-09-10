@@ -13,6 +13,7 @@ import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
 import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTekster;
 import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
+import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
 
     private Instance<OppgaveDataMapperFraEntitetTilDto> mappere;
     private String ungdomsprogramytelsenDeltakerBaseUrl;
+    private OppgaveTekstfragmentRenderer renderer;
 
     EndretStartdatoOppgaveInnholdUtleder() {
         // for CDI proxy
@@ -30,10 +32,12 @@ public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
     @Inject
     public EndretStartdatoOppgaveInnholdUtleder(
         @Any Instance<OppgaveDataMapperFraEntitetTilDto> mappere,
-        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl
+        @KonfigVerdi(value = "UNGDOMPROGRAMSYTELSEN_DELTAKER_BASE_URL") String ungdomsprogramytelsenDeltakerBaseUrl,
+        OppgaveTekstfragmentRenderer renderer
     ) {
         this.mappere = mappere;
         this.ungdomsprogramytelsenDeltakerBaseUrl = ungdomsprogramytelsenDeltakerBaseUrl;
+        this.renderer = renderer;
     }
 
     @Override
@@ -42,10 +46,19 @@ public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
     }
 
     @Override
-    public List<OppgaveTekst> egneTekster(BrukerdialogOppgaveEntitet oppgave) {
+    public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).alle();
+    }
+
+    @Override
+    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
+        return rendre(oppgave).varselInnhold();
+    }
+
+    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         EndretStartdatoDataDto dto = hentDto(oppgave);
         return OppgaveTekster.endretStartdatoInnhold(
-            dto.nyStartdato(), dto.forrigeStartdato(), oppgave.getYtelsetype(), oppgave.getFristTid());
+            renderer, dto.nyStartdato(), oppgave.getYtelsetype(), oppgave.getFristTid());
     }
 
     @Override
