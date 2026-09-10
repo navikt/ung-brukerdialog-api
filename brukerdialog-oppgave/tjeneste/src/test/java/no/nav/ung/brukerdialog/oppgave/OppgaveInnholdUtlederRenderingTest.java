@@ -136,7 +136,7 @@ class OppgaveInnholdUtlederRenderingTest {
             new BekreftBostedOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1), false, null,
                 BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL,
             new OppgaveTekstfragmentRenderer());
-        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
         String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
 
@@ -179,7 +179,7 @@ class OppgaveInnholdUtlederRenderingTest {
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,
                     "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET, BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL,
                     new OppgaveTekstfragmentRenderer()),
-                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 2, 1, 0, 0)),
+                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, LocalDateTime.of(2025, 2, 1, 0, 0)),
                 "1. januar 2025", "31. januar 2025", "Bor midlertidig i utlandet", "en veileder hos Nav",
                 "Fristen for å svare er senest <b>1. februar 2025</b>.")),
 
@@ -187,7 +187,7 @@ class OppgaveInnholdUtlederRenderingTest {
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
                     LocalDate.of(2025, 3, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT, BostedsavklaringKildeType.FOLKEREGISTER, null)), AKTIVITETSPENGER_BASE_URL,
                     new OppgaveTekstfragmentRenderer()),
-                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null),
+                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "1. mars 2025", "Folkeregisteret")),
 
             // --- endret-startdato ---
@@ -286,8 +286,7 @@ class OppgaveInnholdUtlederRenderingTest {
                             new YtelseRegisterInntektDTO(5000, YtelseType.DAGPENGER))), true)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 3, 10, 0, 0)),
                 "Vi har fått disse opplysningene om ytelse fra Nav for februar", "Dagpenger", "5 000 kr",
-                "ikke hadde ungdomsprogramytelsen hele måneden", "Fristen for å svare er senest <b>10. mars 2025</b>.",
-                "bruker vi inntekten vi har fått oppgitt")),
+                "ikke hadde ungdomsprogramytelsen hele måneden", "Fristen for å svare er senest <b>10. mars 2025</b>.")),
 
             Arguments.of(scenario("avvik registerinntekt - arbeid og ytelse kombinert, hel måned, ingen svarfrist",
                 new KontrollerRegisterinntektOppgaveInnholdUtleder(mappereSomGir(

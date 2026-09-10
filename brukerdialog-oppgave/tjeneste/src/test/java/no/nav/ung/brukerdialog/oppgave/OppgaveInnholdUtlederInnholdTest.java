@@ -69,7 +69,7 @@ class OppgaveInnholdUtlederInnholdTest {
     @EnumSource(OppgaveType.class)
     void utleder_gir_forventet_undertittel_tekster_og_varselLenke(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
-        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
         OppgaveInnholdUtleder utleder = scenario.utleder();
 
         String tittel = utleder.tittel(oppgave);
@@ -94,7 +94,7 @@ class OppgaveInnholdUtlederInnholdTest {
     void frist_vises_i_tekster_for_alle_oppgavetyper_når_satt(OppgaveType oppgaveType) {
         LocalDateTime fristTid = LocalDateTime.of(2025, 3, 15, 12, 0);
         Scenario scenario = scenarioFor(oppgaveType);
-        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, fristTid);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), fristTid);
 
         List<OppgaveTekst> tekster = scenario.utleder().tekster(oppgave);
 
@@ -107,7 +107,7 @@ class OppgaveInnholdUtlederInnholdTest {
     @EnumSource(OppgaveType.class)
     void varselInnhold_er_delmengde_av_tekster_og_utelater_om_varsel(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
-        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
         OppgaveInnholdUtleder utleder = scenario.utleder();
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
@@ -123,13 +123,19 @@ class OppgaveInnholdUtlederInnholdTest {
     @EnumSource(OppgaveType.class)
     void min_side_varseltekst_er_innenfor_500_tegns_grensen_for_alle_typer(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
-        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
 
         String varselTekst = ((OppgaveAvsnitt) scenario.utleder().tekster(oppgave).getFirst()).innhold();
 
         assertThat(varselTekst.length())
             .as("min-side-varselteksten (%s) er %d tegn, må være maks 500", oppgaveType, varselTekst.length())
             .isLessThanOrEqualTo(500);
+    }
+
+    private static OppgaveYtelsetype standardYtelsetypeFor(OppgaveType oppgaveType) {
+        return oppgaveType == OppgaveType.BEKREFT_BOSTED
+            ? OppgaveYtelsetype.AKTIVITETSPENGER
+            : OppgaveYtelsetype.UNGDOMSYTELSE;
     }
 
     @Test
@@ -378,7 +384,7 @@ class OppgaveInnholdUtlederInnholdTest {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
             LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT,
             BostedsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
-        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
@@ -393,7 +399,7 @@ class OppgaveInnholdUtlederInnholdTest {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOpphørOppgavetypeDataDto(
             LocalDate.of(2025, 1, 1), false, null, BostedsvilkårIkkeOppfyltÅrsak.IKKE_BOSATTADRESSE_I_TRONDHEIM,
             BostedsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
-        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
@@ -403,18 +409,17 @@ class OppgaveInnholdUtlederInnholdTest {
     }
 
     @Test
-    void bekreftBosted_tittel_og_undertittel_er_uavhengig_av_ytelsetype() {
+    void bekreftBosted_feil_ytelsetype_kaster_illegalstateexception() {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
             LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null, BostedsvilkårIkkeOppfyltÅrsak.UDEFINERT,
             BostedsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
-        BrukerdialogOppgaveEntitet ungdomsytelse = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE, null);
-        BrukerdialogOppgaveEntitet aktivitetspenger = oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER, null);
-
-        assertThat(utleder.tittel(ungdomsytelse)).isEqualTo(OppgaveTekster.VARSEL_OM_NYE_OPPLYSNINGER_TITTEL);
-        assertThat(utleder.tittel(aktivitetspenger)).isEqualTo(OppgaveTekster.VARSEL_OM_NYE_OPPLYSNINGER_TITTEL);
-        assertThat(utleder.undertittel(ungdomsytelse)).isEqualTo("Bostedsadresse");
-        assertThat(utleder.undertittel(aktivitetspenger)).isEqualTo("Bostedsadresse");
+        assertThatIllegalStateException()
+            .isThrownBy(() -> utleder.tekster(oppgave))
+            .withMessageContaining("BEKREFT_BOSTED")
+            .withMessageContaining("AKTIVITETSPENGER")
+            .withMessageContaining("UNGDOMSYTELSE");
     }
     // Dekning for alle (årsak × dato/periode)-kombinasjoner, kildetyper og ANNET-fritekst er nå
     // testet direkte mot Handlebars-malen i OppgaveTekstfragmentRendererTest (pdf-modulen), siden
@@ -565,11 +570,9 @@ class OppgaveInnholdUtlederInnholdTest {
         BrukerdialogOppgaveEntitet medFrist = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE,
             LocalDateTime.of(2025, 2, 15, 12, 0));
         List<OppgaveTekst> teksterMedFrist = utleder.tekster(medFrist);
-        assertThat(teksterMedFrist).hasSize(7);
+        assertThat(teksterMedFrist).hasSize(6);
         assertThat(avsnitt(teksterMedFrist, 5)).isEqualTo(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>15. februar 2025</b>."));
-        assertThat(avsnitt(teksterMedFrist, 6).innhold()).isEqualTo(
-            "Hvis vi ikke hører fra deg innen svarfristen har gått ut, bruker vi 1. februar 2025 som startdato når vi behandler saken din.");
 
         BrukerdialogOppgaveEntitet utenFrist = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, null);
         assertThat(utleder.tekster(utenFrist)).hasSize(5);

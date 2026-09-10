@@ -6,6 +6,7 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import no.nav.k9.felles.konfigurasjon.konfig.KonfigVerdi;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
@@ -64,6 +65,8 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     }
 
     private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
+        validerYtelsetype(oppgave.getYtelsetype());
+
         OppgavetypeDataDto dto = OppgaveDataMapperFraEntitetTilDto
             .finnTjeneste(mappere, oppgave.getOppgaveType())
             .tilDto(oppgave.getOppgaveData());
@@ -121,5 +124,12 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
     @Override
     public String varselLenke(BrukerdialogOppgaveEntitet oppgave) {
         return aktivitetspengerInnsynBaseUrl + "/oppgave" + oppgave.getOppgavereferanse();
+    }
+
+    private static void validerYtelsetype(OppgaveYtelsetype ytelsetype) {
+        if (ytelsetype != OppgaveYtelsetype.AKTIVITETSPENGER) {
+            throw new IllegalStateException(
+                "BEKREFT_BOSTED støtter kun AKTIVITETSPENGER, fikk ytelsetype=%s".formatted(ytelsetype));
+        }
     }
 }

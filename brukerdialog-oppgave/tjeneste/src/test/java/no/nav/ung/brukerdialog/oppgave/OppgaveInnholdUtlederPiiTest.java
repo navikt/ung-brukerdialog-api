@@ -146,7 +146,7 @@ class OppgaveInnholdUtlederPiiTest {
                     "Bor midlertidig i utlandet", BostedsvilkårIkkeOppfyltÅrsak.ANNET,
                     BostedsavklaringKildeType.ANNET, "en veileder hos Nav")), AKTIVITETSPENGER_BASE_URL,
                     new OppgaveTekstfragmentRenderer()),
-                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.UNGDOMSYTELSE)),
+                oppgave(OppgaveType.BEKREFT_BOSTED, OppgaveYtelsetype.AKTIVITETSPENGER)),
 
             Arguments.of("bekreft opphør ved maksdato",
                 new BekreftOpphørVedMaksdatoOppgaveInnholdUtleder(mappereSomGir(

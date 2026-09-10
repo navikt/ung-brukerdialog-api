@@ -120,7 +120,7 @@ class OppgaveTekstfragmentRendererTest {
     }
 
     @Test
-    void svarfrist_og_konsekvenssetning_vises_kun_når_fristDato_er_satt() {
+    void svarfrist_vises_kun_når_fristDato_er_satt() {
         Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
@@ -128,8 +128,7 @@ class OppgaveTekstfragmentRendererTest {
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
 
         assertThat(tekster).contains(
-            new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."),
-            new OppgaveAvsnitt("Hvis vi ikke hører fra deg innen svarfristen har gått ut, legger vi de registrerte opplysningene til grunn når vi behandler saken din."));
+            new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."));
     }
 
     @Test
