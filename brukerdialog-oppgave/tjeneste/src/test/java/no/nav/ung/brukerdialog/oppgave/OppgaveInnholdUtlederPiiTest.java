@@ -85,6 +85,10 @@ class OppgaveInnholdUtlederPiiTest {
 
     private static final Pattern FØDSELSNUMMER_MØNSTER = Pattern.compile("\\d{11}");
 
+
+    private static final java.util.UUID FAST_OPPGAVEREFERANSE =
+        java.util.UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+
     @ParameterizedTest(name = "{0}")
     @MethodSource("utledereMedDatarikeOppgaver")
     void tekster_inneholder_aldri_fødselsnummer_eller_aktørId(String beskrivelse, OppgaveInnholdUtleder utleder,
@@ -193,7 +197,7 @@ class OppgaveInnholdUtlederPiiTest {
     }
 
     private static BrukerdialogOppgaveEntitet oppgave(OppgaveType oppgaveType, OppgaveYtelsetype ytelsetype) {
-        return new BrukerdialogOppgaveEntitet(java.util.UUID.randomUUID(), oppgaveType,
+        return new BrukerdialogOppgaveEntitet(FAST_OPPGAVEREFERANSE, oppgaveType,
             new AktørId(MISTENKELIG_AKTØR_ID), ytelsetype, LocalDateTime.of(2025, 12, 31, 0, 0));
     }
 
