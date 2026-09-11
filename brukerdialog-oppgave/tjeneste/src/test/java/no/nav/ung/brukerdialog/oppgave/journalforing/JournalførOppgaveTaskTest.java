@@ -12,8 +12,10 @@ import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveStatus;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveEntitet;
 import no.nav.ung.brukerdialog.oppgave.BrukerdialogOppgaveRepository;
+import no.nav.ung.brukerdialog.oppgave.OppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import no.nav.ung.brukerdialog.typer.JournalpostId;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
@@ -27,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.annotation.Annotation;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,11 +53,11 @@ class JournalførOppgaveTaskTest {
     @Mock
     private BrukerdialogOppgaveRepository oppgaveRepository;
     @Mock
-    private Instance<OppgaveDokumentUtleder> dokumentUtledere;
+    private Instance<OppgaveInnholdUtleder> innholdUtledere;
     @Mock
-    private Instance<OppgaveDokumentUtleder> dokumentUtlederValgt;
+    private Instance<OppgaveInnholdUtleder> innholdUtlederValgt;
     @Mock
-    private OppgaveDokumentUtleder dokumentUtleder;
+    private OppgaveInnholdUtleder innholdUtleder;
     @Mock
     private PdlKlient pdl;
     @Mock
@@ -70,7 +71,7 @@ class JournalførOppgaveTaskTest {
     @BeforeEach
     void setUp() {
         task = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository, true,
-            dokumentUtledere, pdl, pdfGenerator, dokArkivKlient);
+            innholdUtledere, pdl, pdfGenerator, dokArkivKlient);
         oppgavereferanse = UUID.randomUUID();
     }
 
@@ -95,7 +96,7 @@ class JournalførOppgaveTaskTest {
 
     /**
      * Stubber PDL-navneoppslaget ({@code hentPersonInfo}) og
-     * {@code dokumentUtledere}-lookupen ({@link OppgaveDokumentUtleder#finnUtleder}) som alle tre
+     * {@code innholdUtledere}-lookupen ({@link OppgaveInnholdUtleder#finnUtleder}) som alle tre
      * testene mot {@link DokArkivKlientFake} (ok/409/5xx) trenger for å nå fram til selve
      * dokarkiv-kallet, uten å NPE på Mockitos default-svar (null) for {@code Person}/
      * {@code Instance}. Se {@code OppgaveLivssyklusTjenesteTest} for samme
@@ -109,12 +110,11 @@ class JournalførOppgaveTaskTest {
         person.setNavn(List.of(navn));
         when(pdl.hentPerson(any(), any(), anyList())).thenReturn(person);
 
-        when(dokumentUtledere.select(any(Annotation.class))).thenReturn(dokumentUtlederValgt);
-        when(dokumentUtlederValgt.isResolvable()).thenReturn(true);
-        when(dokumentUtlederValgt.get()).thenReturn(dokumentUtleder);
-        when(dokumentUtleder.utledTittel(oppgave)).thenReturn(tittel);
-        when(dokumentUtleder.malnavn()).thenReturn("typer/test-mal");
-        when(dokumentUtleder.utledInnholdsdata(oppgave)).thenReturn(Map.of());
+        when(innholdUtledere.select(any(Annotation.class))).thenReturn(innholdUtlederValgt);
+        when(innholdUtlederValgt.isResolvable()).thenReturn(true);
+        when(innholdUtlederValgt.get()).thenReturn(innholdUtleder);
+        when(innholdUtleder.tittel(oppgave)).thenReturn(tittel);
+        when(innholdUtleder.tekster(oppgave)).thenReturn(List.of(new OppgaveAvsnitt("Tekst")));
         when(pdfGenerator.genererPdf(any())).thenReturn(new byte[]{1, 2, 3});
     }
 
@@ -148,7 +148,7 @@ class JournalførOppgaveTaskTest {
         task.doTask(taskData());
 
         // Assert – ingen videre behandling
-        verifyNoInteractions(oppgaveRepository, pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
+        verifyNoInteractions(oppgaveRepository, pdl, pdfGenerator, dokArkivKlient, innholdUtledere);
         verify(journalføringRepository, never()).lagre(any());
     }
 
@@ -162,7 +162,7 @@ class JournalførOppgaveTaskTest {
         assertThatThrownBy(() -> task.doTask(taskData()))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining(oppgavereferanse.toString());
-        verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
+        verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, innholdUtledere);
     }
 
     @Test
@@ -172,13 +172,13 @@ class JournalførOppgaveTaskTest {
         when(journalføringRepository.hentForOppgaveReferanse(oppgavereferanse)).thenReturn(Optional.empty());
         when(oppgaveRepository.hentOppgaveForOppgavereferanse(oppgavereferanse)).thenReturn(Optional.of(oppgave));
         JournalførOppgaveTask taskDeaktivert = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            false, dokumentUtledere, pdl, pdfGenerator, dokArkivKlient);
+            false, innholdUtledere, pdl, pdfGenerator, dokArkivKlient);
 
         // Act
         taskDeaktivert.doTask(taskData());
 
         // Assert – verken forsøk på journalføring eller lagring
-        verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, dokumentUtledere);
+        verifyNoInteractions(pdl, pdfGenerator, dokArkivKlient, innholdUtledere);
         verify(journalføringRepository, never()).lagre(any());
     }
 
@@ -195,7 +195,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedOk("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, innholdUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act
         taskMedFake.doTask(taskData());
@@ -219,7 +219,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedOk("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, innholdUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         ProsessTaskData data = taskData();
         data.setProperty(JournalførOppgaveTask.SAKSNUMMER, "ABC123");
@@ -246,7 +246,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedDuplikat("123456789");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, innholdUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act
         taskMedFake.doTask(taskData());
@@ -271,7 +271,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedOpprettetIkkeFerdigstilt("123456789", "Tema=UNG er ikke gyldig for ferdigstilling");
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, innholdUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act & assert
         assertThatThrownBy(() -> taskMedFake.doTask(taskData()))
@@ -293,7 +293,7 @@ class JournalførOppgaveTaskTest {
         DokArkivKlientFake dokArkivKlientFake = new DokArkivKlientFake();
         dokArkivKlientFake.svarMedFeil(503);
         JournalførOppgaveTask taskMedFake = new JournalførOppgaveTask(journalføringRepository, oppgaveRepository,
-            true, dokumentUtledere, pdl, pdfGenerator, dokArkivKlientFake);
+            true, innholdUtledere, pdl, pdfGenerator, dokArkivKlientFake);
 
         // Act & assert
         assertThatThrownBy(() -> taskMedFake.doTask(taskData()))

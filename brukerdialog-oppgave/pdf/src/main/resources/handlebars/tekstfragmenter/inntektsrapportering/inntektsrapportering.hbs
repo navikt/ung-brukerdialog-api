@@ -1,0 +1,19 @@
+{{#avsnitt data=true}}Gi oss beskjed hvis du hadde inntekt i {{månedNavn}}. Inntekt er lønn, men det kan også være for eksempel etterbetaling, feriepenger, overtid og tillegg for ubekvem arbeidstid.{{/avsnitt}}
+{{#if gjelderDelerAvMåned}}
+{{#avsnitt data=true}}Du skal gi beskjed om hele inntekten du hadde i {{månedNavn}}, selv om du ikke hadde {{> partial/ytelse_navn}} hele måneden.{{/avsnitt}}
+{{/if}}
+{{#avsnitt}}Inntekt er som regel lønnen du får fra en arbeidsgiver, men det kan være mange andre ting også. De vanligste formene for inntekt utenom lønn, er:{{/avsnitt}}
+{{#liste}}
+{{punkt "etterbetaling"}}
+{{punkt "feriepenger"}}
+{{punkt "overtid"}}
+{{punkt "tillegg for kveld, natt, helg og helligdag (ubekvem arbeidstid)"}}
+{{punkt "tips"}}
+{{punkt "frilansinntekt"}}
+{{punkt "inntekt fra aksjeselskap (AS)"}}
+{{/liste}}
+{{#avsnitt}}Du kan lese mer om hva som regnes som inntekt i skatteloven §§ 5.10 til 5.15.{{/avsnitt}}
+{{#avsnitt}}Du svarer på Min side på nav.no.{{/avsnitt}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}

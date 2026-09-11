@@ -76,6 +76,6 @@ class PdfGeneratorTest {
         assertThat(html).contains("1. januar 2025");
         assertThat(html).contains("<p id=\"måned\">mai</p>");
         assertThat(html).contains("september 2021");
-        assertThat(html).contains("12 345 kr");
+        assertThat(html).contains("12\u00A0345\u00A0kr");
     }
 }
