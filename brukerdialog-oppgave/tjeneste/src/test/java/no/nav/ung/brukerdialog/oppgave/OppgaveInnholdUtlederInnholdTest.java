@@ -176,7 +176,7 @@ class OppgaveInnholdUtlederInnholdTest {
                 "Bostedsadresse",
                 List.of(
                     new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
-                    new OppgaveAvsnitt("Annet."),
+                    new OppgaveAvsnitt("Årsak", "Annet."),
                     new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
                     OM_VARSEL_1, OM_VARSEL_2),
                 AKTIVITETSPENGER_BASE_URL, true);
@@ -452,7 +452,7 @@ class OppgaveInnholdUtlederInnholdTest {
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Arbeidsgiver", "Inntekt før skatt");
-        assertThat(tabell.rader()).containsExactly(List.of("Bedriften AS", "25 000 kr"), List.of("Totalt", "25 000 kr"));
+        assertThat(tabell.rader()).containsExactly(List.of("Bedriften AS", "25\u00A0000\u00A0kr"), List.of("Totalt", "25\u00A0000\u00A0kr"));
         assertThat(avsnitt(tekster, 2).innhold())
             .isEqualTo("Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.");
     }
@@ -466,7 +466,7 @@ class OppgaveInnholdUtlederInnholdTest {
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         OppgaveTabell tabell = tabell(utleder.tekster(oppgave), 1);
-        assertThat(tabell.rader()).contains(List.of("999999999", "10 000 kr"));
+        assertThat(tabell.rader()).contains(List.of("999999999", "10\u00A0000\u00A0kr"));
     }
 
     @Test
@@ -480,7 +480,7 @@ class OppgaveInnholdUtlederInnholdTest {
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Nav-ytelse", "Inntekt før skatt");
-        assertThat(tabell.rader()).containsExactly(List.of("Dagpenger", "5 000 kr"), List.of("Totalt", "5 000 kr"));
+        assertThat(tabell.rader()).containsExactly(List.of("Dagpenger", "5\u00A0000\u00A0kr"), List.of("Totalt", "5\u00A0000\u00A0kr"));
         // gjelderDelerAvMåned=true har forrang foran harKunYtelseInntekt - se if/else-rekkefølgen i utlederen.
         assertThat(avsnitt(tekster, 2).innhold()).isEqualTo(
             "Vi bruker ikke hele inntekten din, bare deler av den, når vi regner ut hvor mye penger du får. Det er fordi du ikke hadde ungdomsprogramytelsen hele måneden.");
@@ -499,9 +499,9 @@ class OppgaveInnholdUtlederInnholdTest {
         OppgaveTabell tabell = tabell(tekster, 1);
         assertThat(tabell.kolonneOverskrifter()).containsExactly("Arbeidsgiver/Nav-ytelse", "Inntekt før skatt");
         assertThat(tabell.rader()).containsExactly(
-            List.of("Bedriften AS", "20 000 kr"),
-            List.of("Arbeidsavklaringspenger", "5 000 kr"),
-            List.of("Totalt", "25 000 kr"));
+            List.of("Bedriften AS", "20\u00A0000\u00A0kr"),
+            List.of("Arbeidsavklaringspenger", "5\u00A0000\u00A0kr"),
+            List.of("Totalt", "25\u00A0000\u00A0kr"));
         assertThat(avsnitt(tekster, 2).innhold())
             .isEqualTo("Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.");
     }
@@ -516,7 +516,7 @@ class OppgaveInnholdUtlederInnholdTest {
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 
         OppgaveTabell tabell = tabell(utleder.tekster(oppgave), 1);
-        assertThat(tabell.rader()).containsExactly(List.of(forventetNavn, "100 kr"), List.of("Totalt", "100 kr"));
+        assertThat(tabell.rader()).containsExactly(List.of(forventetNavn, "100\u00A0kr"), List.of("Totalt", "100\u00A0kr"));
     }
 
     private static Stream<Arguments> ytelseTypeVisningsnavn() {
@@ -569,7 +569,7 @@ class OppgaveInnholdUtlederInnholdTest {
             LocalDateTime.of(2025, 2, 15, 12, 0));
         List<OppgaveTekst> teksterMedFrist = utleder.tekster(medFrist);
         assertThat(teksterMedFrist).hasSize(6);
-        assertThat(avsnitt(teksterMedFrist, 5)).isEqualTo(
+        assertThat(avsnitt(teksterMedFrist, 3)).isEqualTo(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>15. februar 2025</b>."));
 
         BrukerdialogOppgaveEntitet utenFrist = oppgave(OppgaveType.BEKREFT_ENDRET_STARTDATO, OppgaveYtelsetype.UNGDOMSYTELSE, null);

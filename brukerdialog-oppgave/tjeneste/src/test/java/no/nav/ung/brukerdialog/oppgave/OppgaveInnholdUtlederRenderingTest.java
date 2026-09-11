@@ -285,7 +285,7 @@ class OppgaveInnholdUtlederRenderingTest {
                         new RegisterinntektDTO(List.of(), List.of(
                             new YtelseRegisterInntektDTO(5000, YtelseType.DAGPENGER))), true)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, LocalDateTime.of(2025, 3, 10, 0, 0)),
-                "Vi har fått disse opplysningene om ytelse fra Nav for februar", "Dagpenger", "5 000 kr",
+                "Vi har fått disse opplysningene om ytelse fra Nav for februar", "Dagpenger", "5\u00A0000\u00A0kr",
                 "ikke hadde ungdomsprogramytelsen hele måneden", "Fristen for å svare er senest <b>10. mars 2025</b>.")),
 
             Arguments.of(scenario("avvik registerinntekt - arbeid og ytelse kombinert, hel måned, ingen svarfrist",
@@ -296,7 +296,7 @@ class OppgaveInnholdUtlederRenderingTest {
                             List.of(new YtelseRegisterInntektDTO(5000, YtelseType.AAP))), false)), UNGDOMSPROGRAM_BASE_URL, AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_AVVIK_REGISTERINNTEKT, OppgaveYtelsetype.UNGDOMSYTELSE, null),
                 "Vi har fått disse opplysningene fra arbeidsgiver om inntekten din for april", "Bedriften AS",
-                "20 000 kr", "Arbeidsavklaringspenger", "25 000 kr",
+                "20\u00A0000\u00A0kr", "Arbeidsavklaringspenger", "25\u00A0000\u00A0kr",
                 "Vi bruker denne inntekten fra arbeidsgiver til å vurdere hvor mye du får utbetalt.")),
 
             // --- rapporter-inntekt (og listerendring) ---

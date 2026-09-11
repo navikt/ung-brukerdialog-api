@@ -93,7 +93,7 @@ class OppgaveTekstfragmentRendererTest {
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
 
-        assertThat(tekster).contains(new OppgaveAvsnitt("En spesifikk forklaring."));
+        assertThat(tekster).contains(new OppgaveAvsnitt("Årsak", "En spesifikk forklaring."));
     }
 
     @Test
