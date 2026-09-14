@@ -12,8 +12,6 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveResponsDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
 import no.nav.ung.brukerdialog.typer.Saksnummer;
@@ -21,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -125,18 +122,9 @@ public class OppgaveLivssyklusTjeneste {
         opprettTaskForJournalføringHvisAktuelt(oppgaveEntitet, journalføring);
     }
 
-    /**
-     * Varselteksten på Min Side er alltid {@link OppgaveInnholdUtleder}s FØRSTE tekstblokk (se
-     * kontrakten på {@link OppgaveInnholdUtleder#tekster}) - samme tekst som første avsnitt i
-     * PDF-brevet og første element i {@code BrukerdialogOppgaveDto.varselInnhold()}.
-     */
     private void opprettTaskForPubliseringAvVarsel(BrukerdialogOppgaveEntitet oppgaveEntitet) {
         OppgaveInnholdUtleder innholdUtleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgaveEntitet.getOppgaveType());
-        List<OppgaveTekst> tekster = innholdUtleder.tekster(oppgaveEntitet);
-        if (tekster.isEmpty() || !(tekster.getFirst() instanceof OppgaveAvsnitt avsnitt)) {
-            throw new IllegalStateException("Første tekstblokk må være OppgaveAvsnitt (oppgaveType=%s)".formatted(oppgaveEntitet.getOppgaveType()));
-        }
-        String varselTekst = avsnitt.innhold();
+        String varselTekst = innholdUtleder.varseltekst(oppgaveEntitet);
 
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(PubliserMinSideVarselTask.class);
         prosessTaskData.setProperty(PubliserMinSideVarselTask.OPPGAVE_REFERANSE, oppgaveEntitet.getOppgavereferanse().toString());

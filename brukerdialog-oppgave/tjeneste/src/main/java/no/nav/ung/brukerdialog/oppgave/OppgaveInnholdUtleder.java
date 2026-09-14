@@ -3,6 +3,7 @@ package no.nav.ung.brukerdialog.oppgave;
 import jakarta.enterprise.inject.Instance;
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 
 import java.util.List;
@@ -22,7 +23,18 @@ public interface OppgaveInnholdUtleder {
 
     List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave);
 
-    List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave);
+    // Første tekstblokk i tekster(oppgave) - brukes som varseltekst på Min Side og i API-kontrakten.
+    default String varseltekst(BrukerdialogOppgaveEntitet oppgave) {
+        List<OppgaveTekst> tekster = tekster(oppgave);
+        if (tekster.isEmpty() || !(tekster.getFirst() instanceof OppgaveAvsnitt avsnitt)) {
+            throw new IllegalStateException(
+                "Første tekstblokk for oppgaveType=%s må være et OppgaveAvsnitt for å kunne brukes som varseltekst"
+                    .formatted(oppgave.getOppgaveType()));
+        }
+        String varseltekst = avsnitt.innhold();
+        OppgaveTekster.validerVarselTekstLengde(varseltekst, oppgave.getOppgaveType());
+        return varseltekst;
+    }
 
     String varselLenke(BrukerdialogOppgaveEntitet oppgave);
 }

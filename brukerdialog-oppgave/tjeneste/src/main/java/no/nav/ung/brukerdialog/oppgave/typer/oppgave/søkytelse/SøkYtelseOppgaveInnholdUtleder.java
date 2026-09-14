@@ -50,15 +50,6 @@ public class SøkYtelseOppgaveInnholdUtleder implements OppgaveInnholdUtleder {
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         SøkYtelseOppgavetypeDataDto dto = hentDto(oppgave);
         validerYtelsetype(oppgave.getYtelsetype());
 

@@ -22,8 +22,18 @@ public record BekreftOpphorVedMaksdatoOppgavetypeDataDto(
     @JsonProperty(value = "maxDato", required = true)
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate maxDato
+    LocalDate maxDato,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    @JsonProperty(value = "varseltekst")
+    String varseltekst
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public BekreftOpphorVedMaksdatoOppgavetypeDataDto(LocalDate sluttdato, LocalDate maxDato) {
+        this(sluttdato, maxDato, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.BEKREFT_OPPHOR_VED_MAKSDATO;

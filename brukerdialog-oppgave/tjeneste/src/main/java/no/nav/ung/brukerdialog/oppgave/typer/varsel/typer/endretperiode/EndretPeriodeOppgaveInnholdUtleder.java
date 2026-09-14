@@ -64,15 +64,6 @@ public class EndretPeriodeOppgaveInnholdUtleder implements OppgaveInnholdUtleder
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         EndretPeriodeDataDto dto = hentDto(oppgave);
         Gren gren = bestemGren(dto);
         OppgaveYtelsetype ytelsetype = oppgave.getYtelsetype();

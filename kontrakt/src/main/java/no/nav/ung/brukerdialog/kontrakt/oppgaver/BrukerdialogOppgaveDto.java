@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -48,14 +46,7 @@ public record BrukerdialogOppgaveDto(
 
     @JsonProperty(value = "frist")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    ZonedDateTime frist,
-
-    @JsonProperty(value = "varselInnhold", required = true)
-    @NotNull
-    List<OppgaveTekst> varselInnhold,
-
-    @JsonProperty(value = "undertittel")
-    String undertittel
+    ZonedDateTime frist
 ) {
 }
 

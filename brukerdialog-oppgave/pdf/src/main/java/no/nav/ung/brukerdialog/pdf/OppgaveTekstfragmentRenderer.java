@@ -27,29 +27,23 @@ import java.util.Objects;
 public class OppgaveTekstfragmentRenderer {
 
     static final String AKKUMULATOR_NØKKEL = "__oppgaveTekster__";
-    static final String VARSEL_INNHOLD_NØKKEL = "__varselInnhold__";
 
-    public record Resultat(List<OppgaveTekst> alle, List<OppgaveTekst> varselInnhold) {
-    }
-
-    public Resultat rendre(String malnavn, Map<String, Object> data) {
+    public List<OppgaveTekst> rendre(String malnavn, Map<String, Object> data) {
         Objects.requireNonNull(malnavn, "malnavn");
         Objects.requireNonNull(data, "data");
         Template template = kompilerMal(malnavn);
         List<OppgaveTekst> akkumulator = new ArrayList<>();
-        List<OppgaveTekst> varselInnhold = new ArrayList<>();
         Context context = Context.newBuilder(data)
             .resolver(MapValueResolver.INSTANCE, MethodValueResolver.INSTANCE)
             .build();
         context.data(AKKUMULATOR_NØKKEL, akkumulator);
-        context.data(VARSEL_INNHOLD_NØKKEL, varselInnhold);
         try {
             template.apply(context);
         } catch (IOException e) {
             throw new UncheckedIOException(
                 "Klarte ikke å rendre tekstfragment-mal '%s'".formatted(malnavn), e);
         }
-        return new Resultat(akkumulator, varselInnhold);
+        return akkumulator;
     }
 
     private static Template kompilerMal(String malnavn) {

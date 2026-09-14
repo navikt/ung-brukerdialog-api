@@ -17,12 +17,13 @@ public class InntektsrapporteringOppgaveDataMapperFraEntitetTilDto implements Op
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (InntektsrapporteringOppgaveDataEntitet) entitet;
         return new InntektsrapporteringOppgavetypeDataDto(
             e.getFraOgMed(),
             e.getTilOgMed(),
-            e.isGjelderDelerAvMåned()
+            e.isGjelderDelerAvMåned(),
+            varseltekst
         );
     }
 }

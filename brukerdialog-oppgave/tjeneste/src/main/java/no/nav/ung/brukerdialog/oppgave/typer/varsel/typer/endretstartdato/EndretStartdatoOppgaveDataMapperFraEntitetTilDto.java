@@ -17,9 +17,9 @@ public class EndretStartdatoOppgaveDataMapperFraEntitetTilDto implements Oppgave
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (EndretStartdatoOppgaveDataEntitet) entitet;
-        return new EndretStartdatoDataDto(e.getNyStartdato(), e.getForrigeStartdato());
+        return new EndretStartdatoDataDto(e.getNyStartdato(), e.getForrigeStartdato(), varseltekst);
     }
 }
 

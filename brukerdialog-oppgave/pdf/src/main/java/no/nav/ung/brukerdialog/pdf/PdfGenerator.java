@@ -290,9 +290,6 @@ public class PdfGenerator {
 
     private static void leggTilElement(Options options, OppgaveTekst element) {
         akkumulator(options).add(element);
-        if (Boolean.TRUE.equals(options.hash("data", false))) {
-            varselInnholdAkkumulator(options).add(element);
-        }
     }
 
     private static String tekstFraBlokk(CharSequence blokkInnhold) {
@@ -307,11 +304,6 @@ public class PdfGenerator {
     @SuppressWarnings("unchecked")
     private static List<OppgaveTekst> akkumulator(Options options) {
         return (List<OppgaveTekst>) options.data(OppgaveTekstfragmentRenderer.AKKUMULATOR_NØKKEL);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<OppgaveTekst> varselInnholdAkkumulator(Options options) {
-        return (List<OppgaveTekst>) options.data(OppgaveTekstfragmentRenderer.VARSEL_INNHOLD_NØKKEL);
     }
 
     @SuppressWarnings("unchecked")

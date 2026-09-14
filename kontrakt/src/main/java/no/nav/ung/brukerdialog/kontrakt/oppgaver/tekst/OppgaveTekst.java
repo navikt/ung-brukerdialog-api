@@ -4,19 +4,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Typesikker tekstblokk til bruk i oppgavebrev - delt datamodell mellom PDF-dokumentet
- * ({@code brukerdialog-oppgave/pdf}), min-side-varselet og {@code varselInnhold}-feltet på
- * {@link no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto}, slik at teksten som
- * vises de tre stedene aldri kan drifte fra hverandre. Merk at {@code varselInnhold} kun er en
- * innsnevret undermengde av oppgavens fulle tekst (PDF-en/min-side-varselet baserer seg på hele
- * listen via {@code OppgaveInnholdUtleder#tekster}, mens {@code varselInnhold} kun inneholder
- * elementene som er merket relevante for konsumenten).
- * <p>
- * En oppgave sin fullstendige tekst er en {@code List<OppgaveTekst>} som konsumenten itererer
- * over i rekkefølge - ikke et generisk {@code Map<String, Object>}. Kontrakten er at det FØRSTE
- * elementet i den fulle listen alltid er en {@link OppgaveAvsnitt} (ren tekst, uten overskrift),
- * siden dette elementet også brukes som selve varselteksten på Min Side.
- * <p>
+ * Typesikker tekstblokk til bruk i PDF-brevet og min-side-varselet - konsumeres via
+ * {@code OppgaveInnholdUtleder#tekster}. Det FØRSTE elementet er alltid en {@link OppgaveAvsnitt}
+ * (ren tekst, uten overskrift), siden dette elementet også brukes som selve varselteksten på
+ * Min Side og som {@code varseltekst} på {@link no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto}.
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,

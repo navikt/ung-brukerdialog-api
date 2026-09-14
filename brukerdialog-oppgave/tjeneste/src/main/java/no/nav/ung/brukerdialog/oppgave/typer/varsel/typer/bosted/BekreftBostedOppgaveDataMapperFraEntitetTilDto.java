@@ -18,11 +18,11 @@ public class BekreftBostedOppgaveDataMapperFraEntitetTilDto implements OppgaveDa
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (BekreftBostedOppgaveDataEntitet) entitet;
         if (e.getTom() == null) {
-            return new BekreftBostedOpphørOppgavetypeDataDto(e.getFom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak(), e.getKilde(), e.getKildeFritekst());
+            return new BekreftBostedOpphørOppgavetypeDataDto(e.getFom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak(), e.getKilde(), e.getKildeFritekst(), varseltekst);
         }
-        return new BekreftBostedOppgavetypeDataDto(e.getFom(), e.getTom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak(), e.getKilde(), e.getKildeFritekst());
+        return new BekreftBostedOppgavetypeDataDto(e.getFom(), e.getTom(), e.isErBosattITrondheim(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getIkkeOppfyltÅrsak(), e.getKilde(), e.getKildeFritekst(), varseltekst);
     }
 }
