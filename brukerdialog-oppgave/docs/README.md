@@ -13,6 +13,9 @@ Brukerdialog-oppgaver er oppgaver som sendes til brukerne via Min Side og Aktør
 | [RAPPORTER_INNTEKT](oppgavetyper/RAPPORTER_INNTEKT.md) | Ungdomsytelse, Aktivitetspenger | Oppgave | - **Ungdomsytelse:** [§ 11 i Forskrift om forsøk med ungdomsprogram og ungdomsprogramytelse (gjelder fra 1. august 2025)](https://lovdata.no/dokument/LTI/forskrift/2025-06-20-1182)<br>- **Aktivitetspenger:** ingen lovreferanse klar ennå | Bruker rapporterer inntekt for foregående måned |
 | [SØK_YTELSE](oppgavetyper/SØK_YTELSE.md) | Ungdomsytelse | Oppgave | [§ 8 jf. § 3 og §§ 6, 9 og 10 i Forskrift om forsøk om ungdomsprogram og ungdomsprogramytelse](https://lovdata.no/dokument/LTI/forskrift/2025-06-20-1182) | Bruker oppfordres til å søke om ytelsen |
 | [BEKREFT_BOSTED](oppgavetyper/BEKREFT_BOSTED.md) | Aktivitetspenger | Varsel |  | Bruker kan uttale seg om opplysninger vedrørende bosted og om bruker bor i Trondheim |
+| [BEKREFT_BISTAND](oppgavetyper/BEKREFT_BISTAND.md) | Aktivitetspenger | Varsel |  | Bruker kan uttale seg om at Nav ikke har et vedtak etter navloven § 14 a om behov for bistand |
+| [BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER](oppgavetyper/BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER.md) | Aktivitetspenger | Varsel |  | Bruker kan uttale seg om opplysninger om at bruker mottar en annen ytelse til livsopphold |
+| [BEKREFT_AKTIVITET](oppgavetyper/BEKREFT_AKTIVITET.md) | Aktivitetspenger | Varsel |  | Bruker kan uttale seg om opplysninger om at aktivitetsvilkåret ikke er oppfylt |
 | [BEKREFT_AUTOMATISK_OPPHOR](oppgavetyper/BEKREFT_AUTOMATISK_OPPHOR.md) | Ungdomsytelse | Varsel | [§ 8 jf. § 3 i Forskrift om forsøk om ungdomsprogram og ungdomsprogramytelse](https://lovdata.no/dokument/LTI/forskrift/2025-06-20-1182) | Bruker varsles om opphør ved maksdato (260/300 dager) |
 
 Skjermbilder for oppgavene er tilgjengelig via storybook:

@@ -1,0 +1,30 @@
+{{#avsnitt data=true~}}
+    Vi har fått opplysninger om at du {{#if erPeriode~}}
+        i perioden {{datoLang fom}} til {{datoLang tom}}
+    {{~else~}}
+        fra {{datoLang fom}}
+    {{~/if}} {{#switch årsak~}}
+        {{~#case "IKKE_14A_VEDTAK"~}}
+            {{~#if erPeriode~}}
+                ikke har
+            {{~else~}}
+                ikke lenger har
+            {{~/if}} et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger.
+        {{~/case~}}
+        {{~#default~}}
+            {{~#if erPeriode~}}
+                ikke oppfyller
+            {{~else~}}
+                ikke lenger oppfyller
+            {{~/if}} vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger.
+        {{~/default~}}
+    {{~/switch}}
+{{~/avsnitt}}
+{{#isNotNull årsakFritekst}}
+{{#avsnitt tittel="Årsak" data=true}}{{årsakFritekst}}{{/avsnitt}}
+{{/isNotNull}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?" data=true}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}
+{{> partial/om_varsel}}

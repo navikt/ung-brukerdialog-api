@@ -4,7 +4,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bistand.BekreftBistandOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet.BekreftAktivitetOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPeriodeOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.EndretStartdatoOppgaveInnholdUtleder;
@@ -21,6 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OppgaveInnholdUtlederDekningTest {
 
     private static final List<Class<? extends OppgaveInnholdUtleder>> IMPLEMENTASJONER = List.of(
+        BekreftAktivitetOppgaveInnholdUtleder.class,
+        BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder.class,
+        BekreftBistandOppgaveInnholdUtleder.class,
         BekreftBostedOppgaveInnholdUtleder.class,
         BekreftOpphørVedMaksdatoOppgaveInnholdUtleder.class,
         EndretPeriodeOppgaveInnholdUtleder.class,

@@ -1,0 +1,28 @@
+package no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.oppgave.OppgaveDataMapperFraEntitetTilDto;
+import no.nav.ung.brukerdialog.oppgave.OppgaveTypeRef;
+import no.nav.ung.brukerdialog.oppgave.typer.OppgaveDataEntitet;
+
+@ApplicationScoped
+@OppgaveTypeRef(OppgaveType.BEKREFT_AKTIVITET)
+public class BekreftAktivitetOppgaveDataMapperFraEntitetTilDto implements OppgaveDataMapperFraEntitetTilDto {
+
+    protected BekreftAktivitetOppgaveDataMapperFraEntitetTilDto() {
+        // CDI proxy
+    }
+
+    @Override
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+        var e = (BekreftAktivitetOppgaveDataEntitet) entitet;
+        if (e.getTom() == null) {
+            return new BekreftAktivitetOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+        }
+        return new BekreftAktivitetOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+    }
+}

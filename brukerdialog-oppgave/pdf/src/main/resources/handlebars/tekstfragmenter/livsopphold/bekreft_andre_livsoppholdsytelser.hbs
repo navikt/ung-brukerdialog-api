@@ -1,0 +1,37 @@
+{{#avsnitt data=true~}}
+    Vi har fått opplysninger om at du {{#if erPeriode~}}
+        i perioden {{datoLang fom}} til {{datoLang tom}}
+    {{~else~}}
+        fra {{datoLang fom}}
+    {{~/if}} får {{#switch årsak~}}
+        {{~#case "MOTTAR_ARBEIDSAVKLARINGSPENGER"~}}arbeidsavklaringspenger{{~/case~}}
+        {{~#case "MOTTAR_TILTAKSPENGER"~}}tiltakspenger{{~/case~}}
+        {{~#case "MOTTAR_KVALIFISERINGSSTØNAD"~}}kvalifiseringsstønad{{~/case~}}
+        {{~#case "MOTTAR_DAGPENGER"~}}dagpenger{{~/case~}}
+        {{~#case "MOTTAR_FORELDREPENGER"~}}foreldrepenger{{~/case~}}
+        {{~#case "MOTTAR_SVANGERSKAPSPENGER"~}}svangerskapspenger{{~/case~}}
+        {{~#case "MOTTAR_UFØRETRYGD"~}}uføretrygd{{~/case~}}
+        {{~#case "MOTTAR_INTRODUKSJONSSTØNAD"~}}introduksjonsstønad{{~/case~}}
+        {{~#case "MOTTAR_BARNEPENSJON"~}}barnepensjon{{~/case~}}
+        {{~#default~}}en annen ytelse til livsopphold{{~/default~}}
+    {{~/switch}}. Du kan ikke få aktivitetspenger samtidig som du får {{#switch årsak~}}
+        {{~#case "MOTTAR_ARBEIDSAVKLARINGSPENGER"~}}arbeidsavklaringspenger{{~/case~}}
+        {{~#case "MOTTAR_TILTAKSPENGER"~}}tiltakspenger{{~/case~}}
+        {{~#case "MOTTAR_KVALIFISERINGSSTØNAD"~}}kvalifiseringsstønad{{~/case~}}
+        {{~#case "MOTTAR_DAGPENGER"~}}dagpenger{{~/case~}}
+        {{~#case "MOTTAR_FORELDREPENGER"~}}foreldrepenger{{~/case~}}
+        {{~#case "MOTTAR_SVANGERSKAPSPENGER"~}}svangerskapspenger{{~/case~}}
+        {{~#case "MOTTAR_UFØRETRYGD"~}}uføretrygd{{~/case~}}
+        {{~#case "MOTTAR_INTRODUKSJONSSTØNAD"~}}introduksjonsstønad{{~/case~}}
+        {{~#case "MOTTAR_BARNEPENSJON"~}}barnepensjon{{~/case~}}
+        {{~#default~}}en annen ytelse til livsopphold{{~/default~}}
+    {{~/switch}}.
+{{~/avsnitt}}
+{{#isNotNull årsakFritekst}}
+{{#avsnitt tittel="Årsak" data=true}}{{årsakFritekst}}{{/avsnitt}}
+{{/isNotNull}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?" data=true}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#case "NAV"}}Nav{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}
+{{> partial/om_varsel}}

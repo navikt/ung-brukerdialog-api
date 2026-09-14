@@ -8,6 +8,15 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsvilkårIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsvilkåretIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserAvklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsvilkårIkkeOppfyltÅrsak;
@@ -26,6 +35,9 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.Bekreft
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bistand.BekreftBistandOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet.BekreftAktivitetOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPeriodeOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
@@ -57,7 +69,7 @@ import static org.mockito.Mockito.when;
 /**
  * Regresjonstest mot personopplysningslekkasje.
  * <p>
- * Denne testen kjører alle 8 produksjonsimplementasjonene mot en datarik variant av sin DTO
+ * Denne testen kjører alle 9 produksjonsimplementasjonene mot en datarik variant av sin DTO
  * (fritekst-forklaringer, arbeidsgivernavn, org.nr, beløp o.l. - de personopplysningene som
  * FAKTISK er lov, se javadoc) og verifiserer at ingen av dem noensinne inneholder:
  * <ol>
@@ -69,7 +81,7 @@ import static org.mockito.Mockito.when;
  * {@link OppgaveInnholdUtleder#varselLenke}. Utfyllende dekning av det faktiske tekstinnholdet
  * (inkl. eksakt likhet på hele {@code tekster()}-lista) finnes i
  * {@link OppgaveInnholdUtlederInnholdTest} - denne testen er et smalt, men bredt-dekkende
- * sikkerhetsnett på tvers av alle 8 typer, ikke en erstatning for den.
+ * sikkerhetsnett på tvers av alle 9 typer, ikke en erstatning for den.
  */
 class OppgaveInnholdUtlederPiiTest {
 
@@ -142,6 +154,27 @@ class OppgaveInnholdUtlederPiiTest {
 
     private static Stream<Arguments> utledereMedDatarikeOppgaver() {
         return Stream.of(
+            Arguments.of("bekreft aktivitet",
+                new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET,
+                    "Du har ikke møtt til den avtalte aktiviteten", AktivitetsavklaringKildeType.ANNET, "en veileder hos Nav")),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.AKTIVITETSPENGER)),
+
+            Arguments.of("bekreft andre livsoppholdsytelser",
+                new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_ANNEN_YTELSE,
+                    "Du mottar sosialhjelp fra kommunen", AndreLivsoppholdsytelserAvklaringKildeType.ANNET, "en saksbehandler i kommunen")),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.AKTIVITETSPENGER)),
+
+            Arguments.of("bekreft bistand",
+                new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    "Oppfølgingsvedtaket ble avsluttet i desember", BistandsavklaringKildeType.ANNET, "en veileder hos Nav")),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER)),
+
             Arguments.of("bekreft bosted",
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true,

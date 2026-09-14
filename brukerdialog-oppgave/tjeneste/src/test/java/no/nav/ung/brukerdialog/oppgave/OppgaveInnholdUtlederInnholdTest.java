@@ -9,6 +9,18 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsvilkårIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsvilkåretIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserAvklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
@@ -28,6 +40,9 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.Bekreft
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bistand.BekreftBistandOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet.BekreftAktivitetOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPeriodeOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
@@ -62,7 +77,7 @@ class OppgaveInnholdUtlederInnholdTest {
     private static final String AKTIVITETSPENGER_BASE_URL = "https://aktivitetspenger-innsyn.example";
 
     // ---------------------------------------------------------------------------------------
-    // Uttømmende sveip: tittel + tekster + varselLenke for alle 8 oppgavetyper
+    // Uttømmende sveip: tittel + tekster + varselLenke for alle 9 oppgavetyper
     // ---------------------------------------------------------------------------------------
 
     @ParameterizedTest
@@ -131,7 +146,8 @@ class OppgaveInnholdUtlederInnholdTest {
     }
 
     private static OppgaveYtelsetype standardYtelsetypeFor(OppgaveType oppgaveType) {
-        return oppgaveType == OppgaveType.BEKREFT_BOSTED
+        return oppgaveType == OppgaveType.BEKREFT_BOSTED || oppgaveType == OppgaveType.BEKREFT_BISTAND
+            || oppgaveType == OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER || oppgaveType == OppgaveType.BEKREFT_AKTIVITET
             ? OppgaveYtelsetype.AKTIVITETSPENGER
             : OppgaveYtelsetype.UNGDOMSYTELSE;
     }
@@ -166,6 +182,45 @@ class OppgaveInnholdUtlederInnholdTest {
 
     private static Scenario scenarioFor(OppgaveType oppgaveType) {
         return switch (oppgaveType) {
+            case BEKREFT_AKTIVITET -> new Scenario(
+                new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET,
+                    "Du har ikke møtt til den avtalte aktiviteten.", AktivitetsavklaringKildeType.NAV, null)),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                "Aktivitetsvilkåret",
+                List.of(
+                    new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."),
+                    new OppgaveAvsnitt("Årsak", "Du har ikke møtt til den avtalte aktiviteten."),
+                    new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Nav"),
+                    OM_VARSEL_1, OM_VARSEL_2),
+                AKTIVITETSPENGER_BASE_URL, true);
+
+            case BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER -> new Scenario(
+                new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_DAGPENGER,
+                    "Nav har registrert et vedtak om dagpenger fra 1. januar.", AndreLivsoppholdsytelserAvklaringKildeType.NAV, null)),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                "Andre ytelser til livsopphold",
+                List.of(
+                    new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 får dagpenger. Du kan ikke få aktivitetspenger samtidig som du får dagpenger."),
+                    new OppgaveAvsnitt("Årsak", "Nav har registrert et vedtak om dagpenger fra 1. januar."),
+                    new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Nav"),
+                    OM_VARSEL_1, OM_VARSEL_2),
+                AKTIVITETSPENGER_BASE_URL, true);
+
+            case BEKREFT_BISTAND -> new Scenario(
+                new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    "Veilederen din har ikke fattet vedtak om behov for bistand.", BistandsavklaringKildeType.BRUKER, null)),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                "Behov for bistand",
+                List.of(
+                    new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
+                    new OppgaveAvsnitt("Årsak", "Veilederen din har ikke fattet vedtak om behov for bistand."),
+                    new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
+                    OM_VARSEL_1, OM_VARSEL_2),
+                AKTIVITETSPENGER_BASE_URL, true);
+
             case BEKREFT_BOSTED -> new Scenario(
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
                     LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), true, null,
@@ -369,6 +424,153 @@ class OppgaveInnholdUtlederInnholdTest {
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster.get(0)).isEqualTo(
             new OppgaveAvsnitt("Veilederen din har meldt deg ut i ungdomsprogrammet med sluttdato <b>30. juni 2025</b>."));
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // BekreftAktivitet: bundet vs. opphør, fritekst-avsnitt og kildetyper
+    // ---------------------------------------------------------------------------------------
+
+    @Test
+    void bekreftAktivitet_bundet_periode_uten_fritekst() {
+        var utleder = new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AktivitetsvilkåretIkkeOppfyltÅrsak.UDEFINERT, null,
+            AktivitetsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."),
+            // Ingen «Årsak»-avsnitt: fritekst mangler.
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftAktivitet_opphør_periode_uten_tom() {
+        var utleder = new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOpphørOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET,
+            "Aktiviteten din ble avsluttet.", AktivitetsavklaringKildeType.ANNET, "veilederen din")),
+            AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."),
+            new OppgaveAvsnitt("Årsak", "Aktiviteten din ble avsluttet."),
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "veilederen din"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftAktivitet_feil_ytelsetype_kaster_illegalstateexception() {
+        var utleder = new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET, "Fritekst.",
+            AktivitetsavklaringKildeType.NAV, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+
+        assertThatIllegalStateException()
+            .isThrownBy(() -> utleder.tekster(oppgave))
+            .withMessageContaining("BEKREFT_AKTIVITET")
+            .withMessageContaining("AKTIVITETSPENGER")
+            .withMessageContaining("UNGDOMSYTELSE");
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // BekreftAndreLivsoppholdsytelser: bundet vs. opphør, navngitt ytelse vs. generisk, kildetyper
+    // ---------------------------------------------------------------------------------------
+
+    @Test
+    void bekreftAndreLivsoppholdsytelser_bundet_periode_uten_fritekst() {
+        var utleder = new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_UFØRETRYGD, null,
+            AndreLivsoppholdsytelserAvklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 får uføretrygd. Du kan ikke få aktivitetspenger samtidig som du får uføretrygd."),
+            // Ingen «Årsak»-avsnitt: fritekst mangler.
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftAndreLivsoppholdsytelser_opphør_periode_uten_tom() {
+        var utleder = new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_ANNEN_YTELSE,
+            "Du mottar stønad til livsopphold fra en annen offentlig ordning.", AndreLivsoppholdsytelserAvklaringKildeType.ANNET, "kommunen")),
+            AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du fra 1. januar 2025 får en annen ytelse til livsopphold. Du kan ikke få aktivitetspenger samtidig som du får en annen ytelse til livsopphold."),
+            new OppgaveAvsnitt("Årsak", "Du mottar stønad til livsopphold fra en annen offentlig ordning."),
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "kommunen"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftAndreLivsoppholdsytelser_feil_ytelsetype_kaster_illegalstateexception() {
+        var utleder = new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_DAGPENGER, "Fritekst.",
+            AndreLivsoppholdsytelserAvklaringKildeType.NAV, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+
+        assertThatIllegalStateException()
+            .isThrownBy(() -> utleder.tekster(oppgave))
+            .withMessageContaining("BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER")
+            .withMessageContaining("AKTIVITETSPENGER")
+            .withMessageContaining("UNGDOMSYTELSE");
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // BekreftBistand: bundet vs. opphør, fritekst-avsnitt og kildetyper
+    // ---------------------------------------------------------------------------------------
+
+    @Test
+    void bekreftBistand_bundet_periode_uten_fritekst() {
+        var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.UDEFINERT, null,
+            BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke oppfyller vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger."),
+            // Ingen «Årsak»-avsnitt: fritekst mangler.
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftBistand_opphør_periode_uten_tom() {
+        var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOpphørOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+            "Oppfølgingsvedtaket ditt er avsluttet.", BistandsavklaringKildeType.ANNET, "veilederen din")),
+            AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
+        assertThat(tekster).containsExactly(
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
+            new OppgaveAvsnitt("Årsak", "Oppfølgingsvedtaket ditt er avsluttet."),
+            new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "veilederen din"),
+            OM_VARSEL_1, OM_VARSEL_2);
+    }
+
+    @Test
+    void bekreftBistand_feil_ytelsetype_kaster_illegalstateexception() {
+        var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Fritekst.",
+            BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.UNGDOMSYTELSE, null);
+
+        assertThatIllegalStateException()
+            .isThrownBy(() -> utleder.tekster(oppgave))
+            .withMessageContaining("BEKREFT_BISTAND")
+            .withMessageContaining("AKTIVITETSPENGER")
+            .withMessageContaining("UNGDOMSYTELSE");
     }
 
     // ---------------------------------------------------------------------------------------

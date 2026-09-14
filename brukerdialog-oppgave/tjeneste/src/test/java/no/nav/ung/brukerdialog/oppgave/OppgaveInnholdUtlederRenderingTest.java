@@ -6,6 +6,18 @@ import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BistandsvilkårIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsavklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.AktivitetsvilkåretIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserAvklaringKildeType;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.AndreLivsoppholdsytelserIkkeOppfyltÅrsak;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
@@ -25,6 +37,9 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.Bekreft
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bistand.BekreftBistandOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet.BekreftAktivitetOppgaveInnholdUtleder;
+import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretperiode.EndretPeriodeOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretsluttdato.EndretSluttdatoOppgaveInnholdUtleder;
@@ -100,7 +115,7 @@ class OppgaveInnholdUtlederRenderingTest {
             .contains("Kari Nordmann")
             .contains("01019099999")
             .contains(scenario.oppgave().getOppgavereferanse().toString())
-            // Alle 8 scenarioer skal si hvor svaret leveres, med en ekte lenke - ikke
+            // Alle scenarioer skal si hvor svaret leveres, med en ekte lenke - ikke
             // bare et navn (og aldri "... her", som er umulig i et arkivert, statisk dokument).
             .contains("href=\"https://www.nav.no/minside\"")
             .doesNotContain("svaret ditt her")
@@ -131,6 +146,20 @@ class OppgaveInnholdUtlederRenderingTest {
     }
 
     @Test
+    void svarfrist_utelates_når_fristTid_mangler_bistand_opphør() {
+        var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(
+            new BekreftBistandOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1),
+                BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Du har fullført oppfølgingen.",
+                BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL,
+            new OppgaveTekstfragmentRenderer());
+        BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null);
+
+        String html = pdfGenerator.tilHtml(pdfDokument(utleder, oppgave));
+
+        assertThat(html).doesNotContain("Fristen for å svare");
+    }
+
+    @Test
     void svarfrist_utelates_når_fristTid_mangler_bosted_opphør() {
         var utleder = new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(
             new BekreftBostedOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1), false, null,
@@ -155,7 +184,7 @@ class OppgaveInnholdUtlederRenderingTest {
     }
 
     // ---------------------------------------------------------------------------------------
-    // Scenarioer - ett per distinkt gren på tvers av alle 8 oppgavetyper, se klasse-javadoc
+    // Scenarioer - ett per distinkt gren på tvers av alle 9 oppgavetyper, se klasse-javadoc
     // ---------------------------------------------------------------------------------------
 
     private record RenderScenario(String beskrivelse, OppgaveInnholdUtleder utleder,
@@ -173,6 +202,59 @@ class OppgaveInnholdUtlederRenderingTest {
 
     private static Stream<Arguments> scenarioer() {
         return Stream.of(
+            // --- bekreft-aktivitet: bundet/opphør, årsakfritekst, kilde, svarfrist ---
+            Arguments.of(scenario("aktivitet - bundet periode, ANNET-årsak, NAV-kilde, svarfrist",
+                new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET,
+                    "Du har ikke møtt til den avtalte aktiviteten.", AktivitetsavklaringKildeType.NAV, null)),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.AKTIVITETSPENGER, LocalDateTime.of(2025, 2, 1, 0, 0)),
+                "1. januar 2025", "31. januar 2025", "ikke er i aktivitet",
+                "Du har ikke møtt til den avtalte aktiviteten.",
+                "Fristen for å svare er senest <b>1. februar 2025</b>.")),
+
+            Arguments.of(scenario("aktivitet - opphør, ANNET-kilde, ingen svarfrist",
+                new BekreftAktivitetOppgaveInnholdUtleder(mappereSomGir(new BekreftAktivitetOpphørOppgavetypeDataDto(
+                    LocalDate.of(2025, 3, 1), AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET, "Aktiviteten din ble avsluttet.",
+                    AktivitetsavklaringKildeType.ANNET, "veilederen din")), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_AKTIVITET, OppgaveYtelsetype.AKTIVITETSPENGER, null),
+                "1. mars 2025", "ikke lenger er i aktivitet", "veilederen din")),
+
+            // --- bekreft-andre-livsoppholdsytelser: bundet/opphør, navngitt ytelse vs. generisk, kilde ---
+            Arguments.of(scenario("andre livsoppholdsytelser - bundet periode, MOTTAR_DAGPENGER, NAV-kilde, svarfrist",
+                new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_DAGPENGER,
+                    "Nav har registrert et vedtak om dagpenger fra 1. januar.", AndreLivsoppholdsytelserAvklaringKildeType.NAV, null)),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.AKTIVITETSPENGER, LocalDateTime.of(2025, 2, 1, 0, 0)),
+                "1. januar 2025", "31. januar 2025", "får dagpenger", "Nav har registrert et vedtak om dagpenger fra 1. januar.",
+                "Fristen for å svare er senest <b>1. februar 2025</b>.")),
+
+            Arguments.of(scenario("andre livsoppholdsytelser - opphør, MOTTAR_ANNEN_YTELSE, ANNET-kilde, ingen svarfrist",
+                new BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder(mappereSomGir(new BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(
+                    LocalDate.of(2025, 3, 1), AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_ANNEN_YTELSE,
+                    "Du mottar stønad til livsopphold fra en annen offentlig ordning.",
+                    AndreLivsoppholdsytelserAvklaringKildeType.ANNET, "kommunen")), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER, OppgaveYtelsetype.AKTIVITETSPENGER, null),
+                "1. mars 2025", "får en annen ytelse til livsopphold", "kommunen")),
+
+            // --- bekreft-bistand: bundet/opphør, årsakfritekst, kilde, svarfrist ---
+            Arguments.of(scenario("bistand - bundet periode, IKKE_14A_VEDTAK, ANNET-kilde, svarfrist",
+                new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    "Oppfølgingsvedtaket ble avsluttet i desember", BistandsavklaringKildeType.ANNET, "en veileder hos Nav")),
+                    AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, LocalDateTime.of(2025, 2, 1, 0, 0)),
+                "1. januar 2025", "31. januar 2025", "Oppfølgingsvedtaket ble avsluttet i desember", "en veileder hos Nav",
+                "Fristen for å svare er senest <b>1. februar 2025</b>.")),
+
+            Arguments.of(scenario("bistand - opphør, BRUKER-kilde, ingen svarfrist",
+                new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOpphørOppgavetypeDataDto(
+                    LocalDate.of(2025, 3, 1), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Du har fullført oppfølgingen.",
+                    BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
+                oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null),
+                "1. mars 2025", "Du har fullført oppfølgingen.", "Deg")),
+
             // --- bekreft-bosted: bundet/opphør, ikkeOppfyltForklaring, svarfrist ---
             Arguments.of(scenario("bosted - bundet periode, ANNET-årsak, svarfrist",
                 new BekreftBostedOppgaveInnholdUtleder(mappereSomGir(new BekreftBostedOppgavetypeDataDto(
