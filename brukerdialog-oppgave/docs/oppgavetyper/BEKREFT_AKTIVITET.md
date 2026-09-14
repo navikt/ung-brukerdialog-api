@@ -19,7 +19,7 @@ Lenken peker til oppgavesiden hos aktivitetspenger-innsyn.
 
 ## Data
 
-Kontrakt: [`BekreftAktivitetOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/aktivitet/BekreftAktivitetOppgavetypeDataDto.java)
+Kontrakt: [`BekreftAktivitetOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/aktivitet/BekreftAktivitetOppgavetypeDataDto.java)
 
 | Felt | Type | Beskrivelse |
 |------|------|-------------|
@@ -30,7 +30,7 @@ Kontrakt: [`BekreftAktivitetOppgavetypeDataDto`](../../../../kontrakt/src/main/j
 | `kilde` | `AktivitetsavklaringKildeType` | Påkrevd. Hvor saksbehandler har fått opplysningene fra |
 | `kildeFritekst` | `String` | Påkrevd når kilde = `ANNET` |
 
-Opphørsvarianten [`BekreftAktivitetOpphørOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/aktivitet/BekreftAktivitetOpph%C3%B8rOppgavetypeDataDto.java)
+Opphørsvarianten [`BekreftAktivitetOpphørOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/aktivitet/BekreftAktivitetOpph%C3%B8rOppgavetypeDataDto.java)
 har de samme feltene, men uten `tom`. Begge lagres i samme tabell; `tom is null` er det som
 skiller opphør fra avslag.
 

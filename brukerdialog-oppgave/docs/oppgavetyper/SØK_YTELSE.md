@@ -18,7 +18,7 @@ Lenken peker til forsiden av deltakerfrontenden.
 
 ## Data
 
-Kontrakt: [`SøkYtelseOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/søkytelse/SøkYtelseOppgavetypeDataDto.java)
+Kontrakt: [`SøkYtelseOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/søkytelse/SøkYtelseOppgavetypeDataDto.java)
 
 | Felt | Type | Beskrivelse |
 |------|------|-------------|

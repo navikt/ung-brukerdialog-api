@@ -18,7 +18,7 @@ Lenken peker til oppgavesiden hos deltakerfrontenden.
 
 ## Data
 
-Kontrakt: [`EndretSluttdatoDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/endretsluttdato/EndretSluttdatoDataDto.java)
+Kontrakt: [`EndretSluttdatoDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/endretsluttdato/EndretSluttdatoDataDto.java)
 
 | Felt | Type | Påkrevd | Beskrivelse |
 |------|------|---------|-------------|

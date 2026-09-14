@@ -22,7 +22,7 @@ Lenken peker til oppgavesiden hos aktivitetspenger-innsyn.
 
 ## Data
 
-Kontrakt: [`BekreftAndreLivsoppholdsytelserOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/livsopphold/BekreftAndreLivsoppholdsytelserOppgavetypeDataDto.java)
+Kontrakt: [`BekreftAndreLivsoppholdsytelserOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/livsopphold/BekreftAndreLivsoppholdsytelserOppgavetypeDataDto.java)
 
 | Felt | Type | Beskrivelse |
 |------|------|-------------|
@@ -33,7 +33,7 @@ Kontrakt: [`BekreftAndreLivsoppholdsytelserOppgavetypeDataDto`](../../../../kont
 | `kilde` | `AndreLivsoppholdsytelserAvklaringKildeType` | Påkrevd. Hvor saksbehandler har fått opplysningene fra |
 | `kildeFritekst` | `String` | Påkrevd når kilde = `ANNET` |
 
-Opphørsvarianten [`BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/livsopphold/BekreftAndreLivsoppholdsytelserOpph%C3%B8rOppgavetypeDataDto.java)
+Opphørsvarianten [`BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/livsopphold/BekreftAndreLivsoppholdsytelserOpph%C3%B8rOppgavetypeDataDto.java)
 har de samme feltene, men uten `tom`. Begge lagres i samme tabell; `tom is null` er det som
 skiller opphør fra avslag.
 
