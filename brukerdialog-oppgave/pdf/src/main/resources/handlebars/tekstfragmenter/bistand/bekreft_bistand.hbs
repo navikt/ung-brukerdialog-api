@@ -1,22 +1,23 @@
 {{#avsnitt data=true~}}
-    Vi har fått opplysninger om at du {{#if erPeriode~}}
-        i perioden {{datoLang fom}} til {{datoLang tom}}
-    {{~else~}}
-        fra {{datoLang fom}}
-    {{~/if}} {{#switch årsak~}}
+    {{#switch årsak~}}
         {{~#case "IKKE_14A_VEDTAK"~}}
-            {{~#if erPeriode~}}
-                ikke har
+            Vi har fått opplysninger om at du {{#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke har
             {{~else~}}
-                ikke lenger har
+                fra {{datoLang fom}} ikke lenger har
             {{~/if}} et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger.
         {{~/case~}}
+        {{~#case "KOMMET_I_UTDANNING"~}}
+            Vi har fått opplysninger om at du har begynt på en utdanning og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
+        {{~/case~}}
+        {{~#case "KOMMET_I_ARBEID"~}}
+            Vi har fått opplysninger om at du har begynt å jobbe og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
+        {{~/case~}}
         {{~#default~}}
-            {{~#if erPeriode~}}
-                ikke oppfyller
-            {{~else~}}
-                ikke lenger oppfyller
-            {{~/if}} vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger.
+            Vi har fått opplysninger om at du ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
         {{~/default~}}
     {{~/switch}}
 {{~/avsnitt}}

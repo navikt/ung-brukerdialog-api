@@ -41,9 +41,21 @@ class BekreftBistandTekstfragmentRendererTest {
             Arguments.of("IKKE_14A_VEDTAK", true,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
             Arguments.of("UDEFINERT", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger oppfyller vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger."),
+                "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
             Arguments.of("UDEFINERT", true,
-                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke oppfyller vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger.")
+                "Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
+            Arguments.of("KOMMET_I_UTDANNING", false,
+                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("KOMMET_I_UTDANNING", true,
+                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
+            Arguments.of("KOMMET_I_ARBEID", false,
+                "Vi har fått opplysninger om at du har begynt å jobbe og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("KOMMET_I_ARBEID", true,
+                "Vi har fått opplysninger om at du har begynt å jobbe og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
+            Arguments.of("ANNET", false,
+                "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("ANNET", true,
+                "Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger.")
         );
     }
 

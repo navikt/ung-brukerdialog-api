@@ -537,7 +537,7 @@ class OppgaveInnholdUtlederInnholdTest {
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
-            new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke oppfyller vilkåret om behov for bistand til å komme i arbeid. Du må oppfylle dette vilkåret for å få aktivitetspenger."),
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
             // Ingen «Årsak»-avsnitt: fritekst mangler.
             new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
             OM_VARSEL_1, OM_VARSEL_2);
