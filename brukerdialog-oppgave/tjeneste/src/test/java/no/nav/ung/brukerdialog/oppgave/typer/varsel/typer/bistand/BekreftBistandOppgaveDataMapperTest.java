@@ -48,6 +48,17 @@ class BekreftBistandOppgaveDataMapperTest {
     }
 
     @Test
+    void varseltekst_settes_på_dto_for_begge_variantene() {
+        var periode = (BekreftBistandOppgaveDataEntitet) tilEntitet.map(new BekreftBistandOppgavetypeDataDto(FOM, TOM,
+            BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, null, BistandsavklaringKildeType.BRUKER, null));
+        var opphør = (BekreftBistandOppgaveDataEntitet) tilEntitet.map(new BekreftBistandOpphørOppgavetypeDataDto(FOM,
+            BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, null, BistandsavklaringKildeType.BRUKER, null));
+
+        assertThat(((BekreftBistandOppgavetypeDataDto) tilDto.tilDto(periode, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+        assertThat(((BekreftBistandOpphørOppgavetypeDataDto) tilDto.tilDto(opphør, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+    }
+
+    @Test
     void kilde_annet_uten_fritekst_avvises_av_entiteten() {
         var dto = new BekreftBistandOppgavetypeDataDto(FOM, TOM, BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
             "Ingen oppfølging registrert.", BistandsavklaringKildeType.ANNET, null);

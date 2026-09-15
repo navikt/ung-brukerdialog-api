@@ -48,6 +48,17 @@ class BekreftAktivitetOppgaveDataMapperTest {
     }
 
     @Test
+    void varseltekst_settes_på_dto_for_begge_variantene() {
+        var periode = (BekreftAktivitetOppgaveDataEntitet) tilEntitet.map(new BekreftAktivitetOppgavetypeDataDto(FOM, TOM,
+            AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET, null, AktivitetsavklaringKildeType.NAV, null));
+        var opphør = (BekreftAktivitetOppgaveDataEntitet) tilEntitet.map(new BekreftAktivitetOpphørOppgavetypeDataDto(FOM,
+            AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET, null, AktivitetsavklaringKildeType.NAV, null));
+
+        assertThat(((BekreftAktivitetOppgavetypeDataDto) tilDto.tilDto(periode, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+        assertThat(((BekreftAktivitetOpphørOppgavetypeDataDto) tilDto.tilDto(opphør, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+    }
+
+    @Test
     void kilde_annet_uten_fritekst_avvises_av_entiteten() {
         var dto = new BekreftAktivitetOppgavetypeDataDto(FOM, TOM, AktivitetsvilkåretIkkeOppfyltÅrsak.ANNET,
             "Du har ikke møtt til den avtalte aktiviteten.", AktivitetsavklaringKildeType.ANNET, null);

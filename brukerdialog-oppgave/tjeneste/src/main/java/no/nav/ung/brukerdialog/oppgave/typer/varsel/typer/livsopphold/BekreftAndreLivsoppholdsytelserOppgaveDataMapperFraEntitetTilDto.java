@@ -18,11 +18,11 @@ public class BekreftAndreLivsoppholdsytelserOppgaveDataMapperFraEntitetTilDto im
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (BekreftAndreLivsoppholdsytelserOppgaveDataEntitet) entitet;
         if (e.getTom() == null) {
-            return new BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+            return new BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
         }
-        return new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+        return new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
     }
 }

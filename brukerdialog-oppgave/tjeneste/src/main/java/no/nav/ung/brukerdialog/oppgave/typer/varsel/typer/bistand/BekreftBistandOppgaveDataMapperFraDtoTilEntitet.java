@@ -30,14 +30,16 @@ public class BekreftBistandOppgaveDataMapperFraDtoTilEntitet implements OppgaveD
                 BistandsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 BistandsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String _
             ) -> new BekreftBistandOppgaveDataEntitet(fom, tom, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             case BekreftBistandOpphørOppgavetypeDataDto(
                 LocalDate fom,
                 BistandsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 BistandsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String _
             ) -> new BekreftBistandOppgaveDataEntitet(fom, null, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             default -> throw new IllegalArgumentException("Ugyldig data type: " + data.getClass());
         };

@@ -41,7 +41,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, true);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(
             "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."));
@@ -53,7 +53,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(
             "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."));
@@ -66,7 +66,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         data.put("kilde", kilde);
         data.put("kildeFritekst", "veilederen din");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         String forventetLabel = switch (kilde) {
             case "BRUKER" -> "Deg";
@@ -85,7 +85,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Du har ikke møtt til den avtalte aktiviteten.");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(new OppgaveAvsnitt("Årsak", "Du har ikke møtt til den avtalte aktiviteten."));
     }
@@ -95,7 +95,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("UDEFINERT", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         // hovedsetning + kildeblokk + de 2 om-varsel-avsnittene, ingen fritekst-avsnitt, ingen frist (fristDato=null)
         assertThat(tekster).hasSize(4);
@@ -106,20 +106,11 @@ class BekreftAktivitetTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("ANNET", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(OM_VARSEL_1, OM_VARSEL_2);
     }
 
-    @Test
-    void om_varsel_seksjonen_er_ikke_del_av_varselinnholdet() {
-        Map<String, Object> data = grunndata("ANNET", false);
-        data.put("kilde", "BRUKER");
-
-        List<OppgaveTekst> varselInnhold = renderer.rendre(MALNAVN, data).varselInnhold();
-
-        assertThat(varselInnhold).doesNotContain(OM_VARSEL_1, OM_VARSEL_2);
-    }
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
@@ -127,7 +118,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."));
@@ -138,7 +129,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("ANNET", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).noneMatch(t -> t instanceof OppgaveAvsnitt a
             && a.innhold() != null && a.innhold().contains("Fristen for å"));

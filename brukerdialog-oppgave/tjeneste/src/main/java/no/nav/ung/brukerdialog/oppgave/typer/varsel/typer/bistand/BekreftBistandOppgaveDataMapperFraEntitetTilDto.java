@@ -18,11 +18,11 @@ public class BekreftBistandOppgaveDataMapperFraEntitetTilDto implements OppgaveD
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (BekreftBistandOppgaveDataEntitet) entitet;
         if (e.getTom() == null) {
-            return new BekreftBistandOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+            return new BekreftBistandOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
         }
-        return new BekreftBistandOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+        return new BekreftBistandOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
     }
 }

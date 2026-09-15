@@ -65,7 +65,7 @@ class BekreftBistandTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, erPeriode);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(forventet));
     }
@@ -77,7 +77,7 @@ class BekreftBistandTekstfragmentRendererTest {
         data.put("kilde", kilde);
         data.put("kildeFritekst", "veilederen din");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         String forventetLabel = "BRUKER".equals(kilde) ? "Deg" : "veilederen din";
         OppgaveTekst kildeAvsnitt = tekster.stream()
@@ -92,7 +92,7 @@ class BekreftBistandTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Oppfølgingsvedtaket ditt ble avsluttet i desember.");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(new OppgaveAvsnitt("Årsak", "Oppfølgingsvedtaket ditt ble avsluttet i desember."));
     }
@@ -102,7 +102,7 @@ class BekreftBistandTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         // hovedsetning + kildeblokk + de 2 om-varsel-avsnittene, ingen fritekst-avsnitt, ingen frist (fristDato=null)
         assertThat(tekster).hasSize(4);
@@ -113,20 +113,11 @@ class BekreftBistandTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(OM_VARSEL_1, OM_VARSEL_2);
     }
 
-    @Test
-    void om_varsel_seksjonen_er_ikke_del_av_varselinnholdet() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
-        data.put("kilde", "BRUKER");
-
-        List<OppgaveTekst> varselInnhold = renderer.rendre(MALNAVN, data).varselInnhold();
-
-        assertThat(varselInnhold).doesNotContain(OM_VARSEL_1, OM_VARSEL_2);
-    }
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
@@ -134,7 +125,7 @@ class BekreftBistandTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."));
@@ -145,7 +136,7 @@ class BekreftBistandTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).noneMatch(t -> t instanceof OppgaveAvsnitt a
             && a.innhold() != null && a.innhold().contains("Fristen for å"));

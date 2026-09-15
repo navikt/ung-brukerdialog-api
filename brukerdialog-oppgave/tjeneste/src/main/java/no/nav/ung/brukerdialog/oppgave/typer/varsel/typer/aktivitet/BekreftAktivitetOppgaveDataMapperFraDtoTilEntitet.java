@@ -30,14 +30,16 @@ public class BekreftAktivitetOppgaveDataMapperFraDtoTilEntitet implements Oppgav
                 AktivitetsvilkåretIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 AktivitetsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String varseltekst
             ) -> new BekreftAktivitetOppgaveDataEntitet(fom, tom, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             case BekreftAktivitetOpphørOppgavetypeDataDto(
                 LocalDate fom,
                 AktivitetsvilkåretIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 AktivitetsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String varseltekst
             ) -> new BekreftAktivitetOppgaveDataEntitet(fom, null, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             default -> throw new IllegalArgumentException("Ugyldig data type: " + data.getClass());
         };

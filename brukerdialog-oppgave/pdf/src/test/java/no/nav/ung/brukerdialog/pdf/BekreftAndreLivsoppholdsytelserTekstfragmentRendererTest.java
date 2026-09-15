@@ -58,7 +58,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, true);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(
             "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 får "
@@ -71,7 +71,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(
             "Vi har fått opplysninger om at du fra 1. januar 2025 får " + ytelsesnavn + "."
@@ -85,7 +85,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         data.put("kilde", kilde);
         data.put("kildeFritekst", "kommunen");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         String forventetLabel = switch (kilde) {
             case "BRUKER" -> "Deg";
@@ -104,7 +104,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Du mottar stønad til livsopphold fra en annen offentlig ordning.");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(new OppgaveAvsnitt("Årsak", "Du mottar stønad til livsopphold fra en annen offentlig ordning."));
     }
@@ -114,7 +114,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         // hovedsetning + kildeblokk + de 2 om-varsel-avsnittene, ingen fritekst-avsnitt, ingen frist (fristDato=null)
         assertThat(tekster).hasSize(4);
@@ -125,20 +125,11 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(OM_VARSEL_1, OM_VARSEL_2);
     }
 
-    @Test
-    void om_varsel_seksjonen_er_ikke_del_av_varselinnholdet() {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
-        data.put("kilde", "BRUKER");
-
-        List<OppgaveTekst> varselInnhold = renderer.rendre(MALNAVN, data).varselInnhold();
-
-        assertThat(varselInnhold).doesNotContain(OM_VARSEL_1, OM_VARSEL_2);
-    }
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
@@ -146,7 +137,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."));
@@ -157,7 +148,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).noneMatch(t -> t instanceof OppgaveAvsnitt a
             && a.innhold() != null && a.innhold().contains("Fristen for å"));

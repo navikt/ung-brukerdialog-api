@@ -18,11 +18,11 @@ public class BekreftAktivitetOppgaveDataMapperFraEntitetTilDto implements Oppgav
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (BekreftAktivitetOppgaveDataEntitet) entitet;
         if (e.getTom() == null) {
-            return new BekreftAktivitetOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+            return new BekreftAktivitetOpphørOppgavetypeDataDto(e.getFom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
         }
-        return new BekreftAktivitetOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst());
+        return new BekreftAktivitetOppgavetypeDataDto(e.getFom(), e.getTom(), e.getIkkeOppfyltÅrsak(), e.getIkkeOppfyltÅrsakFritekstbeskrivelse(), e.getKilde(), e.getKildeFritekst(), varseltekst);
     }
 }

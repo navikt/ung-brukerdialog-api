@@ -30,14 +30,16 @@ public class BekreftAndreLivsoppholdsytelserOppgaveDataMapperFraDtoTilEntitet im
                 AndreLivsoppholdsytelserIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 AndreLivsoppholdsytelserAvklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String _
             ) -> new BekreftAndreLivsoppholdsytelserOppgaveDataEntitet(fom, tom, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             case BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(
                 LocalDate fom,
                 AndreLivsoppholdsytelserIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 AndreLivsoppholdsytelserAvklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String _
             ) -> new BekreftAndreLivsoppholdsytelserOppgaveDataEntitet(fom, null, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst);
             default -> throw new IllegalArgumentException("Ugyldig data type: " + data.getClass());
         };

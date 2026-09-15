@@ -34,9 +34,18 @@ public record BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(
 
     @Size(max = 1000)
     @Pattern(regexp = InputValideringRegex.FRITEKST, message = "kildeFritekst inneholder ugyldige tegn")
-    String kildeFritekst
+    String kildeFritekst,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    String varseltekst
 
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(LocalDate fom, AndreLivsoppholdsytelserIkkeOppfyltÅrsak ikkeOppfyltÅrsak, String ikkeOppfyltÅrsakFritekstbeskrivelse, AndreLivsoppholdsytelserAvklaringKildeType kilde, String kildeFritekst) {
+        this(fom, ikkeOppfyltÅrsak, ikkeOppfyltÅrsakFritekstbeskrivelse, kilde, kildeFritekst, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.BEKREFT_ANDRE_LIVSOPPHOLDSYTELSER;

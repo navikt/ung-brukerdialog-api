@@ -48,6 +48,17 @@ class BekreftAndreLivsoppholdsytelserOppgaveDataMapperTest {
     }
 
     @Test
+    void varseltekst_settes_på_dto_for_begge_variantene() {
+        var periode = (BekreftAndreLivsoppholdsytelserOppgaveDataEntitet) tilEntitet.map(new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(FOM, TOM,
+            AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_DAGPENGER, null, AndreLivsoppholdsytelserAvklaringKildeType.NAV, null));
+        var opphør = (BekreftAndreLivsoppholdsytelserOppgaveDataEntitet) tilEntitet.map(new BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto(FOM,
+            AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_DAGPENGER, null, AndreLivsoppholdsytelserAvklaringKildeType.NAV, null));
+
+        assertThat(((BekreftAndreLivsoppholdsytelserOppgavetypeDataDto) tilDto.tilDto(periode, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+        assertThat(((BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto) tilDto.tilDto(opphør, "Varseltekst")).varseltekst()).isEqualTo("Varseltekst");
+    }
+
+    @Test
     void kilde_annet_uten_fritekst_avvises_av_entiteten() {
         var dto = new BekreftAndreLivsoppholdsytelserOppgavetypeDataDto(FOM, TOM, AndreLivsoppholdsytelserIkkeOppfyltÅrsak.MOTTAR_UFØRETRYGD,
             null, AndreLivsoppholdsytelserAvklaringKildeType.ANNET, null);
