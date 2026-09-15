@@ -5,14 +5,12 @@ import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.BrukerdialogOppgaveDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @ApplicationScoped
 public class BrukerdialogOppgaveMapper {
@@ -34,9 +32,9 @@ public class BrukerdialogOppgaveMapper {
     }
 
     public BrukerdialogOppgaveDto tilDto(BrukerdialogOppgaveEntitet oppgave) {
+        String varseltekst = varseltekst(oppgave);
         var oppgavetypeData = OppgaveDataMapperFraEntitetTilDto.finnTjeneste(mappere, oppgave.getOppgaveType())
-            .tilDto(oppgave.getOppgaveData());
-        OppgaveInnhold innhold = innhold(oppgave);
+            .tilDto(oppgave.getOppgaveData(), varseltekst);
 
         return new BrukerdialogOppgaveDto(
             oppgave.getOppgavereferanse(),
@@ -47,23 +45,18 @@ public class BrukerdialogOppgaveMapper {
             oppgave.getStatus(),
             toZonedDateTime(oppgave.getOpprettetTidspunkt()),
             toZonedDateTime(oppgave.getLøstDato()),
-            toZonedDateTime(oppgave.getFristTid()),
-            innhold.varselInnhold(),
-            innhold.undertittel()
+            toZonedDateTime(oppgave.getFristTid())
         );
     }
 
-    private record OppgaveInnhold(List<OppgaveTekst> varselInnhold, String undertittel) {
-    }
-
-    private OppgaveInnhold innhold(BrukerdialogOppgaveEntitet oppgave) {
+    private String varseltekst(BrukerdialogOppgaveEntitet oppgave) {
         try {
             OppgaveInnholdUtleder utleder = OppgaveInnholdUtleder.finnUtleder(innholdUtledere, oppgave.getOppgaveType());
-            return new OppgaveInnhold(utleder.varselInnhold(oppgave), utleder.undertittel(oppgave));
+            return utleder.varseltekst(oppgave);
         } catch (RuntimeException e) {
-            log.warn("Klarte ikke å utlede tekster/undertittel for oppgave (oppgaveType={}, oppgaveReferanse={}) - returnerer tom liste/null",
+            log.warn("Klarte ikke å utlede varseltekst for oppgave (oppgaveType={}, oppgaveReferanse={}) - returnerer null",
                 oppgave.getOppgaveType(), oppgave.getOppgavereferanse(), e);
-            return new OppgaveInnhold(List.of(), null);
+            return null;
         }
     }
 

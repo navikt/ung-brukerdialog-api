@@ -22,8 +22,18 @@ public record EndretSluttdatoDataDto(
 
     @JsonProperty(value = "forrigeSluttdato")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate forrigeSluttdato
+    LocalDate forrigeSluttdato,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    @JsonProperty(value = "varseltekst")
+    String varseltekst
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public EndretSluttdatoDataDto(LocalDate nySluttdato, LocalDate forrigeSluttdato) {
+        this(nySluttdato, forrigeSluttdato, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.BEKREFT_ENDRET_SLUTTDATO;

@@ -17,9 +17,9 @@ public class SøkYtelseOppgaveDataMapperFraEntitetTilDto implements OppgaveDataM
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (SøkYtelseOppgaveDataEntitet) entitet;
-        return new SøkYtelseOppgavetypeDataDto(e.getFomDato());
+        return new SøkYtelseOppgavetypeDataDto(e.getFomDato(), varseltekst);
     }
 }
 

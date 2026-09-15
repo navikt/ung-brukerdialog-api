@@ -26,8 +26,18 @@ public record EndretPeriodeDataDto(
     @JsonProperty(value = "endringer", required = true)
     @NotNull
     @Size(max = 4)
-    Set<PeriodeEndringType> endringer
+    Set<PeriodeEndringType> endringer,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    @JsonProperty(value = "varseltekst")
+    String varseltekst
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public EndretPeriodeDataDto(PeriodeDTO nyPeriode, PeriodeDTO forrigePeriode, Set<PeriodeEndringType> endringer) {
+        this(nyPeriode, forrigePeriode, endringer, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.BEKREFT_ENDRET_PERIODE;

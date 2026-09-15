@@ -72,12 +72,10 @@ class YtelseFrasePartialTest {
     private static List<OppgaveTekst> rendre(String malTekst, Map<String, Object> modell) throws Exception {
         Template template = HANDLEBARS.compileInline(malTekst);
         List<OppgaveTekst> alle = new ArrayList<>();
-        List<OppgaveTekst> varselInnhold = new ArrayList<>();
         Context context = Context.newBuilder(modell)
             .resolver(MapValueResolver.INSTANCE, MethodValueResolver.INSTANCE)
             .build();
         context.data(OppgaveTekstfragmentRenderer.AKKUMULATOR_NØKKEL, alle);
-        context.data(OppgaveTekstfragmentRenderer.VARSEL_INNHOLD_NØKKEL, varselInnhold);
         template.apply(context);
         return alle;
     }

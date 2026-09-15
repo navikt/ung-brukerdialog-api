@@ -31,7 +31,8 @@ public class BekreftBostedOppgaveDataMapperFraDtoTilEntitet implements OppgaveDa
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 BostedsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String varseltekst
             ) -> new BekreftBostedOppgaveDataEntitet(fom, tom, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak, kilde, kildeFritekst);
             case BekreftBostedOpphørOppgavetypeDataDto(
                 LocalDate fom,
@@ -39,7 +40,8 @@ public class BekreftBostedOppgaveDataMapperFraDtoTilEntitet implements OppgaveDa
                 String ikkeOppfyltÅrsakFritekstbeskrivelse,
                 BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak,
                 BostedsavklaringKildeType kilde,
-                String kildeFritekst
+                String kildeFritekst,
+                String varseltekst
             ) -> new BekreftBostedOppgaveDataEntitet(fom, null, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak, kilde, kildeFritekst);
             default -> throw new IllegalArgumentException("Ugyldig data type: " + data.getClass());
         };

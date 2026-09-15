@@ -60,15 +60,6 @@ public class KontrollerRegisterinntektOppgaveInnholdUtleder implements OppgaveIn
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         KontrollerRegisterinntektOppgavetypeDataDto dto = hentDto(oppgave);
         RegisterinntektDTO registerinntekt = dto.registerinntekt();
         List<ArbeidOgFrilansRegisterInntektDTO> arbeid = registerinntekt.arbeidOgFrilansInntekter() != null

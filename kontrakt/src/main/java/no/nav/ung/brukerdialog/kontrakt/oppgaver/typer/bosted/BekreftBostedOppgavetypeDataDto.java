@@ -38,9 +38,18 @@ public record BekreftBostedOppgavetypeDataDto(
 
     @Size(max = 1000)
     @Pattern(regexp = InputValideringRegex.FRITEKST, message = "kildeFritekst inneholder ugyldige tegn")
-    String kildeFritekst
+    String kildeFritekst,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    String varseltekst
 
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public BekreftBostedOppgavetypeDataDto(LocalDate fom, LocalDate tom, Boolean erBosattITrondheim, String ikkeOppfyltÅrsakFritekstbeskrivelse, BostedsvilkårIkkeOppfyltÅrsak ikkeOppfyltÅrsak, BostedsavklaringKildeType kilde, String kildeFritekst) {
+        this(fom, tom, erBosattITrondheim, ikkeOppfyltÅrsakFritekstbeskrivelse, ikkeOppfyltÅrsak, kilde, kildeFritekst, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.BEKREFT_BOSTED;

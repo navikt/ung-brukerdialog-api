@@ -47,15 +47,6 @@ public class EndretStartdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         EndretStartdatoDataDto dto = hentDto(oppgave);
         return OppgaveTekster.endretStartdatoInnhold(
             renderer, dto.nyStartdato(), oppgave.getYtelsetype(), oppgave.getFristTid());

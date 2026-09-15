@@ -60,7 +60,7 @@ class OppgaveTekstfragmentRendererTest {
         Map<String, Object> data = grunndata(årsak, erPeriode);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(forventet));
     }
@@ -72,7 +72,7 @@ class OppgaveTekstfragmentRendererTest {
         data.put("kilde", kilde);
         data.put("kildeFritekst", "Skatteetaten");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         String forventetLabel = switch (kilde) {
             case "BRUKER" -> "Deg";
@@ -91,7 +91,7 @@ class OppgaveTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("annetFritekst", "En spesifikk forklaring.");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(new OppgaveAvsnitt("Årsak", "En spesifikk forklaring."));
     }
@@ -102,7 +102,7 @@ class OppgaveTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("annetFritekst", "Skal ikke vises.");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).noneMatch(t -> t instanceof OppgaveAvsnitt a && a.innhold().equals("Skal ikke vises."));
         // hovedsetning + kildeblokk + de 2 om-varsel-avsnittene, ingen fritekst-avsnitt, ingen frist (fristDato=null)
@@ -114,7 +114,7 @@ class OppgaveTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(OM_VARSEL_1, OM_VARSEL_2);
     }
@@ -125,7 +125,7 @@ class OppgaveTekstfragmentRendererTest {
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).contains(
             new OppgaveAvsnitt("Fristen for å svare er senest <b>1. februar 2025</b>."));
@@ -136,7 +136,7 @@ class OppgaveTekstfragmentRendererTest {
         Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
         data.put("kilde", "BRUKER");
 
-        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data).alle();
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
 
         assertThat(tekster).noneMatch(t -> t instanceof OppgaveAvsnitt a
             && a.innhold() != null && a.innhold().contains("Fristen for å"));

@@ -17,8 +17,8 @@ public class BekreftOpphorVedMaksdatoOppgaveDataMapperFraEntitetTilDto implement
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (BekreftOpphorVedMaksdatoOppgaveDataEntitet) entitet;
-        return new BekreftOpphorVedMaksdatoOppgavetypeDataDto(e.getSluttdato(), e.getMaxDato());
+        return new BekreftOpphorVedMaksdatoOppgavetypeDataDto(e.getSluttdato(), e.getMaxDato(), varseltekst);
     }
 }

@@ -6,7 +6,6 @@ import no.nav.k9.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.journalforing.JournalføringDto;
-import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BostedsavklaringKildeType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.oppgave.journalforing.JournalførOppgaveTask;
@@ -65,7 +64,7 @@ class OppgaveLivssyklusTjenesteTest {
         when(innholdUtledereInstance.select(any(Annotation.class))).thenReturn(innholdUtlederValgt);
         when(innholdUtlederValgt.isResolvable()).thenReturn(true);
         when(innholdUtlederValgt.get()).thenReturn(innholdUtleder);
-        when(innholdUtleder.tekster(any())).thenReturn(List.of(new OppgaveAvsnitt("Varseltekst")));
+        when(innholdUtleder.varseltekst(any())).thenReturn("Varseltekst");
         when(innholdUtleder.varselLenke(any())).thenReturn("https://nav.no/minside");
 
         when(oppgaveDataMapperInstance.select(any(Annotation.class))).thenReturn(oppgaveDataMapperValgt);

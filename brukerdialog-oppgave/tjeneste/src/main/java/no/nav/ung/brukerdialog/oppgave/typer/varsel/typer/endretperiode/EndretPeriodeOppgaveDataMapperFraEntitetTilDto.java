@@ -18,7 +18,7 @@ public class EndretPeriodeOppgaveDataMapperFraEntitetTilDto implements OppgaveDa
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (EndretPeriodeOppgaveDataEntitet) entitet;
 
         PeriodeDTO nyPeriode = e.getNyPeriodeFom() != null
@@ -29,7 +29,7 @@ public class EndretPeriodeOppgaveDataMapperFraEntitetTilDto implements OppgaveDa
             ? new PeriodeDTO(e.getForrigePeriodeFom(), e.getForrigePeriodeTom())
             : null;
 
-        return new EndretPeriodeDataDto(nyPeriode, forrigePeriode, e.getEndringer());
+        return new EndretPeriodeDataDto(nyPeriode, forrigePeriode, e.getEndringer(), varseltekst);
     }
 }
 

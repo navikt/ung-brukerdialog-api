@@ -26,8 +26,18 @@ public record InntektsrapporteringOppgavetypeDataDto(
 
     @JsonProperty(value = "gjelderDelerAvMåned", required = true)
     @NotNull
-    Boolean gjelderDelerAvMåned
+    Boolean gjelderDelerAvMåned,
+
+    // Kun satt av backend på output (varselteksten fra PDF-brevet). Ignoreres på input.
+    @JsonProperty(value = "varseltekst")
+    String varseltekst
 ) implements OppgavetypeDataDto {
+
+    // Konstruktør uten varseltekst - brukes der varseltekst ikke er kjent/relevant enda.
+    public InntektsrapporteringOppgavetypeDataDto(LocalDate fraOgMed, LocalDate tilOgMed, Boolean gjelderDelerAvMåned) {
+        this(fraOgMed, tilOgMed, gjelderDelerAvMåned, null);
+    }
+
     @Override
     public OppgaveType oppgavetype() {
         return OppgaveType.RAPPORTER_INNTEKT;

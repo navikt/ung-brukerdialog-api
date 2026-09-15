@@ -49,15 +49,6 @@ public class BekreftOpphørVedMaksdatoOppgaveInnholdUtleder implements OppgaveIn
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         BekreftOpphorVedMaksdatoOppgavetypeDataDto dto = hentDto(oppgave);
 
         Map<String, Object> data = new LinkedHashMap<>();

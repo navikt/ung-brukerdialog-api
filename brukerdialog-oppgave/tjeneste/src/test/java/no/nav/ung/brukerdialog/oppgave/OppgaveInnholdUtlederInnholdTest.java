@@ -105,18 +105,16 @@ class OppgaveInnholdUtlederInnholdTest {
 
     @ParameterizedTest
     @EnumSource(OppgaveType.class)
-    void varselInnhold_er_delmengde_av_tekster_og_utelater_om_varsel(OppgaveType oppgaveType) {
+    void varseltekst_er_lik_første_avsnitt_i_tekster(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
         BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
         OppgaveInnholdUtleder utleder = scenario.utleder();
 
-        List<OppgaveTekst> tekster = utleder.tekster(oppgave);
-        List<OppgaveTekst> varselInnhold = utleder.varselInnhold(oppgave);
+        String varseltekst = utleder.varseltekst(oppgave);
+        String førsteAvsnitt = ((OppgaveAvsnitt) utleder.tekster(oppgave).getFirst()).innhold();
 
-        assertThat(tekster).as("tekster (%s) skal inneholde alle elementene i varselInnhold", oppgaveType)
-            .containsAll(varselInnhold);
-        assertThat(varselInnhold).as("varselInnhold (%s) skal ikke inneholde «Om «Varsel om nye opplysninger»»-avsnittene", oppgaveType)
-            .doesNotContain(OM_VARSEL_1, OM_VARSEL_2);
+        assertThat(varseltekst).as("varseltekst (%s) skal være lik første avsnitt i tekster", oppgaveType)
+            .isEqualTo(førsteAvsnitt);
     }
 
     @ParameterizedTest

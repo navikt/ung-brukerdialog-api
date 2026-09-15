@@ -49,15 +49,6 @@ public class EndretSluttdatoOppgaveInnholdUtleder implements OppgaveInnholdUtled
 
     @Override
     public List<OppgaveTekst> tekster(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).alle();
-    }
-
-    @Override
-    public List<OppgaveTekst> varselInnhold(BrukerdialogOppgaveEntitet oppgave) {
-        return rendre(oppgave).varselInnhold();
-    }
-
-    private OppgaveTekstfragmentRenderer.Resultat rendre(BrukerdialogOppgaveEntitet oppgave) {
         EndretSluttdatoDataDto dto = hentDto(oppgave);
         return OppgaveTekster.endretSluttdatoInnhold(
             renderer, dto.nySluttdato(), dto.forrigeSluttdato(), oppgave.getYtelsetype(), oppgave.getFristTid());

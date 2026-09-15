@@ -16,5 +16,10 @@ public interface OppgaveDataMapperFraEntitetTilDto {
             .orElseThrow(() -> new IllegalArgumentException("Finner ingen OppgaveDataEntitetTilDtoMapper for oppgavetype: " + oppgaveType));
     }
 
-    OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet);
+    OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst);
+
+    // Brukes der kun de rå datafeltene trengs (f.eks. til Handlebars-rendring), ikke selve DTO-en som returneres til klient.
+    default OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+        return tilDto(entitet, null);
+    }
 }

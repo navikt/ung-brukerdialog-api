@@ -2,11 +2,13 @@ package no.nav.ung.brukerdialog.oppgave;
 
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveYtelsetype;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class OppgaveTekster {
@@ -45,7 +47,7 @@ public final class OppgaveTekster {
         return "Endret startdato";
     }
 
-    public static OppgaveTekstfragmentRenderer.Resultat endretStartdatoInnhold(OppgaveTekstfragmentRenderer renderer,
+    public static List<OppgaveTekst> endretStartdatoInnhold(OppgaveTekstfragmentRenderer renderer,
                                                              LocalDate nyStartdato,
                                                              OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -59,7 +61,7 @@ public final class OppgaveTekster {
         return erMeldtUt ? "Sluttdato" : "Endret sluttdato";
     }
 
-    public static OppgaveTekstfragmentRenderer.Resultat endretSluttdatoInnhold(OppgaveTekstfragmentRenderer renderer,
+    public static List<OppgaveTekst> endretSluttdatoInnhold(OppgaveTekstfragmentRenderer renderer,
                                                              LocalDate nySluttdato, LocalDate forrigeSluttdato,
                                                              OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -74,7 +76,7 @@ public final class OppgaveTekster {
         return "Stans";
     }
 
-    public static OppgaveTekstfragmentRenderer.Resultat fjernetPeriodeInnhold(OppgaveTekstfragmentRenderer renderer,
+    public static List<OppgaveTekst> fjernetPeriodeInnhold(OppgaveTekstfragmentRenderer renderer,
                                                             OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("ytelsetype", ytelsetype.name());
@@ -86,7 +88,7 @@ public final class OppgaveTekster {
         return "Ny start- og sluttdato";
     }
 
-    public static OppgaveTekstfragmentRenderer.Resultat endretStartOgSluttdatoInnhold(OppgaveTekstfragmentRenderer renderer,
+    public static List<OppgaveTekst> endretStartOgSluttdatoInnhold(OppgaveTekstfragmentRenderer renderer,
                                                                     LocalDate nyFom, LocalDate nyTom,
                                                                     OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -101,7 +103,7 @@ public final class OppgaveTekster {
         return "Endring i perioden";
     }
 
-    public static OppgaveTekstfragmentRenderer.Resultat ukjentPeriodeendringInnhold(OppgaveTekstfragmentRenderer renderer,
+    public static List<OppgaveTekst> ukjentPeriodeendringInnhold(OppgaveTekstfragmentRenderer renderer,
                                                                   LocalDate nyFom, LocalDate nyTom,
                                                                   OppgaveYtelsetype ytelsetype, LocalDateTime fristTid) {
         Map<String, Object> data = new LinkedHashMap<>();

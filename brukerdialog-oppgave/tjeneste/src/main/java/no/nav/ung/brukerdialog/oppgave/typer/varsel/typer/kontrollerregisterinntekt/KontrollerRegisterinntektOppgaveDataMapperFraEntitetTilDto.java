@@ -22,7 +22,7 @@ public class KontrollerRegisterinntektOppgaveDataMapperFraEntitetTilDto implemen
     }
 
     @Override
-    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet) {
+    public OppgavetypeDataDto tilDto(OppgaveDataEntitet entitet, String varseltekst) {
         var e = (KontrollerRegisterinntektOppgaveDataEntitet) entitet;
 
         List<ArbeidOgFrilansRegisterInntektDTO> arbeidOgFrilans = e.getArbeidOgFrilansInntekter().stream()
@@ -45,7 +45,8 @@ public class KontrollerRegisterinntektOppgaveDataMapperFraEntitetTilDto implemen
             e.getFraOgMed(),
             e.getTilOgMed(),
             registerinntekt,
-            e.isGjelderDelerAvMåned()
+            e.isGjelderDelerAvMåned(),
+            varseltekst
         );
     }
 
