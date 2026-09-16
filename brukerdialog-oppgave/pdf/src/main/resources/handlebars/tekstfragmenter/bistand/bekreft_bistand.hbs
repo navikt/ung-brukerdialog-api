@@ -1,0 +1,31 @@
+{{#avsnitt~}}
+    {{#switch årsak~}}
+        {{~#case "IKKE_14A_VEDTAK"~}}
+            Vi har fått opplysninger om at du {{#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke har
+            {{~else~}}
+                fra {{datoLang fom}} ikke lenger har
+            {{~/if}} et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger.
+        {{~/case~}}
+        {{~#case "KOMMET_I_UTDANNING"~}}
+            Vi har fått opplysninger om at du har begynt på en utdanning og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
+        {{~/case~}}
+        {{~#case "KOMMET_I_ARBEID"~}}
+            Vi har fått opplysninger om at du har begynt å jobbe og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
+        {{~/case~}}
+        {{~#default~}}
+            Vi har fått opplysninger om at du ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
+        {{~/default~}}
+    {{~/switch}}
+{{~/avsnitt}}
+{{#isNotNull årsakFritekst}}
+{{#avsnitt tittel="Årsak"}}{{årsakFritekst}}{{/avsnitt}}
+{{/isNotNull}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?"}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#case "NAV"}}Nav{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}
+{{> partial/om_varsel}}

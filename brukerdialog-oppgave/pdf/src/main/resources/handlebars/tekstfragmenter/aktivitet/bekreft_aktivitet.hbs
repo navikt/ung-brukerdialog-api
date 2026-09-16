@@ -1,0 +1,15 @@
+{{#avsnitt~}}
+    Vi har fått opplysninger om at du {{#if erPeriode~}}
+        i perioden {{datoLang fom}} til {{datoLang tom}} ikke er
+    {{~else~}}
+        fra {{datoLang fom}} ikke lenger er
+    {{~/if}} i aktivitet. Du må være i aktivitet for å få aktivitetspenger.
+{{~/avsnitt}}
+{{#isNotNull årsakFritekst}}
+{{#avsnitt tittel="Årsak"}}{{årsakFritekst}}{{/avsnitt}}
+{{/isNotNull}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?"}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#case "NAV"}}Nav{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{#if fristDato}}
+{{> partial/svarfrist handlingsverb="svare"}}
+{{/if}}
+{{> partial/om_varsel}}

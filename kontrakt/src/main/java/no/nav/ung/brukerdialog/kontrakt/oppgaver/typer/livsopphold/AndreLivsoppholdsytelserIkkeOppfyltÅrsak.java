@@ -1,0 +1,15 @@
+package no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold;
+
+public enum AndreLivsoppholdsytelserIkkeOppfyltÅrsak {
+    MOTTAR_ARBEIDSAVKLARINGSPENGER,
+    MOTTAR_TILTAKSPENGER,
+    MOTTAR_KVALIFISERINGSSTØNAD,
+    MOTTAR_DAGPENGER,
+    MOTTAR_FORELDREPENGER,
+    MOTTAR_SVANGERSKAPSPENGER,
+    MOTTAR_UFØRETRYGD,
+    MOTTAR_INTRODUKSJONSSTØNAD,
+    MOTTAR_BARNEPENSJON,
+    MOTTAR_ANNEN_YTELSE,
+    UDEFINERT
+}

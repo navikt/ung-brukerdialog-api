@@ -2,7 +2,13 @@ package no.nav.ung.brukerdialog.kontrakt.oppgaver;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bistand.BekreftBistandOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.aktivitet.BekreftAktivitetOpphørOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgavetypeDataDto;
+import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.livsopphold.BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.bosted.BekreftBostedOppgavetypeDataDto;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.endretperiode.EndretPeriodeDataDto;
@@ -24,6 +30,12 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.typer.søkytelse.SøkYtelseOppg
 @JsonSubTypes({
     @JsonSubTypes.Type(value = BekreftBostedOppgavetypeDataDto.class, name = "BOSTED"),
     @JsonSubTypes.Type(value = BekreftBostedOpphørOppgavetypeDataDto.class, name = "BOSTED_OPPHØR"),
+    @JsonSubTypes.Type(value = BekreftBistandOppgavetypeDataDto.class, name = "BISTAND"),
+    @JsonSubTypes.Type(value = BekreftBistandOpphørOppgavetypeDataDto.class, name = "BISTAND_OPPHØR"),
+    @JsonSubTypes.Type(value = BekreftAndreLivsoppholdsytelserOppgavetypeDataDto.class, name = "ANDRE_LIVSOPPHOLDSYTELSER"),
+    @JsonSubTypes.Type(value = BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto.class, name = "ANDRE_LIVSOPPHOLDSYTELSER_OPPHØR"),
+    @JsonSubTypes.Type(value = BekreftAktivitetOppgavetypeDataDto.class, name = "AKTIVITET"),
+    @JsonSubTypes.Type(value = BekreftAktivitetOpphørOppgavetypeDataDto.class, name = "AKTIVITET_OPPHØR"),
     @JsonSubTypes.Type(value = EndretStartdatoDataDto.class, name = "ENDRET_STARTDATO"),
     @JsonSubTypes.Type(value = EndretSluttdatoDataDto.class, name = "ENDRET_SLUTTDATO"),
     @JsonSubTypes.Type(value = EndretPeriodeDataDto.class, name = "ENDRET_PERIODE"),

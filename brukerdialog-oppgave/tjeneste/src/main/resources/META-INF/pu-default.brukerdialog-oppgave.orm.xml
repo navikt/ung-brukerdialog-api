@@ -33,6 +33,9 @@
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.oppgave.inntektsrapportering.InntektsrapporteringOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.oppgave.søkytelse.SøkYtelseOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bosted.BekreftBostedOppgaveDataEntitet" />
+	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.bistand.BekreftBistandOppgaveDataEntitet" />
+	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.livsopphold.BekreftAndreLivsoppholdsytelserOppgaveDataEntitet" />
+	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.aktivitet.BekreftAktivitetOppgaveDataEntitet" />
 	<entity class="no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphorVedMaksdatoOppgaveDataEntitet" />
 
 

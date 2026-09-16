@@ -18,7 +18,7 @@ Lenken peker til oppgavesiden hos aktivitetspenger-innsyn.
 
 ## Data
 
-Kontrakt: [`BekreftBostedOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/bosted/BekreftBostedOppgavetypeDataDto.java)
+Kontrakt: [`BekreftBostedOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/bosted/BekreftBostedOppgavetypeDataDto.java)
 
 | Felt | Type | Beskrivelse                                            |
 |------|------|--------------------------------------------------------|
@@ -30,7 +30,7 @@ Kontrakt: [`BekreftBostedOppgavetypeDataDto`](../../../../kontrakt/src/main/java
 | `kilde` | `BostedsavklaringKildeType` | Påkrevd. Hvor saksbehandler har fått opplysningene fra |
 | `kildeFritekst` | `String` | Påkrevd når kilde = `ANNET`                            |
 
-Opphørsvarianten [`BekreftBostedOpphørOppgavetypeDataDto`](../../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/bosted/BekreftBostedOpph%C3%B8rOppgavetypeDataDto.java)
+Opphørsvarianten [`BekreftBostedOpphørOppgavetypeDataDto`](../../../kontrakt/src/main/java/no/nav/ung/brukerdialog/kontrakt/oppgaver/typer/bosted/BekreftBostedOpph%C3%B8rOppgavetypeDataDto.java)
 har de samme feltene, men uten `tom`.
 
 ## Implementasjon

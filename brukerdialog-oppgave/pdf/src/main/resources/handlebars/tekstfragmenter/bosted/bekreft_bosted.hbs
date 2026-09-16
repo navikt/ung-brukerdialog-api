@@ -1,4 +1,27 @@
-{{#avsnitt}}Vi har fått opplysninger om at du {{#switch årsak}}{{#case "STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM"}}{{#if erPeriode}}i perioden {{datoLang fom}} til {{datoLang tom}} har studie- eller arbeidssted utenfor Trondheim kommune{{else}}fra {{datoLang fom}} har studie- eller arbeidssted utenfor Trondheim kommune{{/if}}{{/case}}{{#default}}{{#if erPeriode}}i perioden {{datoLang fom}} til {{datoLang tom}} ikke bor i Trondheim kommune{{else}}fra {{datoLang fom}} ikke lenger bor i Trondheim kommune{{/if}}{{/default}}{{/switch}}{{#eq årsak "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"}}, og at du heller ikke er folkeregistrert der{{/eq}}. Du må {{#switch årsak}}{{#case "IKKE_BOSATTADRESSE_I_TRONDHEIM"}}ha bostedsadresse{{/case}}{{#case "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"}}ha bostedsadresse{{/case}}{{#default}}bo{{/default}}{{/switch}} i Trondheim kommune for å få aktivitetspenger.{{/avsnitt}}
+{{#avsnitt ~}}
+    Vi har fått opplysninger om at du {{#switch årsak~}}
+        {{~#case "STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM"~}}
+            {{~#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} har studie- eller arbeidssted utenfor Trondheim kommune
+            {{~else~}}
+                fra {{datoLang fom}} har studie- eller arbeidssted utenfor Trondheim kommune
+            {{~/if}}
+        {{~/case~}}
+        {{~#default~}}
+            {{~#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke bor i Trondheim kommune
+            {{~else~}}
+                fra {{datoLang fom}} ikke lenger bor i Trondheim kommune
+            {{~/if}}
+        {{~/default~}}
+    {{~/switch~}}
+    {{~#eq årsak "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"~}}, og at du heller ikke er folkeregistrert der{{~/eq~}}.
+    Du må {{#switch årsak~}}
+        {{~#case "IKKE_BOSATTADRESSE_I_TRONDHEIM"~}}ha bostedsadresse{{~/case~}}
+        {{~#case "IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM"~}}ha bostedsadresse{{~/case~}}
+        {{~#default~}}bo{{~/default~}}
+    {{~/switch}} i Trondheim kommune for å få aktivitetspenger.
+{{~/avsnitt}}
 {{#eq årsak "ANNET"}}
 {{#avsnitt tittel="Årsak"}}{{annetFritekst}}{{/avsnitt}}
 {{/eq}}
