@@ -36,7 +36,7 @@ har de samme feltene, men uten `tom`. Begge lagres i samme tabell; `tom is null`
 skiller opphør fra avslag.
 
 Til forskjell fra bosted finnes ingen registerkilde for bistandsbehov, så
-`BistandsavklaringKildeType` har kun `BRUKER` og `ANNET`.
+`BistandsavklaringKildeType` har `BRUKER`, `NAV` og `ANNET`.
 
 ## Implementasjon
 

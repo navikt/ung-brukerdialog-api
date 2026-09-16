@@ -24,7 +24,7 @@
 {{#isNotNull årsakFritekst}}
 {{#avsnitt tittel="Årsak"}}{{årsakFritekst}}{{/avsnitt}}
 {{/isNotNull}}
-{{#avsnitt tittel="Hvor har vi fått opplysningene fra?"}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
+{{#avsnitt tittel="Hvor har vi fått opplysningene fra?"}}{{#switch kilde}}{{#case "BRUKER"}}Deg{{/case}}{{#case "NAV"}}Nav{{/case}}{{#default}}{{kildeFritekst}}{{/default}}{{/switch}}{{/avsnitt}}
 {{#if fristDato}}
 {{> partial/svarfrist handlingsverb="svare"}}
 {{/if}}
