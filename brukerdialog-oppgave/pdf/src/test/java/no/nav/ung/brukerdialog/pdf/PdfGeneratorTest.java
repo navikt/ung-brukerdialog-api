@@ -78,4 +78,42 @@ class PdfGeneratorTest {
         assertThat(html).contains("september 2021");
         assertThat(html).contains("12\u00A0345\u00A0kr");
     }
+
+    /**
+     * Verifiserer konverteringen som brukes til å gjøre {@code fet}-hjelperens HTML-markup
+     * (se {@link PdfGenerator#registrerTekstfragmentHjelpere}) om til ren tekst for varsler på
+     * Min side/Ditt NAV, som ikke støtter HTML.
+     */
+    @Test
+    void tilVarslingsvennligTekst_fjerner_bold_tagger_men_beholder_teksten() {
+        String html = "Fristen for å svare er senest <b>6. juli 2026</b>.";
+
+        assertThat(PdfGenerator.tilVarslingsvennligTekst(html))
+            .isEqualTo("Fristen for å svare er senest 6. juli 2026.");
+    }
+
+    @Test
+    void tilVarslingsvennligTekst_fjerner_flere_fete_segmenter_i_samme_tekst() {
+        String html = "<b>Startdato</b> er endret til <b>6. juli 2026</b>.";
+
+        assertThat(PdfGenerator.tilVarslingsvennligTekst(html))
+            .isEqualTo("Startdato er endret til 6. juli 2026.");
+    }
+
+    @Test
+    void tilVarslingsvennligTekst_dekoder_html_entiteter() {
+        assertThat(PdfGenerator.tilVarslingsvennligTekst("Ungdomsprogrammet &amp; aktivitetspenger"))
+            .isEqualTo("Ungdomsprogrammet & aktivitetspenger");
+    }
+
+    @Test
+    void tilVarslingsvennligTekst_lar_ren_tekst_uten_tagger_være_uendret() {
+        assertThat(PdfGenerator.tilVarslingsvennligTekst("Du får denne meldingen slik at du kan svare."))
+            .isEqualTo("Du får denne meldingen slik at du kan svare.");
+    }
+
+    @Test
+    void tilVarslingsvennligTekst_returnerer_tom_streng_for_null() {
+        assertThat(PdfGenerator.tilVarslingsvennligTekst(null)).isEmpty();
+    }
 }
