@@ -5,6 +5,7 @@ import jakarta.enterprise.inject.Instance;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.OppgaveType;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
+import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 
 import java.util.List;
 
@@ -31,7 +32,8 @@ public interface OppgaveInnholdUtleder {
                 "Første tekstblokk for oppgaveType=%s må være et OppgaveAvsnitt for å kunne brukes som varseltekst"
                     .formatted(oppgave.getOppgaveType()));
         }
-        String varseltekst = avsnitt.innhold();
+
+        String varseltekst = PdfGenerator.tilVarslingsvennligTekst(avsnitt.innhold());
         OppgaveTekster.validerVarselTekstLengde(varseltekst, oppgave.getOppgaveType());
         return varseltekst;
     }

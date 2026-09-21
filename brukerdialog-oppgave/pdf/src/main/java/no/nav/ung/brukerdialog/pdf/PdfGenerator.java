@@ -24,6 +24,7 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgavePunktliste;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTabell;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
+import org.jsoup.Jsoup;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfBoxRenderer;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -68,6 +69,20 @@ public class PdfGenerator {
         Objects.requireNonNull(dokument, "dokument");
         String html = tilHtml(dokument);
         return tilPdf(html);
+    }
+
+    /**
+     * Konverterer en tekstblokk som er rendret av tekstfragment-hjelperne (se
+     * {@link #registrerTekstfragmentHjelpere}, spesielt {@code fet}) til ren tekst, uten
+     * HTML-tagger. Disse hjelperne produserer bevisst bokstavelig HTML-markup (f.eks.
+     * {@code <b>...</b>}) fordi {@link OppgaveTekst}-modellen primært er laget for
+     * HTML-rendring i {@link #tilHtml}/journalpost-PDF-en.
+     */
+    public static String tilVarslingsvennligTekst(String html) {
+        if (html == null) {
+            return "";
+        }
+        return Jsoup.parse(html).wholeText();
     }
 
     /**

@@ -50,6 +50,7 @@ import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.endretstartdato.Endret
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.kontrollerregisterinntekt.KontrollerRegisterinntektOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.oppgave.typer.varsel.typer.opphorvedmaksdato.BekreftOpphørVedMaksdatoOppgaveInnholdUtleder;
 import no.nav.ung.brukerdialog.pdf.OppgaveTekstfragmentRenderer;
+import no.nav.ung.brukerdialog.pdf.PdfGenerator;
 import no.nav.ung.brukerdialog.typer.AktørId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -120,7 +121,7 @@ class OppgaveInnholdUtlederInnholdTest {
 
     @ParameterizedTest
     @EnumSource(OppgaveType.class)
-    void varseltekst_er_lik_første_avsnitt_i_tekster(OppgaveType oppgaveType) {
+    void varseltekst_er_ren_tekst_versjon_av_første_avsnitt_i_tekster(OppgaveType oppgaveType) {
         Scenario scenario = scenarioFor(oppgaveType);
         BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
         OppgaveInnholdUtleder utleder = scenario.utleder();
@@ -128,8 +129,10 @@ class OppgaveInnholdUtlederInnholdTest {
         String varseltekst = utleder.varseltekst(oppgave);
         String førsteAvsnitt = ((OppgaveAvsnitt) utleder.tekster(oppgave).getFirst()).innhold();
 
-        assertThat(varseltekst).as("varseltekst (%s) skal være lik første avsnitt i tekster", oppgaveType)
-            .isEqualTo(førsteAvsnitt);
+        assertThat(varseltekst)
+            .as("varseltekst (%s) skal være ren-tekst-versjonen av første avsnitt i tekster - uten HTML-tagger", oppgaveType)
+            .isEqualTo(PdfGenerator.tilVarslingsvennligTekst(førsteAvsnitt))
+            .doesNotContain("<", ">");
     }
 
     @ParameterizedTest
@@ -138,7 +141,7 @@ class OppgaveInnholdUtlederInnholdTest {
         Scenario scenario = scenarioFor(oppgaveType);
         BrukerdialogOppgaveEntitet oppgave = oppgave(oppgaveType, standardYtelsetypeFor(oppgaveType), null);
 
-        String varselTekst = ((OppgaveAvsnitt) scenario.utleder().tekster(oppgave).getFirst()).innhold();
+        String varselTekst = scenario.utleder().varseltekst(oppgave);
 
         assertThat(varselTekst.length())
             .as("min-side-varselteksten (%s) er %d tegn, må være maks 500", oppgaveType, varselTekst.length())
