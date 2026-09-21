@@ -116,4 +116,12 @@ class PdfGeneratorTest {
     void tilVarslingsvennligTekst_returnerer_tom_streng_for_null() {
         assertThat(PdfGenerator.tilVarslingsvennligTekst(null)).isEmpty();
     }
+
+    @Test
+    void tilVarslingsvennligTekst_bevarer_whitespace_fra_kildeteksten() {
+        String html = "<b>Startdato</b>\ner endret til   <b>6. juli 2026</b>.";
+
+        assertThat(PdfGenerator.tilVarslingsvennligTekst(html))
+            .isEqualTo("Startdato\ner endret til   6. juli 2026.");
+    }
 }

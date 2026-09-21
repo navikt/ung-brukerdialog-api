@@ -82,7 +82,7 @@ public class PdfGenerator {
         if (html == null) {
             return "";
         }
-        return Jsoup.parse(html).text();
+        return Jsoup.parse(html).wholeText();
     }
 
     /**
