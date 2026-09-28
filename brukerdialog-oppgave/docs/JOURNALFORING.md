@@ -138,7 +138,7 @@ minne under kallet.
 
 | Miljøvariabel | Type | Default | Formål |
 |---|---|---|---|
-| `JOURNALFORING_ENABLED` | Boolean | `false` | Global av/på-bryter. `true` i dev-gcp, `false` i prod-gcp inntil flyten er verifisert. |
+| `JOURNALFORING_ENABLED` | Boolean | `false` | Global av/på-bryter. `true` i både dev-gcp og prod-gcp. |
 
 Flagget styrer **kun** om `JournalførOppgaveTask` faktisk journalfører — sjekket av tasken selv
 idet den kjører, ikke ved oppretting. Er flagget av, journalføres ikke oppgaven, og ingen rad
@@ -158,8 +158,6 @@ Enkelt-oppgavetyper kan deaktiveres uavhengig av det globale flagget via en hard
   `OpprettOppgaveDto`, klar til å aktiveres når `ung-sak`/nedstrøms konsumenter er bekreftet klare
   til å alltid sende feltet i prod. Manglende verdi gir i mellomtiden kun en `WARN`-logg (se
   `OppgaveLivssyklusTjeneste`).
-- **Prod er ikke aktivert ennå** (`JOURNALFORING_ENABLED=false` i `prod-gcp.yml`) — aktiveres når
-  flyten er verifisert i dev.
 
 ## Sentrale klasser
 
