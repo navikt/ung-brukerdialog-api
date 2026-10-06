@@ -34,6 +34,22 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.k9.prosesstask</groupId>
+            <artifactId>prosesstask</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-kafka-klient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-pdl-klient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.tms.mikrofrontend.selector</groupId>
+            <artifactId>builder</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
