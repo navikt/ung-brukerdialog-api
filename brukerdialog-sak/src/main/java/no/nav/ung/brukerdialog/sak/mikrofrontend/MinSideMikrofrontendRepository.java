@@ -35,6 +35,5 @@ public class MinSideMikrofrontendRepository {
 
     public void lagre(MinSideMikrofrontendEntitet entitet) {
         entityManager.persist(entitet);
-        entityManager.flush();
     }
 }

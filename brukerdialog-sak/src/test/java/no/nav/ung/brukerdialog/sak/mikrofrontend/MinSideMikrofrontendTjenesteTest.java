@@ -90,6 +90,7 @@ class MinSideMikrofrontendTjenesteTest {
     void skal_ikke_deaktivere_på_nytt_når_mikrofrontend_allerede_er_deaktivert() {
         var aktørId = AktørId.dummy();
         tjeneste.aktiver(aktørId, MIKROFRONTEND);
+        flushOgTøm();
         tjeneste.deaktiver(aktørId, MIKROFRONTEND);
         flushOgTøm();
         clearInvocations(prosessTaskTjeneste);
@@ -103,6 +104,7 @@ class MinSideMikrofrontendTjenesteTest {
     void skal_kunne_aktivere_igjen_etter_deaktivering() {
         var aktørId = AktørId.dummy();
         tjeneste.aktiver(aktørId, MIKROFRONTEND);
+        flushOgTøm();
         tjeneste.deaktiver(aktørId, MIKROFRONTEND);
         flushOgTøm();
         clearInvocations(prosessTaskTjeneste);

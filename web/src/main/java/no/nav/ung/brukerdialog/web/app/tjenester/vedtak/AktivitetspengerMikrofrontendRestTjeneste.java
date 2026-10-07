@@ -50,7 +50,7 @@ public class AktivitetspengerMikrofrontendRestTjeneste {
     @POST
     @Path("/aktiver")
     @Operation(summary = "Aktiverer inngangen til aktivitetspenger på Min side for brukeren. Idempotent.", tags = "mikrofrontend")
-    @BeskyttetRessurs(action = BeskyttetRessursActionType.UPDATE, resource = BeskyttetRessursResourceType.FAGSAK)
+    @BeskyttetRessurs(action = BeskyttetRessursActionType.CREATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response aktiver(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) AktiverMikrofrontendRequest request) {
         boolean aktivert = mikrofrontendTjeneste.aktiver(request.aktørId(), MikrofrontendId.AKTIVITETSPENGER_INNSYN);
         log.info("Aktivering av mikrofrontend for saksnummer={}: {}",
