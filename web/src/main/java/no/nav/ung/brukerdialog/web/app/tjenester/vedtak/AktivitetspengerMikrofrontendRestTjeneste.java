@@ -50,6 +50,7 @@ public class AktivitetspengerMikrofrontendRestTjeneste {
     @POST
     @Path("/aktiver")
     @Operation(summary = "Aktiverer inngangen til aktivitetspenger på Min side for brukeren. Idempotent.", tags = "mikrofrontend")
+    // Ung-sak kaller dette endepunktet i en task, selvom det virker som at det er en saksbehandler som kaller det. Derfor er det satt til CREATE.
     @BeskyttetRessurs(action = BeskyttetRessursActionType.CREATE, resource = BeskyttetRessursResourceType.FAGSAK)
     public Response aktiver(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacAttributtSupplier.class) AktiverMikrofrontendRequest request) {
         boolean aktivert = mikrofrontendTjeneste.aktiver(request.aktørId(), MikrofrontendId.AKTIVITETSPENGER_INNSYN);
