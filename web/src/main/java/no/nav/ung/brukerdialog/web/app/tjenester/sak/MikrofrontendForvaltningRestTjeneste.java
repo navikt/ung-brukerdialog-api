@@ -95,7 +95,6 @@ public class MikrofrontendForvaltningRestTjeneste {
 
         // Fødselsnummeret lagres ikke. Aksessloggen får aktørId når den finnes.
         entityManager.persist(new DiagnostikkSakLogg(aktørId.orElse(null), null, BASE_PATH + path, request.begrunnelse()));
-        entityManager.flush();
 
         return aktørId
             .map(it -> handling.apply(it, MikrofrontendId.AKTIVITETSPENGER_INNSYN))

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import no.nav.k9.felles.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.k9.felles.validering.InputValideringRegex;
 import no.nav.ung.brukerdialog.abac.StandardAbacAttributt;
 import no.nav.ung.brukerdialog.typer.PersonIdent;
 
@@ -17,7 +18,7 @@ public record MikrofrontendForvaltningRequest(
 
     @NotNull
     @Size(min = 3, max = 4000)
-    @Pattern(regexp = "^[\\p{Graph}\\p{IsWhite_Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$")
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
     String begrunnelse
 ) {
 
