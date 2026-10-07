@@ -142,6 +142,8 @@ spec:
     # Integrasjoner (Kafka)
     - name: KAFKA_MINSIDE_VARSEL_TOPIC
       value: min-side.aapen-brukervarsel-v1
+    - name: KAFKA_MINSIDE_MIKROFRONTEND_TOPIC
+      value: min-side.aapen-microfrontend-v1
 
 
     # Loadbalancerconfig

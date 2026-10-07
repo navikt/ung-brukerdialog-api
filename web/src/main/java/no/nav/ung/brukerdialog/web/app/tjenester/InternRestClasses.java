@@ -5,7 +5,9 @@ import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.DiagnostikkBr
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.MigrerBrukerdialogOppgaverRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.oppgavebehandling.OppgavebehandlingRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.sak.DiagnostikkSakRestTjeneste;
+import no.nav.ung.brukerdialog.web.app.tjenester.sak.MikrofrontendForvaltningRestTjeneste;
 import no.nav.ung.brukerdialog.web.app.tjenester.vedtak.AktivitetspengerFagsakRestTjeneste;
+import no.nav.ung.brukerdialog.web.app.tjenester.vedtak.AktivitetspengerMikrofrontendRestTjeneste;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +21,9 @@ public class InternRestClasses implements RestClasses {
             DiagnostikkBrukerdialogOppgaverRestTjeneste.class,
             OppgavebehandlingRestTjeneste.class,
             AktivitetspengerFagsakRestTjeneste.class,
-            DiagnostikkSakRestTjeneste.class));
+            AktivitetspengerMikrofrontendRestTjeneste.class,
+            DiagnostikkSakRestTjeneste.class,
+            MikrofrontendForvaltningRestTjeneste.class));
         return Set.copyOf(classes);
     }
 }
