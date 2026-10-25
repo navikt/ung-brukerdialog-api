@@ -24,7 +24,7 @@ public record JournalføringParametre(
 
             case AKTIVITETSPENGER -> new JournalføringParametre(
                 Fagsaksystem.UNG_SAK,
-                Tema.UNG, // TODO: Bytt til riktig tema når det er opprettet.
+                Tema.AVP,
                 Behandlingsnummer.AKTIVITETSPENGER,
                 Brevkode.AKTIVITETSPENGER,
                 Journalposttittel.AKTIVITETSPENGER);

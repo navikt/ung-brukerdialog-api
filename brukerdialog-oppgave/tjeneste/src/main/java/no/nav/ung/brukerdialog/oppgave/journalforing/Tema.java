@@ -7,7 +7,8 @@ package no.nav.ung.brukerdialog.oppgave.journalforing;
  */
 public enum Tema {
 
-    UNG("Ungdomsytelsen");
+    UNG("Ungdomsytelsen"),
+    AVP("Aktivitetspenger");
     // TODO: OMS ("Omsorgs-, pleie- og opplæringspenger") når K9-ytelser skal støttes.
     // Se JournalføringParametre.utled(...).
 
