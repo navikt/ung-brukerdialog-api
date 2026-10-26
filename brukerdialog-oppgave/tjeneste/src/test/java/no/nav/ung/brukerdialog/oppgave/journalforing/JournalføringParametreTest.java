@@ -20,7 +20,10 @@ class JournalføringParametreTest {
         JournalføringParametre parametre = JournalføringParametre.utled(ytelsetype);
 
         assertThat(parametre.fagsaksystem()).isEqualTo(Fagsaksystem.UNG_SAK);
-        assertThat(parametre.tema()).isEqualTo(Tema.UNG);
+        assertThat(parametre.tema()).isEqualTo(switch (ytelsetype) {
+            case UNGDOMSYTELSE -> Tema.UNG;
+            case AKTIVITETSPENGER -> Tema.AVP;
+        });
         assertThat(parametre.behandlingsnummer()).isEqualTo(switch (ytelsetype) {
             case UNGDOMSYTELSE -> Behandlingsnummer.UNGDOMSPROGRAMYTELSEN;
             case AKTIVITETSPENGER -> Behandlingsnummer.AKTIVITETSPENGER;
