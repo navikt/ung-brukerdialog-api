@@ -64,6 +64,7 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
 
         LocalDate fom;
         LocalDate tom;
+        boolean erOpphør;
         String fritekst;
         BostedsvilkårIkkeOppfyltÅrsak årsak;
         BostedsavklaringKildeType kilde;
@@ -73,6 +74,7 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case BekreftBostedOppgavetypeDataDto bundet -> {
                 fom = bundet.fom();
                 tom = bundet.tom();
+                erOpphør = false;
                 fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 årsak = bundet.ikkeOppfyltÅrsak();
                 kilde = bundet.kilde();
@@ -81,6 +83,7 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
             case BekreftBostedOpphørOppgavetypeDataDto opphør -> {
                 fom = opphør.fom();
                 tom = null;
+                erOpphør = true;
                 fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 årsak = opphør.ikkeOppfyltÅrsak();
                 kilde = opphør.kilde();
@@ -91,16 +94,16 @@ public class BekreftBostedOppgaveInnholdUtleder implements OppgaveInnholdUtleder
         }
 
         return renderer.rendre("tekstfragmenter/bosted/bekreft_bosted",
-            byggData(årsak, fom, tom, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
+            byggData(årsak, fom, tom, erOpphør, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
     }
 
     private static Map<String, Object> byggData(
-        BostedsvilkårIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, String fritekst,
+        BostedsvilkårIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, boolean erOpphør, String fritekst,
         BostedsavklaringKildeType kilde, String kildeFritekst, LocalDateTime fristTid
     ) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak.name());
-        data.put("erPeriode", tom != null);
+        data.put("erOpphør", erOpphør);
         data.put("fom", fom.toString());
         data.put("tom", tom != null ? tom.toString() : null);
         data.put("annetFritekst", årsak == BostedsvilkårIkkeOppfyltÅrsak.ANNET

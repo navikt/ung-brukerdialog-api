@@ -33,7 +33,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"ANNET", "UDEFINERT"})
     void hovedsetning_avgrenset_periode(String årsak) {
-        Map<String, Object> data = grunndata(årsak, true);
+        Map<String, Object> data = grunndata(årsak, false);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -45,7 +45,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"ANNET", "UDEFINERT"})
     void hovedsetning_bruker_åpen_periode_ved_opphør(String årsak) {
-        Map<String, Object> data = grunndata(årsak, false);
+        Map<String, Object> data = grunndata(årsak, true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -56,8 +56,8 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @ParameterizedTest
     @MethodSource("årsakOgTidsromKombinasjoner")
-    void hovedsetning_for_spesifikke_årsaker(String årsak, boolean erPeriode, String forventet) {
-        Map<String, Object> data = grunndata(årsak, erPeriode);
+    void hovedsetning_for_spesifikke_årsaker(String årsak, boolean erOpphør, String forventet) {
+        Map<String, Object> data = grunndata(årsak, erOpphør);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -67,13 +67,13 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     static Stream<Arguments> årsakOgTidsromKombinasjoner() {
         return Stream.of(
-            Arguments.of("FRAVÆR_FRA_PLANLAGT_AKTIVITET", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger."),
             Arguments.of("FRAVÆR_FRA_PLANLAGT_AKTIVITET", true,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger."),
+            Arguments.of("FRAVÆR_FRA_PLANLAGT_AKTIVITET", false,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger."),
-            Arguments.of("AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN", false,
-                "Vi har fått opplysninger om at du 1. januar 2025 ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger fra 1. januar 2025 siden du ikke startet i denne jobben."),
             Arguments.of("AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN", true,
+                "Vi har fått opplysninger om at du 1. januar 2025 ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger fra 1. januar 2025 siden du ikke startet i denne jobben."),
+            Arguments.of("AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN", false,
                 "Vi har fått opplysninger om at du 1. januar 2025 ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger i perioden 1. januar 2025 til 31. januar 2025 siden du ikke startet i denne jobben.")
         );
     }
@@ -81,7 +81,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"BRUKER", "NAV", "ANNET"})
     void kildeblokk_dekker_alle_kildetyper(String kilde) {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", kilde);
         data.put("kildeFritekst", "veilederen din");
 
@@ -100,7 +100,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_gir_eget_avsnitt() {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Du har ikke møtt til den avtalte aktiviteten.");
 
@@ -111,7 +111,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_avsnitt_utelates_når_fritekst_mangler() {
-        Map<String, Object> data = grunndata("UDEFINERT", false);
+        Map<String, Object> data = grunndata("UDEFINERT", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -122,7 +122,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @Test
     void om_varsel_seksjonen_er_alltid_med() {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -133,7 +133,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
@@ -145,7 +145,7 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
     @Test
     void svarfrist_utelates_når_fristDato_mangler() {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -154,12 +154,12 @@ class BekreftAktivitetTekstfragmentRendererTest {
             && a.innhold() != null && a.innhold().contains("Fristen for å"));
     }
 
-    private static Map<String, Object> grunndata(String årsak, boolean erPeriode) {
+    private static Map<String, Object> grunndata(String årsak, boolean erOpphør) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak);
-        data.put("erPeriode", erPeriode);
+        data.put("erOpphør", erOpphør);
         data.put("fom", FOM.toString());
-        data.put("tom", erPeriode ? TOM.toString() : null);
+        data.put("tom", erOpphør ? null : TOM.toString());
         data.put("årsakFritekst", null);
         data.put("kildeFritekst", null);
         return data;

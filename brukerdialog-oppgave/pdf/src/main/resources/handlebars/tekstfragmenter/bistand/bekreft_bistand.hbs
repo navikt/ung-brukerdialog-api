@@ -1,15 +1,15 @@
 {{#avsnitt~}}
     {{#switch årsak~}}
         {{~#case "KOMMET_I_UTDANNING"~}}
-            Vi har fått opplysninger om at du har begynt på en utdanning og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            Vi har fått opplysninger om at du har begynt på en utdanning og ikke {{#if erOpphør}}lenger {{/if}}trenger hjelp fra Nav til å få jobb eller utdanning.
             {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
         {{~/case~}}
         {{~#case "KOMMET_I_ARBEID"~}}
-            Vi har fått opplysninger om at du har begynt å jobbe og ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            Vi har fått opplysninger om at du har begynt å jobbe og ikke {{#if erOpphør}}lenger {{/if}}trenger hjelp fra Nav til å få jobb eller utdanning.
             {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
         {{~/case~}}
         {{~#default~}}
-            Vi har fått opplysninger om at du ikke {{#unless erPeriode}}lenger {{/unless}}trenger hjelp fra Nav til å få jobb eller utdanning.
+            Vi har fått opplysninger om at du ikke {{#if erOpphør}}lenger {{/if}}trenger hjelp fra Nav til å få jobb eller utdanning.
             {{> tekstfragmenter/bistand/bistand_bortfall_aktivitetspenger}}
         {{~/default~}}
     {{~/switch}}

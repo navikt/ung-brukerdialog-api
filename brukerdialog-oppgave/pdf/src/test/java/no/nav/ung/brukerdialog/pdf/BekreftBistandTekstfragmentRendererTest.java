@@ -36,29 +36,29 @@ class BekreftBistandTekstfragmentRendererTest {
 
     static Stream<Arguments> årsakOgTidsromKombinasjoner() {
         return Stream.of(
-            Arguments.of("UDEFINERT", false,
-                "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
             Arguments.of("UDEFINERT", true,
-                "Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
-            Arguments.of("KOMMET_I_UTDANNING", false,
-                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
-            Arguments.of("KOMMET_I_UTDANNING", true,
-                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
-            Arguments.of("KOMMET_I_ARBEID", false,
-                "Vi har fått opplysninger om at du har begynt å jobbe og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
-            Arguments.of("KOMMET_I_ARBEID", true,
-                "Vi har fått opplysninger om at du har begynt å jobbe og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
-            Arguments.of("ANNET", false,
                 "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("UDEFINERT", false,
+                "Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
+            Arguments.of("KOMMET_I_UTDANNING", true,
+                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("KOMMET_I_UTDANNING", false,
+                "Vi har fått opplysninger om at du har begynt på en utdanning og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
+            Arguments.of("KOMMET_I_ARBEID", true,
+                "Vi har fått opplysninger om at du har begynt å jobbe og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("KOMMET_I_ARBEID", false,
+                "Vi har fått opplysninger om at du har begynt å jobbe og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
             Arguments.of("ANNET", true,
+                "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
+            Arguments.of("ANNET", false,
                 "Vi har fått opplysninger om at du ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger.")
         );
     }
 
     @ParameterizedTest
     @MethodSource("årsakOgTidsromKombinasjoner")
-    void hovedsetning_dekker_alle_årsak_og_tidsrom_kombinasjoner(String årsak, boolean erPeriode, String forventet) {
-        Map<String, Object> data = grunndata(årsak, erPeriode);
+    void hovedsetning_dekker_alle_årsak_og_tidsrom_kombinasjoner(String årsak, boolean erOpphør, String forventet) {
+        Map<String, Object> data = grunndata(årsak, erOpphør);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -69,7 +69,7 @@ class BekreftBistandTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"BRUKER", "ANNET"})
     void kildeblokk_dekker_alle_kildetyper(String kilde) {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", kilde);
         data.put("kildeFritekst", "veilederen din");
 
@@ -84,7 +84,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_gir_eget_avsnitt() {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Oppfølgingsvedtaket ditt ble avsluttet i desember.");
 
@@ -95,7 +95,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_avsnitt_utelates_når_fritekst_mangler() {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -106,7 +106,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void om_varsel_seksjonen_er_alltid_med() {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -117,7 +117,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
@@ -129,7 +129,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void svarfrist_utelates_når_fristDato_mangler() {
-        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -138,12 +138,12 @@ class BekreftBistandTekstfragmentRendererTest {
             && a.innhold() != null && a.innhold().contains("Fristen for å"));
     }
 
-    private static Map<String, Object> grunndata(String årsak, boolean erPeriode) {
+    private static Map<String, Object> grunndata(String årsak, boolean erOpphør) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak);
-        data.put("erPeriode", erPeriode);
+        data.put("erOpphør", erOpphør);
         data.put("fom", FOM.toString());
-        data.put("tom", erPeriode ? TOM.toString() : null);
+        data.put("tom", erOpphør ? null : TOM.toString());
         data.put("årsakFritekst", null);
         data.put("kildeFritekst", null);
         return data;

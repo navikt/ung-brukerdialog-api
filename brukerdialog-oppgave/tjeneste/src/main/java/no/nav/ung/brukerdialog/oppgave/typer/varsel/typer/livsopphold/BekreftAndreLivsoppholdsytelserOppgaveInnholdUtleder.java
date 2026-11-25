@@ -64,6 +64,7 @@ public class BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder implements Opp
 
         LocalDate fom;
         LocalDate tom;
+        boolean erOpphør;
         AndreLivsoppholdsytelserIkkeOppfyltÅrsak årsak;
         String fritekst;
         AndreLivsoppholdsytelserAvklaringKildeType kilde;
@@ -73,6 +74,7 @@ public class BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder implements Opp
             case BekreftAndreLivsoppholdsytelserOppgavetypeDataDto bundet -> {
                 fom = bundet.fom();
                 tom = bundet.tom();
+                erOpphør = false;
                 årsak = bundet.ikkeOppfyltÅrsak();
                 fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 kilde = bundet.kilde();
@@ -81,6 +83,7 @@ public class BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder implements Opp
             case BekreftAndreLivsoppholdsytelserOpphørOppgavetypeDataDto opphør -> {
                 fom = opphør.fom();
                 tom = null;
+                erOpphør = true;
                 årsak = opphør.ikkeOppfyltÅrsak();
                 fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 kilde = opphør.kilde();
@@ -91,16 +94,16 @@ public class BekreftAndreLivsoppholdsytelserOppgaveInnholdUtleder implements Opp
         }
 
         return renderer.rendre("tekstfragmenter/livsopphold/bekreft_andre_livsoppholdsytelser",
-            byggData(årsak, fom, tom, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
+            byggData(årsak, fom, tom, erOpphør, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
     }
 
     private static Map<String, Object> byggData(
-        AndreLivsoppholdsytelserIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, String fritekst,
+        AndreLivsoppholdsytelserIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, boolean erOpphør, String fritekst,
         AndreLivsoppholdsytelserAvklaringKildeType kilde, String kildeFritekst, LocalDateTime fristTid
     ) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak.name());
-        data.put("erPeriode", tom != null);
+        data.put("erOpphør", erOpphør);
         data.put("fom", fom.toString());
         data.put("tom", tom != null ? tom.toString() : null);
         data.put("årsakFritekst", fritekst != null && !fritekst.isBlank() ? fritekst : null);
