@@ -28,7 +28,7 @@ public class TilgjengeligSøknadUtleder {
         this.vinduLukkerEtterTom = vinduLukkerEtterTom;
     }
 
-    TilgjengeligSøknadResponse utled(LocalDate iDag,
+    TilgjengeligSøknadResponse utled(LocalDate aktuellMottattDato,
                                      List<SøknadHendelseEntitet> søknader,
                                      FagsakEntitet fagsak) {
 
@@ -53,11 +53,11 @@ public class TilgjengeligSøknadUtleder {
         LocalDate vinduÅpner = sisteInnvilgedeTom.minus(vinduÅpnerFørTom);
         LocalDate vinduLukker = sisteInnvilgedeTom.plus(vinduLukkerEtterTom);
 
-        if (iDag.isBefore(vinduÅpner)) {
+        if (aktuellMottattDato.isBefore(vinduÅpner)) {
             return new TilgjengeligSøknadResponse(TilgjengeligSøknadType.INGEN, false, true);
         }
         //I dag er før eller dagen vinduet lukker
-        if (!iDag.isAfter(vinduLukker)) {
+        if (!aktuellMottattDato.isAfter(vinduLukker)) {
             return new TilgjengeligSøknadResponse(TilgjengeligSøknadType.NY_PERIODE_SØKNAD, false, true);
         }
         //I dag er etter vinduet for ny periode. Får da søke som førstegangsbehandling.
