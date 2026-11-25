@@ -1,9 +1,27 @@
 {{#avsnitt~}}
-    Vi har fått opplysninger om at du {{#if erPeriode~}}
-        i perioden {{datoLang fom}} til {{datoLang tom}} ikke er
-    {{~else~}}
-        fra {{datoLang fom}} ikke lenger er
-    {{~/if}} i aktivitet. Du må være i aktivitet for å få aktivitetspenger.
+    {{#switch årsak~}}
+        {{~#case "FRAVÆR_FRA_PLANLAGT_AKTIVITET"~}}
+            Vi har fått opplysninger om at du {{#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke deltar
+            {{~else~}}
+                fra {{datoLang fom}} ikke lenger deltar
+            {{~/if}} i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger.
+        {{~/case~}}
+        {{~#case "AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN"~}}
+            Vi har fått opplysninger om at du {{datoLang fom}} ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger {{#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}}
+            {{~else~}}
+                fra {{datoLang fom}}
+            {{~/if}} siden du ikke startet i denne jobben.
+        {{~/case~}}
+        {{~#default~}}
+            Vi har fått opplysninger om at du {{#if erPeriode~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke er
+            {{~else~}}
+                fra {{datoLang fom}} ikke lenger er
+            {{~/if}} i aktivitet. Du må være i aktivitet for å få aktivitetspenger.
+        {{~/default~}}
+    {{~/switch}}
 {{~/avsnitt}}
 {{#isNotNull årsakFritekst}}
 {{#avsnitt tittel="Årsak"}}{{årsakFritekst}}{{/avsnitt}}

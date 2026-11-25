@@ -149,7 +149,7 @@ class OppgaveInnholdUtlederRenderingTest {
     void svarfrist_utelates_når_fristTid_mangler_bistand_opphør() {
         var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(
             new BekreftBistandOpphørOppgavetypeDataDto(LocalDate.of(2025, 3, 1),
-                BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Du har fullført oppfølgingen.",
+                BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING, "Du har fullført oppfølgingen.",
                 BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL,
             new OppgaveTekstfragmentRenderer());
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null);
@@ -239,9 +239,9 @@ class OppgaveInnholdUtlederRenderingTest {
                 "1. mars 2025", "får en annen ytelse til livsopphold", "kommunen")),
 
             // --- bekreft-bistand: bundet/opphør, årsakfritekst, kilde, svarfrist ---
-            Arguments.of(scenario("bistand - bundet periode, IKKE_14A_VEDTAK, ANNET-kilde, svarfrist",
+            Arguments.of(scenario("bistand - bundet periode, KOMMET_I_UTDANNING, ANNET-kilde, svarfrist",
                 new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
-                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING,
                     "Oppfølgingsvedtaket ble avsluttet i desember", BistandsavklaringKildeType.ANNET, "en veileder hos Nav")),
                     AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, LocalDateTime.of(2025, 2, 1, 0, 0)),
@@ -250,7 +250,7 @@ class OppgaveInnholdUtlederRenderingTest {
 
             Arguments.of(scenario("bistand - opphør, BRUKER-kilde, ingen svarfrist",
                 new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOpphørOppgavetypeDataDto(
-                    LocalDate.of(2025, 3, 1), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Du har fullført oppfølgingen.",
+                    LocalDate.of(2025, 3, 1), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING, "Du har fullført oppfølgingen.",
                     BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null),
                 "1. mars 2025", "Du har fullført oppfølgingen.", "Deg")),

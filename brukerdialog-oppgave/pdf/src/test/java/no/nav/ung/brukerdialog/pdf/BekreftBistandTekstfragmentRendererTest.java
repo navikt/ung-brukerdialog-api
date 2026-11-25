@@ -36,10 +36,6 @@ class BekreftBistandTekstfragmentRendererTest {
 
     static Stream<Arguments> årsakOgTidsromKombinasjoner() {
         return Stream.of(
-            Arguments.of("IKKE_14A_VEDTAK", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
-            Arguments.of("IKKE_14A_VEDTAK", true,
-                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
             Arguments.of("UDEFINERT", false,
                 "Vi har fått opplysninger om at du ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
             Arguments.of("UDEFINERT", true,
@@ -73,7 +69,7 @@ class BekreftBistandTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"BRUKER", "ANNET"})
     void kildeblokk_dekker_alle_kildetyper(String kilde) {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", kilde);
         data.put("kildeFritekst", "veilederen din");
 
@@ -88,7 +84,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_gir_eget_avsnitt() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Oppfølgingsvedtaket ditt ble avsluttet i desember.");
 
@@ -99,7 +95,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_avsnitt_utelates_når_fritekst_mangler() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -110,7 +106,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void om_varsel_seksjonen_er_alltid_med() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -121,7 +117,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
@@ -133,7 +129,7 @@ class BekreftBistandTekstfragmentRendererTest {
 
     @Test
     void svarfrist_utelates_når_fristDato_mangler() {
-        Map<String, Object> data = grunndata("IKKE_14A_VEDTAK", false);
+        Map<String, Object> data = grunndata("KOMMET_I_UTDANNING", false);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);

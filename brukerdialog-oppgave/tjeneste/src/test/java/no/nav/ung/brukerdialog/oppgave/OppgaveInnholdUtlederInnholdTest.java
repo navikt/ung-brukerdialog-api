@@ -213,12 +213,12 @@ class OppgaveInnholdUtlederInnholdTest {
 
             case BEKREFT_BISTAND -> new Scenario(
                 new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
-                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING,
                     "Veilederen din har ikke fattet vedtak om behov for bistand.", BistandsavklaringKildeType.BRUKER, null)),
                     AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 "Behov for bistand",
                 List.of(
-                    new OppgaveAvsnitt("Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
+                    new OppgaveAvsnitt("Vi har fått opplysninger om at du har begynt på en utdanning og ikke trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du i perioden 1. januar 2025 til 31. januar 2025 ikke får aktivitetspenger."),
                     new OppgaveAvsnitt("Årsak", "Veilederen din har ikke fattet vedtak om behov for bistand."),
                     new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "Deg"),
                     OM_VARSEL_1, OM_VARSEL_2),
@@ -549,14 +549,14 @@ class OppgaveInnholdUtlederInnholdTest {
     @Test
     void bekreftBistand_opphør_periode_uten_tom() {
         var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOpphørOppgavetypeDataDto(
-            LocalDate.of(2025, 1, 1), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+            LocalDate.of(2025, 1, 1), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING,
             "Oppfølgingsvedtaket ditt er avsluttet.", BistandsavklaringKildeType.ANNET, "veilederen din")),
             AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER, null);
 
         List<OppgaveTekst> tekster = utleder.tekster(oppgave);
         assertThat(tekster).containsExactly(
-            new OppgaveAvsnitt("Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger har et vedtak fra Nav om behov for bistand til å komme i arbeid. Du må ha et slikt vedtak for å få aktivitetspenger."),
+            new OppgaveAvsnitt("Vi har fått opplysninger om at du har begynt på en utdanning og ikke lenger trenger hjelp fra Nav til å få jobb eller utdanning. Det betyr at du fra 1. januar 2025 ikke lenger får aktivitetspenger."),
             new OppgaveAvsnitt("Årsak", "Oppfølgingsvedtaket ditt er avsluttet."),
             new OppgaveAvsnitt("Hvor har vi fått opplysningene fra?", "veilederen din"),
             OM_VARSEL_1, OM_VARSEL_2);
@@ -565,7 +565,7 @@ class OppgaveInnholdUtlederInnholdTest {
     @Test
     void bekreftBistand_feil_ytelsetype_kaster_illegalstateexception() {
         var utleder = new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
-            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK, "Fritekst.",
+            LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING, "Fritekst.",
             BistandsavklaringKildeType.BRUKER, null)), AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer());
         BrukerdialogOppgaveEntitet oppgave = oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.UNGDOMSYTELSE, null);
 

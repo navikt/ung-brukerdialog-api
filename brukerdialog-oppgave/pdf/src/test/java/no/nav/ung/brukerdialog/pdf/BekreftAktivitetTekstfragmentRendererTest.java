@@ -4,23 +4,18 @@ import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveAvsnitt;
 import no.nav.ung.brukerdialog.kontrakt.oppgaver.tekst.OppgaveTekst;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Samme rolle for aktivitetsfragmentet som {@link BekreftBistandTekstfragmentRendererTest} har for
- * bistandsfragmentet: dekker hver gren i malen direkte, uten å gå veien om innholdsutlederen.
- * <p>
- * Malen har foreløpig ingen forgreining på årsak – Første versjon har kun ANNET, der saksbehandler
- * navngir årsaken i fritekst. Testen låser at begge kodene gir den generiske teksten, slik at en
- * ny årsakskode uten egen tekst blir synlig her.
- */
 class BekreftAktivitetTekstfragmentRendererTest {
 
     private static final String MALNAVN = "tekstfragmenter/aktivitet/bekreft_aktivitet";
@@ -57,6 +52,30 @@ class BekreftAktivitetTekstfragmentRendererTest {
 
         assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(
             "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger er i aktivitet. Du må være i aktivitet for å få aktivitetspenger."));
+    }
+
+    @ParameterizedTest
+    @MethodSource("årsakOgTidsromKombinasjoner")
+    void hovedsetning_for_spesifikke_årsaker(String årsak, boolean erPeriode, String forventet) {
+        Map<String, Object> data = grunndata(årsak, erPeriode);
+        data.put("kilde", "BRUKER");
+
+        List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
+
+        assertThat(tekster.get(0)).isEqualTo(new OppgaveAvsnitt(forventet));
+    }
+
+    static Stream<Arguments> årsakOgTidsromKombinasjoner() {
+        return Stream.of(
+            Arguments.of("FRAVÆR_FRA_PLANLAGT_AKTIVITET", false,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger."),
+            Arguments.of("FRAVÆR_FRA_PLANLAGT_AKTIVITET", true,
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger."),
+            Arguments.of("AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN", false,
+                "Vi har fått opplysninger om at du 1. januar 2025 ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger fra 1. januar 2025 siden du ikke startet i denne jobben."),
+            Arguments.of("AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN", true,
+                "Vi har fått opplysninger om at du 1. januar 2025 ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger i perioden 1. januar 2025 til 31. januar 2025 siden du ikke startet i denne jobben.")
+        );
     }
 
     @ParameterizedTest
