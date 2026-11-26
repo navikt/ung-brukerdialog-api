@@ -34,13 +34,16 @@ Opphørsvarianten [`BekreftAktivitetOpphørOppgavetypeDataDto`](../../../kontrak
 har de samme feltene, men uten `tom`. Begge lagres i samme tabell; `tom is null` er det som
 skiller opphør fra avslag.
 
-> **Foreløpig kodeverk.** Ung-sak har ennå ingen spesifikke årsaker for dette vilkåret –
-> `AktivitetsvilkåretIkkeOppfyltÅrsak` har kun `ANNET`, der saksbehandler må navngi årsaken i
-> fritekst. Varselteksten er tilsvarende generisk: «du oppfyller ikke aktivitetsvilkåret», og
-> selve forklaringen kommer i «Årsak»-avsnittet. Når fag lander de faktiske årsakene må både
-> ung-sak-enumet, kontraktkopien og [`bekreft_aktivitet.hbs`](../../pdf/src/main/resources/handlebars/tekstfragmenter/aktivitet/bekreft_aktivitet.hbs)
-> utvides – slik andre livsoppholdsytelser har én setning per ytelse.
-> `AVKORTET` finnes i ung-sak, men er utelatt fra kontrakten: den skal aldri varsles om.
+Hovedsetningen i varselet avhenger av årsaken (eksempel for opphør):
+
+| Årsak | Hovedsetning |
+|-------|--------------|
+| `FRAVÆR_FRA_PLANLAGT_AKTIVITET` | «Vi har fått opplysninger om at du fra DATO ikke lenger deltar i aktivitetene som er planlagt for deg. Du må følge aktivitetsplanen din for å få aktivitetspenger.» |
+| `AVSTÅR_FRA_TILBUD_OM_ARBEID_UTEN_RIMELIG_GRUNN` | «Vi har fått opplysninger om at du DATO ikke startet i en jobb som du kunne ha startet i. Du kan miste retten til aktivitetspenger fra DATO siden du ikke startet i denne jobben.» |
+| `ANNET`, `UDEFINERT` | Generisk «du er ikke i aktivitet»; forklaringen kommer i «Årsak»-avsnittet |
+
+Ved avslått periode brukes «i perioden FOM til TOM» i stedet for «fra DATO».
+`AVKORTET` finnes i ung-sak, men er utelatt fra kontrakten: den skal aldri varsles om.
 
 Kildene er `BRUKER` (deltakeren selv), `NAV` (Navs egne systemer og registre) og `ANNET`
 (fritekst).

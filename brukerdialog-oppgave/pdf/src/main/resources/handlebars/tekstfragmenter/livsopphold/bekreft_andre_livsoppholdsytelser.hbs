@@ -1,8 +1,8 @@
 {{#avsnitt~}}
-    Vi har fått opplysninger om at du {{#if erPeriode~}}
-        i perioden {{datoLang fom}} til {{datoLang tom}}
-    {{~else~}}
+    Vi har fått opplysninger om at du {{#if erOpphør~}}
         fra {{datoLang fom}}
+    {{~else~}}
+        i perioden {{datoLang fom}} til {{datoLang tom}}
     {{~/if}} får {{#switch årsak~}}
         {{~#case "MOTTAR_ARBEIDSAVKLARINGSPENGER"~}}arbeidsavklaringspenger{{~/case~}}
         {{~#case "MOTTAR_TILTAKSPENGER"~}}tiltakspenger{{~/case~}}

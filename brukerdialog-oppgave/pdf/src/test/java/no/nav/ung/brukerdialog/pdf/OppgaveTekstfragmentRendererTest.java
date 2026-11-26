@@ -31,33 +31,33 @@ class OppgaveTekstfragmentRendererTest {
 
     static Stream<Arguments> årsakOgTidsromKombinasjoner() {
         return Stream.of(
-            Arguments.of("IKKE_BOSATTADRESSE_I_TRONDHEIM", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
             Arguments.of("IKKE_BOSATTADRESSE_I_TRONDHEIM", true,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of("IKKE_BOSATTADRESSE_I_TRONDHEIM", false,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
-            Arguments.of("IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
             Arguments.of("IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM", true,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of("IKKE_BOSTEDSADRESSE_OG_IKKE_FOLKEREGISTRERT_I_TRONDHEIM", false,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune, og at du heller ikke er folkeregistrert der. Du må ha bostedsadresse i Trondheim kommune for å få aktivitetspenger."),
-            Arguments.of("STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 har studie- eller arbeidssted utenfor Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
             Arguments.of("STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM", true,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 har studie- eller arbeidssted utenfor Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of("STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM", false,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 har studie- eller arbeidssted utenfor Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
-            Arguments.of("ANNET", false,
-                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
             Arguments.of("ANNET", true,
-                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
-            Arguments.of("UDEFINERT", false,
                 "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of("ANNET", false,
+                "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
             Arguments.of("UDEFINERT", true,
+                "Vi har fått opplysninger om at du fra 1. januar 2025 ikke lenger bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger."),
+            Arguments.of("UDEFINERT", false,
                 "Vi har fått opplysninger om at du i perioden 1. januar 2025 til 31. januar 2025 ikke bor i Trondheim kommune. Du må bo i Trondheim kommune for å få aktivitetspenger.")
         );
     }
 
     @ParameterizedTest
     @MethodSource("årsakOgTidsromKombinasjoner")
-    void hovedsetning_er_lik_for_alle_årsak_og_tidsrom_kombinasjoner(String årsak, boolean erPeriode, String forventet) {
-        Map<String, Object> data = grunndata(årsak, erPeriode);
+    void hovedsetning_er_lik_for_alle_årsak_og_tidsrom_kombinasjoner(String årsak, boolean erOpphør, String forventet) {
+        Map<String, Object> data = grunndata(årsak, erOpphør);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -68,7 +68,7 @@ class OppgaveTekstfragmentRendererTest {
     @ParameterizedTest
     @org.junit.jupiter.params.provider.ValueSource(strings = {"BRUKER", "FOLKEREGISTER", "ANNET"})
     void kildeblokk_dekker_alle_kildetyper(String kilde) {
-        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
+        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", true);
         data.put("kilde", kilde);
         data.put("kildeFritekst", "Skatteetaten");
 
@@ -87,7 +87,7 @@ class OppgaveTekstfragmentRendererTest {
 
     @Test
     void annetFritekst_gir_eget_avsnitt_kun_for_årsak_annet() {
-        Map<String, Object> data = grunndata("ANNET", false);
+        Map<String, Object> data = grunndata("ANNET", true);
         data.put("kilde", "BRUKER");
         data.put("annetFritekst", "En spesifikk forklaring.");
 
@@ -98,7 +98,7 @@ class OppgaveTekstfragmentRendererTest {
 
     @Test
     void annetFritekst_avsnitt_utelates_når_årsak_ikke_er_annet() {
-        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
+        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", true);
         data.put("kilde", "BRUKER");
         data.put("annetFritekst", "Skal ikke vises.");
 
@@ -111,7 +111,7 @@ class OppgaveTekstfragmentRendererTest {
 
     @Test
     void om_varsel_seksjonen_er_alltid_med() {
-        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
+        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -121,7 +121,7 @@ class OppgaveTekstfragmentRendererTest {
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
-        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
+        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", true);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
@@ -133,7 +133,7 @@ class OppgaveTekstfragmentRendererTest {
 
     @Test
     void svarfrist_utelates_når_fristDato_mangler() {
-        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", false);
+        Map<String, Object> data = grunndata("IKKE_BOSATTADRESSE_I_TRONDHEIM", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -142,12 +142,12 @@ class OppgaveTekstfragmentRendererTest {
             && a.innhold() != null && a.innhold().contains("Fristen for å"));
     }
 
-    private static Map<String, Object> grunndata(String årsak, boolean erPeriode) {
+    private static Map<String, Object> grunndata(String årsak, boolean erOpphør) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak);
-        data.put("erPeriode", erPeriode);
+        data.put("erOpphør", erOpphør);
         data.put("fom", FOM.toString());
-        data.put("tom", erPeriode ? TOM.toString() : null);
+        data.put("tom", erOpphør ? null : TOM.toString());
         data.put("annetFritekst", null);
         data.put("kildeFritekst", null);
         return data;

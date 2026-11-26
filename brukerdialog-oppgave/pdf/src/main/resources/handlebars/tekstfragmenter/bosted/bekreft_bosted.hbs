@@ -1,17 +1,17 @@
 {{#avsnitt ~}}
     Vi har fått opplysninger om at du {{#switch årsak~}}
         {{~#case "STUDIE_ELLER_ARBEIDSSTED_UTENFOR_TRONDHEIM"~}}
-            {{~#if erPeriode~}}
-                i perioden {{datoLang fom}} til {{datoLang tom}} har studie- eller arbeidssted utenfor Trondheim kommune
-            {{~else~}}
+            {{~#if erOpphør~}}
                 fra {{datoLang fom}} har studie- eller arbeidssted utenfor Trondheim kommune
+            {{~else~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} har studie- eller arbeidssted utenfor Trondheim kommune
             {{~/if}}
         {{~/case~}}
         {{~#default~}}
-            {{~#if erPeriode~}}
-                i perioden {{datoLang fom}} til {{datoLang tom}} ikke bor i Trondheim kommune
-            {{~else~}}
+            {{~#if erOpphør~}}
                 fra {{datoLang fom}} ikke lenger bor i Trondheim kommune
+            {{~else~}}
+                i perioden {{datoLang fom}} til {{datoLang tom}} ikke bor i Trondheim kommune
             {{~/if}}
         {{~/default~}}
     {{~/switch~}}

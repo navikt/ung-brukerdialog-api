@@ -64,6 +64,7 @@ public class BekreftAktivitetOppgaveInnholdUtleder implements OppgaveInnholdUtle
 
         LocalDate fom;
         LocalDate tom;
+        boolean erOpphør;
         AktivitetsvilkåretIkkeOppfyltÅrsak årsak;
         String fritekst;
         AktivitetsavklaringKildeType kilde;
@@ -73,6 +74,7 @@ public class BekreftAktivitetOppgaveInnholdUtleder implements OppgaveInnholdUtle
             case BekreftAktivitetOppgavetypeDataDto bundet -> {
                 fom = bundet.fom();
                 tom = bundet.tom();
+                erOpphør = false;
                 årsak = bundet.ikkeOppfyltÅrsak();
                 fritekst = bundet.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 kilde = bundet.kilde();
@@ -81,6 +83,7 @@ public class BekreftAktivitetOppgaveInnholdUtleder implements OppgaveInnholdUtle
             case BekreftAktivitetOpphørOppgavetypeDataDto opphør -> {
                 fom = opphør.fom();
                 tom = null;
+                erOpphør = true;
                 årsak = opphør.ikkeOppfyltÅrsak();
                 fritekst = opphør.ikkeOppfyltÅrsakFritekstbeskrivelse();
                 kilde = opphør.kilde();
@@ -91,16 +94,16 @@ public class BekreftAktivitetOppgaveInnholdUtleder implements OppgaveInnholdUtle
         }
 
         return renderer.rendre("tekstfragmenter/aktivitet/bekreft_aktivitet",
-            byggData(årsak, fom, tom, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
+            byggData(årsak, fom, tom, erOpphør, fritekst, kilde, kildeFritekst, oppgave.getFristTid()));
     }
 
     private static Map<String, Object> byggData(
-        AktivitetsvilkåretIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, String fritekst,
+        AktivitetsvilkåretIkkeOppfyltÅrsak årsak, LocalDate fom, LocalDate tom, boolean erOpphør, String fritekst,
         AktivitetsavklaringKildeType kilde, String kildeFritekst, LocalDateTime fristTid
     ) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak.name());
-        data.put("erPeriode", tom != null);
+        data.put("erOpphør", erOpphør);
         data.put("fom", fom.toString());
         data.put("tom", tom != null ? tom.toString() : null);
         data.put("årsakFritekst", fritekst != null && !fritekst.isBlank() ? fritekst : null);

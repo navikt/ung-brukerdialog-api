@@ -55,7 +55,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
     @ParameterizedTest
     @MethodSource("årsakerOgYtelsesnavn")
     void hovedsetning_navngir_ytelsen_for_hver_årsak(String årsak, String ytelsesnavn) {
-        Map<String, Object> data = grunndata(årsak, true);
+        Map<String, Object> data = grunndata(årsak, false);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -68,7 +68,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
     @ParameterizedTest
     @MethodSource("årsakerOgYtelsesnavn")
     void hovedsetning_bruker_åpen_periode_ved_opphør(String årsak, String ytelsesnavn) {
-        Map<String, Object> data = grunndata(årsak, false);
+        Map<String, Object> data = grunndata(årsak, true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -81,7 +81,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
     @ParameterizedTest
     @ValueSource(strings = {"BRUKER", "NAV", "ANNET"})
     void kildeblokk_dekker_alle_kildetyper(String kilde) {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
+        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", true);
         data.put("kilde", kilde);
         data.put("kildeFritekst", "kommunen");
 
@@ -100,7 +100,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_gir_eget_avsnitt() {
-        Map<String, Object> data = grunndata("MOTTAR_ANNEN_YTELSE", false);
+        Map<String, Object> data = grunndata("MOTTAR_ANNEN_YTELSE", true);
         data.put("kilde", "BRUKER");
         data.put("årsakFritekst", "Du mottar stønad til livsopphold fra en annen offentlig ordning.");
 
@@ -111,7 +111,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
 
     @Test
     void årsakFritekst_avsnitt_utelates_når_fritekst_mangler() {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
+        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -122,7 +122,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
 
     @Test
     void om_varsel_seksjonen_er_alltid_med() {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
+        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -133,7 +133,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
 
     @Test
     void svarfrist_vises_kun_når_fristDato_er_satt() {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
+        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", true);
         data.put("kilde", "BRUKER");
         data.put("fristDato", "2025-02-01");
 
@@ -145,7 +145,7 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
 
     @Test
     void svarfrist_utelates_når_fristDato_mangler() {
-        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", false);
+        Map<String, Object> data = grunndata("MOTTAR_DAGPENGER", true);
         data.put("kilde", "BRUKER");
 
         List<OppgaveTekst> tekster = renderer.rendre(MALNAVN, data);
@@ -154,12 +154,12 @@ class BekreftAndreLivsoppholdsytelserTekstfragmentRendererTest {
             && a.innhold() != null && a.innhold().contains("Fristen for å"));
     }
 
-    private static Map<String, Object> grunndata(String årsak, boolean erPeriode) {
+    private static Map<String, Object> grunndata(String årsak, boolean erOpphør) {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("årsak", årsak);
-        data.put("erPeriode", erPeriode);
+        data.put("erOpphør", erOpphør);
         data.put("fom", FOM.toString());
-        data.put("tom", erPeriode ? TOM.toString() : null);
+        data.put("tom", erOpphør ? null : TOM.toString());
         data.put("årsakFritekst", null);
         data.put("kildeFritekst", null);
         return data;

@@ -170,7 +170,7 @@ class OppgaveInnholdUtlederPiiTest {
 
             Arguments.of("bekreft bistand",
                 new BekreftBistandOppgaveInnholdUtleder(mappereSomGir(new BekreftBistandOppgavetypeDataDto(
-                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.IKKE_14A_VEDTAK,
+                    LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), BistandsvilkårIkkeOppfyltÅrsak.KOMMET_I_UTDANNING,
                     "Oppfølgingsvedtaket ble avsluttet i desember", BistandsavklaringKildeType.ANNET, "en veileder hos Nav")),
                     AKTIVITETSPENGER_BASE_URL, new OppgaveTekstfragmentRenderer()),
                 oppgave(OppgaveType.BEKREFT_BISTAND, OppgaveYtelsetype.AKTIVITETSPENGER)),
