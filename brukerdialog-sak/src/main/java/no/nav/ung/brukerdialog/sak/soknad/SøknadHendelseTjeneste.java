@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadResponse;
 import no.nav.ung.brukerdialog.kontrakt.soknad.TilgjengeligSøknadType;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Dependent
@@ -41,7 +43,7 @@ public class SøknadHendelseTjeneste {
             return;
         }
 
-        var tilgjengeligeSøknad = utled(tidligereSøknader, aktørId, ytelseType);
+        var tilgjengeligeSøknad = utled(tidligereSøknader, aktørId, ytelseType, request.mottatt());
         if (tilgjengeligeSøknad.type() == TilgjengeligSøknadType.INGEN) {
             throw new SøknadIkkeTilgjengeligException(tidligereSøknader.stream()
                 .filter(hendelse -> hendelse.getMottattIFagsak() == null)
@@ -59,9 +61,9 @@ public class SøknadHendelseTjeneste {
         return tilgjengeligSøknadUtleder.utled(LocalDate.now(), søknader, finnFagsak(aktørId, ytelseType));
     }
 
-    private TilgjengeligSøknadResponse utled(List<SøknadHendelseEntitet> søknader, AktørId aktørId, FagsakYtelseType ytelseType) {
+    private TilgjengeligSøknadResponse utled(List<SøknadHendelseEntitet> søknader, AktørId aktørId, FagsakYtelseType ytelseType, LocalDateTime mottattidspunkt) {
         return tilgjengeligSøknadUtleder.utled(
-            LocalDate.now(),
+            mottattidspunkt.toLocalDate(),
             søknader,
             finnFagsak(aktørId, ytelseType));
     }

@@ -2,6 +2,7 @@ package no.nav.ung.brukerdialog.sak.soknad;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotNull;
 import no.nav.k9.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.ung.brukerdialog.db.util.JpaExtension;
 import no.nav.ung.brukerdialog.kontrakt.soknad.OpprettSøknadHendelseRequest;
@@ -31,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(JpaExtension.class)
 class SøknadHendelseTjenesteTest {
 
-    private static final LocalDateTime MOTTATT = LocalDateTime.of(2025, 1, 2, 10, 30);
     private static final FagsakYtelseType YTELSE = FagsakYtelseType.AKTIVITETSPENGER;
 
     @Inject
@@ -49,7 +49,8 @@ class SøknadHendelseTjenesteTest {
     @Test
     void skal_registrere_ny_søknadshendelse() {
         var aktørId = AktørId.dummy();
-        var request = request();
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(1);
+        var request = request(mottatt);
 
         tjeneste.registrer(aktørId, YTELSE, request);
 
@@ -58,19 +59,20 @@ class SøknadHendelseTjenesteTest {
         assertThat(lagret.getFirst().getSøknadId()).isEqualTo(request.søknadId());
         assertThat(lagret.getFirst().getAktørId()).isEqualTo(aktørId);
         assertThat(lagret.getFirst().getYtelseType()).isEqualTo(YTELSE);
-        assertThat(lagret.getFirst().getMottatt()).isEqualTo(MOTTATT);
+        assertThat(lagret.getFirst().getMottatt()).isEqualTo(mottatt);
     }
 
     @Test
     void skal_være_idempotent_på_søknadId_slik_at_innsender_trygt_kan_prøve_på_nytt() {
         var aktørId = AktørId.dummy();
-        var request = request();
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(1);
+        var request = request(mottatt);
 
         tjeneste.registrer(aktørId, YTELSE, request);
         entityManager.flush();
         entityManager.clear();
         // Ny UUID-instans med samme verdi, slik ei deserialisert gjeninnsending fra kbp ser ut.
-        tjeneste.registrer(aktørId, YTELSE, request(UUID.fromString(request.søknadId().toString())));
+        tjeneste.registrer(aktørId, YTELSE, request(UUID.fromString(request.søknadId().toString()), mottatt));
 
         assertThat(repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE)).hasSize(1);
     }
@@ -86,22 +88,24 @@ class SøknadHendelseTjenesteTest {
     @Test
     void skal_ikke_kunne_søke_når_bruker_allerede_har_søkt() {
         var aktørId = AktørId.dummy();
-        tjeneste.registrer(aktørId, YTELSE, request());
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(1);
+        tjeneste.registrer(aktørId, YTELSE, request(mottatt));
 
         var tilgjengeligSøknad = finnTilgjengeligSøknad(aktørId);
 
         assertThat(tilgjengeligSøknad.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
         assertThat(tilgjengeligSøknad.harUbehandletSøknad()).isTrue();
 
-        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request()))
+        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request(LocalDateTime.now())))
             .isInstanceOf(SøknadIkkeTilgjengeligException.class)
-            .hasMessageContaining(MOTTATT.toString());
+            .hasMessageContaining(mottatt.toString());
     }
 
     @Test
     void deaktivert_søknad_skal_ikke_hindre_bruker_fra_å_søke_på_nytt() {
         var aktørId = AktørId.dummy();
-        tjeneste.registrer(aktørId, YTELSE, request());
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(1);
+        tjeneste.registrer(aktørId, YTELSE, request(mottatt));
 
         var førsteSøknad = repository.hentAktiveSøknaderForAktørOgYtelse(aktørId, YTELSE).getFirst();
         var førsteSøknadId = førsteSøknad.getId();
@@ -114,12 +118,12 @@ class SøknadHendelseTjenesteTest {
 
     }
 
-    private static OpprettSøknadHendelseRequest request() {
-        return request(UUID.randomUUID());
+    private static OpprettSøknadHendelseRequest request(LocalDateTime mottatt) {
+        return request(UUID.randomUUID(), mottatt);
     }
 
-    private static OpprettSøknadHendelseRequest request(UUID søknadId) {
-        return new OpprettSøknadHendelseRequest(søknadId, MOTTATT);
+    private static OpprettSøknadHendelseRequest request(UUID søknadId, LocalDateTime mottatt) {
+        return new OpprettSøknadHendelseRequest(søknadId, mottatt);
     }
 
     private TilgjengeligSøknadResponse finnTilgjengeligSøknad(AktørId aktørId) {
@@ -129,44 +133,46 @@ class SøknadHendelseTjenesteTest {
     @Test
     void bruker_med_innvilgelse_innenfor_vinduet_skal_få_ny_periode_søknad() {
         var aktørId = AktørId.dummy();
-        var behandletRequest = request();
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(50);
+        var behandletRequest = request(mottatt);
         tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        mottaSak(aktørId, behandletRequest.søknadId(), List.of(innvilgetTom(LocalDate.now())));
+        mottaSak(aktørId, behandletRequest.søknadId(), behandletRequest.mottatt(), List.of(innvilgetTom(LocalDate.now())));
 
         var tilgjengelig = finnTilgjengeligSøknad(aktørId);
         assertThat(tilgjengelig.type()).isEqualTo(TilgjengeligSøknadType.NY_PERIODE_SØKNAD);
         assertThat(tilgjengelig.harInnsyn()).isTrue();
 
-        tjeneste.registrer(aktørId, YTELSE, request());
+        tjeneste.registrer(aktørId, YTELSE, request(LocalDateTime.now()));
 
         var etterNySøknad = finnTilgjengeligSøknad(aktørId);
         assertThat(etterNySøknad.type()).isEqualTo(TilgjengeligSøknadType.INGEN);
         assertThat(etterNySøknad.harUbehandletSøknad()).isTrue();
-        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request()))
+        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request(mottatt)))
             .isInstanceOf(SøknadIkkeTilgjengeligException.class);
     }
 
     @Test
     void bruker_med_løpende_innvilgelse_utenfor_vinduet_skal_avvises_ved_registrering() {
         var aktørId = AktørId.dummy();
-        var behandletRequest = request();
+        LocalDateTime mottatt = LocalDateTime.now().minusWeeks(50);
+        var behandletRequest = request(mottatt);
         tjeneste.registrer(aktørId, YTELSE, behandletRequest);
-        mottaSak(aktørId, behandletRequest.søknadId(), List.of(innvilgetTom(LocalDate.now().plusMonths(6))));
+        mottaSak(aktørId, behandletRequest.søknadId(), behandletRequest.mottatt(), List.of(innvilgetTom(LocalDate.now().plusMonths(6))));
 
         assertThat(finnTilgjengeligSøknad(aktørId).type())
             .isEqualTo(TilgjengeligSøknadType.INGEN);
 
-        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request()))
+        assertThatThrownBy(() -> tjeneste.registrer(aktørId, YTELSE, request(mottatt)))
             .isInstanceOf(SøknadIkkeTilgjengeligException.class)
             .hasMessage("Bruker kan ikke sende søknad nå.");
     }
 
-    private void mottaSak(AktørId aktørId, UUID søknadId, List<VedtakPeriodeDto> vedtaksperioder) {
+    private void mottaSak(AktørId aktørId, UUID søknadId, LocalDateTime mottatt, List<VedtakPeriodeDto> vedtaksperioder) {
         fagsakTjeneste.motta(YTELSE, new MottaFagsakRequest(
             aktørId,
             new Saksnummer("1234"),
             vedtaksperioder,
-            List.of(new MottattSøknadDto(søknadId, MOTTATT.toLocalDate()))));
+            List.of(new MottattSøknadDto(søknadId, mottatt.toLocalDate()))));
         entityManager.flush();
         entityManager.clear();
     }

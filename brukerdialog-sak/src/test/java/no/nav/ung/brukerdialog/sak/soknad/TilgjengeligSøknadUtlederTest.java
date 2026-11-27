@@ -157,8 +157,8 @@ class TilgjengeligSøknadUtlederTest {
         assertThat(resultat.type()).as(beskrivelse).isEqualTo(forventet);
     }
 
-    private static TilgjengeligSøknadResponse utled(LocalDate iDag, List<SøknadHendelseEntitet> hendelser, FagsakEntitet fagsak) {
-        return UTLEDER.utled(iDag, hendelser, fagsak);
+    private static TilgjengeligSøknadResponse utled(LocalDate mottattDato, List<SøknadHendelseEntitet> hendelser, FagsakEntitet fagsak) {
+        return UTLEDER.utled(mottattDato, hendelser, fagsak);
     }
 
     private static SøknadHendelseEntitet ubehandletSøknad() {
